@@ -1,0 +1,146 @@
+{
+  "randomizer": "mystery",
+  "description": "Pesos de mystery para la séptima temporada de ladder.",
+  "allow_quickswap": true,
+  "options": {
+    "FillItemPoolWith": "TwentyRupees2"
+  },
+  "glitches_required": "none",
+  "item_placement": "advanced",
+  "accessibility": {
+    "items": 90,
+    "none": 10
+  },
+  "goals": {
+    "ganon": 35,
+    "fast_ganon": 35,
+    "dungeons": 15,
+    "pedestal": 10,
+    "triforce-hunt": 5
+  },
+  "tower_open": {
+    "0": 5,
+    "1": 5,
+    "2": 10,
+    "3": 10,
+    "4": 10,
+    "5": 20,
+    "6": 20,
+    "7": 20
+  },
+  "ganon_open": {
+    "3": 10,
+    "4": 10,
+    "5": 25,
+    "6": 25,
+    "7": 30
+  },
+  "world_state": {
+    "standard": 40,
+    "open": 40,
+    "inverted": 10,
+    "retro": 10
+  },
+  "boss_shuffle": {
+    "none": 70,
+    "full": 30
+  },
+  "enemy_shuffle": {
+    "none": 70,
+    "shuffled": 30
+  },
+  "hints": {
+    "on": 10,
+    "off": 90
+  },
+  "weapons": {
+    "randomized": 50,
+    "assured": 20,
+    "vanilla": 20,
+    "swordless": 10
+  },
+  "item_pool": {
+    "normal": 60,
+    "hard": 30,
+    "expert": 10
+  },
+  "item_functionality": "normal",
+  "enemy_damage": "default",
+  "enemy_health": {
+    "default": 70,
+    "easy": 15,
+    "hard": 15
+  },
+  "subweights": {
+    "normal": {
+      "chance": 70,
+      "weights": {
+        "dungeon_items": "standard",
+        "entrance_shuffle": "none",
+        "customizer": {
+          "eq": {
+            "PegasusBoots": {
+              "true": 50,
+              "false": 50
+            },
+            "OcarinaActive": {
+              "true": 20,
+              "false": 80
+            },
+            "Hookshot": {
+              "true": 10,
+              "false": 90
+            },
+            "FireRod": {
+              "true": 10,
+              "false": 90
+            },
+            "IceRod": {
+              "true": 10,
+              "false": 90
+            },
+            "Flippers": {
+              "true": 10,
+              "false": 90
+            },
+            "MagicMirror": {
+              "true": 10,
+              "false": 90
+            }
+          },
+          "custom": {
+            "region.wildMaps": {
+              "true": 60,
+              "false": 40
+            },
+            "region.wildCompasses": {
+              "true": 60,
+              "false": 40
+            },
+            "region.wildKeys": {
+              "true": 60,
+              "false": 40
+            },
+            "region.wildBigKeys": {
+              "true": 60,
+              "false": 40
+            }
+          }
+        }
+      }
+    },
+    "entrance": {
+      "chance": 30,
+      "weights": {
+        "entrance_shuffle": {
+          "restricted": 10,
+          "crossed": 20
+        },
+        "dungeon_items": {
+          "standard": 30,
+          "full": 70
+        }
+      }
+    }
+  }
+}

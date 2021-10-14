@@ -1,0 +1,16 @@
+{
+  "randomizer": "smz3",
+  "goal_name": "smz3keys",
+  "description": "SM + ALTTP Combo Randomizer con lógica normal y en modo keysanity. Espadas y morfosfera randomizadas.",
+  "settings": {
+    "smlogic": "normal",
+    "goal": "defeatboth",
+    "swordlocation": "randomized",
+    "morphlocation": "randomized",
+    "keyshuffle": "keysanity",
+    "seed": "",
+    "race": "true",
+    "gamemode": "normal",
+    "players": "1"
+  }
+}

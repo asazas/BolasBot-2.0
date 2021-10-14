@@ -1,0 +1,14 @@
+{
+  "randomizer": "sm",
+  "goal_name": "sm",
+  "description": "Super Metroid Randomizer con lógica casual.",
+  "settings": {
+    "logic": "casual",
+    "goal": "defeatmb",
+    "placement": "full",
+    "seed": "",
+    "race": "true",
+    "gamemode": "normal",
+    "players": "1"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "randomizer": "alttp",
+  "goal_name": "casual",
+  "customizer": false,
+  "description": "Igual que Standard, pero teniendo la espada de nivel 1 desde el inicio. El tío no necesariamente otorga un arma para el escape.",
+  "settings": {
+    "name": "casual",
+    "notes": "Casual",
+    "allow_quickswap": true,
+    "goal": "ganon",
+    "item": {
+      "pool": "normal",
+      "functionality": "normal"
+    },
+    "lang": "es",
+    "mode": "standard",
+    "hints": "off",
+    "weapons": "assured",
+    "crystals": {
+      "ganon": "7",
+      "tower": "7"
+    },
+    "enemizer": {
+      "boss_shuffle": "none",
+      "enemy_damage": "default",
+      "enemy_health": "default",
+      "enemy_shuffle": "none"
+    },
+    "glitches": "none",
+    "spoilers": false,
+    "entrances": "none",
+    "tournament": true,
+    "accessibility": "items",
+    "dungeon_items": "standard",
+    "item_placement": "advanced"
+  }
+}

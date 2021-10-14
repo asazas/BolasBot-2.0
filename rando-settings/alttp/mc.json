@@ -1,0 +1,37 @@
+{
+  "randomizer": "alttp",
+  "goal_name": "mc",
+  "customizer": false,
+  "description": "Map and Compass Shuffle: Seed de modo Open en la que los mapas y brújulas de las mazmorras están incluidos en el pool general de ítems. El premio (cristal o colgante) de una mazmorra solo se revela en el mapa general del mundo al conseguir el mapa de esa mazmorra.",
+  "settings": {
+    "name": "mc",
+    "notes": "Map and Compass Shuffle",
+    "allow_quickswap": true,
+    "goal": "ganon",
+    "item": {
+      "pool": "normal",
+      "functionality": "normal"
+    },
+    "lang": "es",
+    "mode": "open",
+    "hints": "off",
+    "weapons": "randomized",
+    "crystals": {
+      "ganon": "7",
+      "tower": "7"
+    },
+    "enemizer": {
+      "boss_shuffle": "none",
+      "enemy_damage": "default",
+      "enemy_health": "default",
+      "enemy_shuffle": "none"
+    },
+    "glitches": "none",
+    "spoilers": false,
+    "entrances": "none",
+    "tournament": true,
+    "accessibility": "items",
+    "dungeon_items": "mc",
+    "item_placement": "advanced"
+  }
+}

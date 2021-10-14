@@ -1,0 +1,37 @@
+{
+  "randomizer": "alttp",
+  "goal_name": "standard",
+  "customizer": false,
+  "description": "La partida comienza con la secuencia de escape del castillo de Hyrule, igual que en vanilla. El tío de Link proporciona un arma de entre las siguientes para completar esta sección: espada de nivel 1, arco, 10 bombas, vara de fuego, martillo, bastón de Somaria o bastón de Byrna.",
+  "settings": {
+    "name": "standard",
+    "notes": "Standard",
+    "allow_quickswap": true,
+    "goal": "ganon",
+    "item": {
+      "pool": "normal",
+      "functionality": "normal"
+    },
+    "lang": "es",
+    "mode": "standard",
+    "hints": "off",
+    "weapons": "randomized",
+    "crystals": {
+      "ganon": "7",
+      "tower": "7"
+    },
+    "enemizer": {
+      "boss_shuffle": "none",
+      "enemy_damage": "default",
+      "enemy_health": "default",
+      "enemy_shuffle": "none"
+    },
+    "glitches": "none",
+    "spoilers": false,
+    "entrances": "none",
+    "tournament": true,
+    "accessibility": "items",
+    "dungeon_items": "standard",
+    "item_placement": "advanced"
+  }
+}

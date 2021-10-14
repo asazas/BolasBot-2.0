@@ -1,0 +1,14 @@
+{
+  "randomizer": "sm",
+  "goal_name": "smtournament",
+  "description": "Super Metroid Randomizer con lógica de torneo.",
+  "settings": {
+    "logic": "tournament",
+    "goal": "defeatmb",
+    "placement": "full",
+    "seed": "",
+    "race": "true",
+    "gamemode": "normal",
+    "players": "1"
+  }
+}

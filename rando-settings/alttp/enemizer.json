@@ -1,0 +1,37 @@
+{
+  "randomizer": "alttp",
+  "goal_name": "enemizer open",
+  "customizer": false,
+  "description": "Igual que open pero con enemizer shuffled para los pequeños (algunas limitaciones dadas por el juego) y random para bosses (cualquier número de repeticiones para cada boss).",
+  "settings": {
+    "name": "enemizer",
+    "notes": "Enemizer",
+    "allow_quickswap": true,
+    "goal": "ganon",
+    "item": {
+      "pool": "normal",
+      "functionality": "normal"
+    },
+    "lang": "es",
+    "mode": "open",
+    "hints": "off",
+    "weapons": "randomized",
+    "crystals": {
+      "ganon": "7",
+      "tower": "7"
+    },
+    "enemizer": {
+      "boss_shuffle": "random",
+      "enemy_damage": "default",
+      "enemy_health": "default",
+      "enemy_shuffle": "shuffled"
+    },
+    "glitches": "none",
+    "spoilers": false,
+    "entrances": "none",
+    "tournament": true,
+    "accessibility": "items",
+    "dungeon_items": "standard",
+    "item_placement": "advanced"
+  }
+}

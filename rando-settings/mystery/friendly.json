@@ -1,0 +1,108 @@
+{
+  "randomizer": "mystery",
+  "description": "Configuración mystery amistosa, nada extremo ni entrance-randomizer.",
+  "glitches_required": {
+    "none": 100,
+    "overworld_glitches": 0,
+    "major_glitches": 0,
+    "no_logic": 0
+  },
+  "item_placement": {
+    "basic": 25,
+    "advanced": 75
+  },
+  "dungeon_items": {
+    "standard": 40,
+    "mc": 15,
+    "mcs": 15,
+    "full": 20
+  },
+  "accessibility": {
+    "items": 60,
+    "locations": 10,
+    "none": 30
+  },
+  "goals": {
+    "ganon": 40,
+    "fast_ganon": 20,
+    "dungeons": 10,
+    "pedestal": 20,
+    "triforce-hunt": 10
+  },
+  "tower_open": {
+    "0": 5,
+    "1": 5,
+    "2": 5,
+    "3": 5,
+    "4": 10,
+    "5": 10,
+    "6": 20,
+    "7": 35,
+    "random": 5
+  },
+  "ganon_open": {
+    "0": 5,
+    "1": 5,
+    "2": 5,
+    "3": 5,
+    "4": 10,
+    "5": 10,
+    "6": 20,
+    "7": 35,
+    "random": 5
+  },
+  "world_state": {
+    "standard": 35,
+    "open": 35,
+    "inverted": 20,
+    "retro": 10
+  },
+  "entrance_shuffle": "none",
+  "boss_shuffle": {
+    "none": 60,
+    "simple": 10,
+    "full": 10,
+    "random": 20
+  },
+  "enemy_shuffle": {
+    "none": 80,
+    "shuffled": 10,
+    "random": 10
+  },
+  "hints": {
+    "on": 50,
+    "off": 50
+  },
+  "weapons": {
+    "randomized": 40,
+    "assured": 40,
+    "vanilla": 15,
+    "swordless": 5
+  },
+  "item_pool": {
+    "normal": 80,
+    "hard": 20,
+    "expert": 0,
+    "crowd_control": 0
+  },
+  "item_functionality": "normal",
+  "enemy_damage": {
+    "default": 80,
+    "shuffled": 20,
+    "random": 0
+  },
+  "enemy_health": {
+    "default": 80,
+    "easy": 10,
+    "hard": 10,
+    "expert": null
+  },
+  "customizer": {
+    "eq": {
+      "PegasusBoots": {
+        "false": 70,
+        "true": 30
+      }
+    }
+  }
+}
