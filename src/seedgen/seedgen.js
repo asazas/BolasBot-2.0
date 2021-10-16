@@ -3,7 +3,8 @@ const glob = require('glob');
 const axios = require('axios').default;
 const { MessageEmbed } = require('discord.js');
 
-const { get_seed_code } = require('./seedgen-util');
+const { get_seed_code } = require('./util');
+const { mystery_settings } = require('./mystery');
 
 function seed_info_embed(seed, interaction, preset = '') {
 	const code = get_seed_code(seed).join(' | ');
@@ -79,6 +80,10 @@ async function generate_from_preset(preset, extra) {
 	const preset_file_loc = preset_file(preset);
 	if (preset_file_loc) {
 		const preset_data = JSON.parse(fs.readFileSync(preset_file_loc));
+		if (preset_data['randomizer'] == 'mystery') {
+			const preset_mystery = mystery_settings(preset_data);
+			return await generate_alttpr(preset_mystery, extra);
+		}
 		return await generate_alttpr(preset_data, extra);
 	}
 }

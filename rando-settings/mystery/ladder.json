@@ -1,5 +1,6 @@
 {
   "randomizer": "mystery",
+  "name": "ladder",
   "description": "Pesos de mystery para la séptima temporada de ladder.",
   "allow_quickswap": true,
   "options": {

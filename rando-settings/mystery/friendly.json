@@ -1,5 +1,6 @@
 {
   "randomizer": "mystery",
+  "name": "friendly",
   "description": "Configuración mystery amistosa, nada extremo ni entrance-randomizer.",
   "glitches_required": {
     "none": 100,

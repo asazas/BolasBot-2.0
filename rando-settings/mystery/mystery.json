@@ -1,5 +1,6 @@
 {
   "randomizer": "mystery",
+  "name": "mystery",
   "description": "Configuración mystery por defecto. Equilibrio de todos los ajustes posibles, salvo opciones avanzadas de customizer.",
   "glitches_required": {
     "none": 100,

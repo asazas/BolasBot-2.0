@@ -1,7 +1,7 @@
 const glob = require('glob');
 const path = require('path');
 const { SlashCommandBuilder, SlashCommandStringOption } = require('@discordjs/builders');
-const { generate_from_preset, seed_info_embed } = require('../src/seedgen');
+const { generate_from_preset, seed_info_embed } = require('../src/seedgen/seedgen');
 
 const preset_files = glob.sync('rando-settings/**/*.json');
 const preset_option = new SlashCommandStringOption();
