@@ -2,8 +2,70 @@ const glob = require('glob');
 const path = require('path');
 const { MessageAttachment } = require('discord.js');
 const { SlashCommandBuilder, SlashCommandStringOption } = require('@discordjs/builders');
-const { generate_from_preset, seed_info_embed } = require('../src/seedgen/seedgen');
+const { generate_from_preset, alttpr_retrieve_from_url, sm_retrieve_from_url, alttpr_info_embed, sm_info_embed } = require('../src/seedgen/seedgen');
 const { get_formatted_spoiler } = require('../src/seedgen/spoiler');
+
+
+const ALTTPR_URL_REGEX = /^https:\/\/alttpr\.com\/([a-z]{2}\/)?h\/\w{10}$/;
+const SMZ3_URL_REGEX = /^https:\/\/(sm\.)?samus\.link\/seed\/[A-Za-z0-9_-]{8}[Q-T][A-Za-z0-9_-][CGKOSWaeimquy26-][A-Za-z0-9_-]{10}[AQgw]$/;
+
+
+async function seed_crear(interaction) {
+	await interaction.deferReply();
+	const preset = interaction.options.getString('preset').toLowerCase();
+	let extra = interaction.options.getString('extra');
+	if (extra) {
+		extra = extra.toLowerCase();
+	}
+	const full_preset = extra ? preset + ' ' + extra : preset;
+	const seed = await generate_from_preset(preset, extra);
+
+	// super metroid randomizer / combo randomizer
+	if (seed['data']['gameId'] == 'sm' || seed['data']['gameId'] == 'smz3') {
+		await interaction.editReply({ embeds: [sm_info_embed(seed, interaction, full_preset)] });
+		return;
+	}
+
+	else if (seed['data']['spoiler']['meta']['spoilers'] == 'on' || seed['data']['spoiler']['meta']['spoilers'] == 'generate') {
+		const spoiler = JSON.stringify(get_formatted_spoiler(seed), null, 4);
+		const spoiler_attachment = new MessageAttachment(Buffer.from(spoiler), 'spoiler.json');
+		spoiler_attachment.setSpoiler(true);
+		await interaction.editReply({ embeds: [alttpr_info_embed(seed, interaction, full_preset)], files: [spoiler_attachment] });
+	}
+	else {
+		await interaction.editReply({ embeds: [alttpr_info_embed(seed, interaction, full_preset)] });
+	}
+}
+
+
+async function seed_info(interaction) {
+	const url = interaction.options.getString('url');
+	if (ALTTPR_URL_REGEX.test(url)) {
+		await interaction.deferReply();
+		const seed = await alttpr_retrieve_from_url(url);
+		if (seed['data']['spoiler']['meta']['spoilers'] == 'on' || seed['data']['spoiler']['meta']['spoilers'] == 'generate') {
+			const spoiler = JSON.stringify(get_formatted_spoiler(seed), null, 4);
+			const spoiler_attachment = new MessageAttachment(Buffer.from(spoiler), 'spoiler.json');
+			spoiler_attachment.setSpoiler(true);
+			await interaction.editReply({ embeds: [alttpr_info_embed(seed, interaction)], files: [spoiler_attachment] });
+		}
+		else {
+			await interaction.editReply({ embeds: [alttpr_info_embed(seed, interaction)] });
+		}
+		return;
+	}
+
+	else if (SMZ3_URL_REGEX.test(url)) {
+		await interaction.deferReply();
+		const seed = await sm_retrieve_from_url(url);
+		await interaction.editReply({ embeds: [sm_info_embed(seed, interaction)] });
+		return;
+	}
+	else {
+		throw 'La URL proporcionada no es válida.';
+	}
+}
+
 
 const preset_files = glob.sync('rando-settings/**/*.json');
 const preset_option = new SlashCommandStringOption();
@@ -21,28 +83,39 @@ const command = {};
 command.data = new SlashCommandBuilder()
 	.setName('seed')
 	.setDescription('Genera seed.')
-	.addStringOption(preset_option)
-	.addStringOption(option =>
-		option.setName('extra')
-			.setDescription('Opciones extra.'));
+	.addSubcommand(subcommand =>
+		subcommand.setName('crear')
+			.setDescription('Crea una seed a partir de un preset.')
+			.addStringOption(preset_option)
+			.addStringOption(option =>
+				option.setName('extra')
+					.setDescription('Opciones extra.')))
+
+	.addSubcommand(subcommand =>
+		subcommand.setName('info')
+			.setDescription('Obtener información de una seed a partir de su URL.')
+			.addStringOption(option =>
+				option.setName('url')
+					.setDescription('URL de la seed.')
+					.setRequired(true)))
+
+	.addSubcommandGroup(subcommandGroup =>
+		subcommandGroup.setName('ayuda')
+			.setDescription('Ayuda.')
+			.addSubcommand(subcommand =>
+				subcommand.setName('presets')
+					.setDescription('Preset help.')));
+
 
 command.execute = async function(interaction) {
-	await interaction.deferReply();
-	const preset = interaction.options.getString('preset').toLowerCase();
-	let extra = interaction.options.getString('extra');
-	if (extra) {
-		extra = extra.toLowerCase();
+	if (interaction.options.getSubcommand() == 'crear') {
+		await seed_crear(interaction);
+		return;
 	}
-	const full_preset = extra ? preset + ' ' + extra : preset;
-	const seed = await generate_from_preset(preset, extra);
-	if (seed['data']['spoiler']['meta']['spoilers'] == 'on' || seed['data']['spoiler']['meta']['spoilers'] == 'generate') {
-		const spoiler = JSON.stringify(get_formatted_spoiler(seed), null, 4);
-		const spoiler_attachment = new MessageAttachment(Buffer.from(spoiler), 'spoiler.json');
-		spoiler_attachment.setSpoiler(true);
-		await interaction.editReply({ embeds: [seed_info_embed(seed, interaction, full_preset)], files: [spoiler_attachment] });
-	}
-	else {
-		await interaction.editReply({ embeds: [seed_info_embed(seed, interaction, full_preset)] });
+
+	else if (interaction.options.getSubcommand() == 'info') {
+		await seed_info(interaction);
+		return;
 	}
 };
 

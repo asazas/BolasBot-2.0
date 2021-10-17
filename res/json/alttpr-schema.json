@@ -1,0 +1,255 @@
+{
+    "presets": {
+        "custom": [],
+        "beginner": {
+            "glitches_required": "none",
+            "item_placement": "basic",
+            "dungeon_items": "standard",
+            "accessibility": "locations",
+            "goal": "ganon",
+            "tower_open": "7",
+            "ganon_open": "7",
+            "world_state": "standard",
+            "entrance_shuffle": "none",
+            "boss_shuffle": "none",
+            "enemy_shuffle": "none",
+            "hints": "off",
+            "weapons": "assured",
+            "item_pool": "normal",
+            "item_functionality": "normal",
+            "enemy_damage": "default",
+            "enemy_health": "default"
+        },
+        "default": {
+            "glitches_required": "none",
+            "item_placement": "advanced",
+            "dungeon_items": "standard",
+            "accessibility": "items",
+            "goal": "ganon",
+            "tower_open": "7",
+            "ganon_open": "7",
+            "world_state": "open",
+            "entrance_shuffle": "none",
+            "boss_shuffle": "none",
+            "enemy_shuffle": "none",
+            "hints": "on",
+            "weapons": "randomized",
+            "item_pool": "normal",
+            "item_functionality": "normal",
+            "enemy_damage": "default",
+            "enemy_health": "default"
+        },
+        "tournament": {
+            "glitches_required": "none",
+            "item_placement": "advanced",
+            "dungeon_items": "standard",
+            "accessibility": "items",
+            "goal": "ganon",
+            "tower_open": "7",
+            "ganon_open": "7",
+            "world_state": "standard",
+            "entrance_shuffle": "none",
+            "boss_shuffle": "none",
+            "enemy_shuffle": "none",
+            "hints": "off",
+            "weapons": "randomized",
+            "item_pool": "hard",
+            "item_functionality": "normal",
+            "enemy_damage": "default",
+            "enemy_health": "default"
+        },
+        "veetorp": {
+            "glitches_required": "overworld_glitches",
+            "item_placement": "basic",
+            "dungeon_items": "standard",
+            "accessibility": "locations",
+            "goal": "fast_ganon",
+            "tower_open": "7",
+            "ganon_open": "7",
+            "world_state": "open",
+            "entrance_shuffle": "none",
+            "boss_shuffle": "none",
+            "enemy_shuffle": "none",
+            "hints": "on",
+            "weapons": "randomized",
+            "item_pool": "normal",
+            "item_functionality": "normal",
+            "enemy_damage": "default",
+            "enemy_health": "default"
+        },
+        "crosskeys": {
+            "glitches_required": "none",
+            "item_placement": "advanced",
+            "dungeon_items": "full",
+            "accessibility": "items",
+            "goal": "fast_ganon",
+            "tower_open": "7",
+            "ganon_open": "7",
+            "world_state": "open",
+            "entrance_shuffle": "crossed",
+            "boss_shuffle": "none",
+            "enemy_shuffle": "none",
+            "hints": "on",
+            "weapons": "randomized",
+            "item_pool": "normal",
+            "item_functionality": "normal",
+            "enemy_damage": "default",
+            "enemy_health": "default"
+        },
+        "quick": {
+            "glitches_required": "none",
+            "item_placement": "basic",
+            "dungeon_items": "standard",
+            "accessibility": "none",
+            "goal": "fast_ganon",
+            "tower_open": "0",
+            "ganon_open": "0",
+            "world_state": "open",
+            "entrance_shuffle": "none",
+            "boss_shuffle": "none",
+            "enemy_shuffle": "none",
+            "hints": "off",
+            "weapons": "assured",
+            "item_pool": "normal",
+            "item_functionality": "normal",
+            "enemy_damage": "default",
+            "enemy_health": "default"
+        },
+        "nightmare": {
+            "glitches_required": "none",
+            "item_placement": "advanced",
+            "dungeon_items": "full",
+            "accessibility": "none",
+            "goal": "ganon",
+            "tower_open": "7",
+            "ganon_open": "7",
+            "world_state": "inverted",
+            "entrance_shuffle": "insanity",
+            "boss_shuffle": "random",
+            "enemy_shuffle": "random",
+            "hints": "off",
+            "weapons": "swordless",
+            "item_pool": "expert",
+            "item_functionality": "expert",
+            "enemy_damage": "random",
+            "enemy_health": "expert"
+        }
+    },
+    "glitches_required": {
+        "none": "None",
+        "overworld_glitches": "Overworld Glitches",
+        "major_glitches": "Major Glitches",
+        "no_logic": "No Logic"
+    },
+    "item_placement": {
+        "basic": "Basic",
+        "advanced": "Advanced"
+    },
+    "dungeon_items": {
+        "standard": "Standard",
+        "mc": "MC Shuffle",
+        "mcs": "MCS Shuffle",
+        "full": "Full Shuffle"
+    },
+    "accessibility": {
+        "items": "100% Inventory",
+        "locations": "100% Locations",
+        "none": "Not Guaranteed"
+    },
+    "goals": {
+        "ganon": "Defeat Ganon",
+        "fast_ganon": "Fast Ganon",
+        "dungeons": "All Dungeons",
+        "pedestal": "Master Sword Pedestal",
+        "triforce-hunt": "Triforce Pieces"
+    },
+    "tower_open": {
+        "0": "none",
+        "1": "1",
+        "2": "2",
+        "3": "3",
+        "4": "4",
+        "5": "5",
+        "6": "6",
+        "7": "7",
+        "random": "random"
+    },
+    "ganon_open": {
+        "0": "none",
+        "1": "1",
+        "2": "2",
+        "3": "3",
+        "4": "4",
+        "5": "5",
+        "6": "6",
+        "7": "7",
+        "random": "random"
+    },
+    "world_state": {
+        "standard": "Standard",
+        "open": "Open",
+        "inverted": "Inverted",
+        "retro": "Retro"
+    },
+    "entrance_shuffle": {
+        "none": "None",
+        "simple": "Simple",
+        "restricted": "Restricted",
+        "full": "Full",
+        "crossed": "Crossed",
+        "insanity": "Insanity"
+    },
+    "boss_shuffle": {
+        "none": "None",
+        "simple": "Simple",
+        "full": "Full",
+        "random": "Random"
+    },
+    "enemy_shuffle": {
+        "none": "None",
+        "shuffled": "Shuffled",
+        "random": "Random"
+    },
+    "pot_shuffle": {
+        "on": "On",
+        "off": "Off"
+    },
+    "hints": {
+        "on": "On",
+        "off": "Off"
+    },
+    "weapons": {
+        "randomized": "Randomized",
+        "assured": "Assured",
+        "vanilla": "Vanilla",
+        "swordless": "Swordless"
+    },
+    "item_pool": {
+        "normal": "Normal",
+        "hard": "Hard",
+        "expert": "Expert",
+        "crowd_control": "Crowd Control"
+    },
+    "item_functionality": {
+        "normal": "Normal",
+        "hard": "Hard",
+        "expert": "Expert"
+    },
+    "enemy_damage": {
+        "default": "Default",
+        "shuffled": "Shuffled",
+        "random": "Random"
+    },
+    "enemy_health": {
+        "default": "Default",
+        "easy": "Easy",
+        "hard": "Hard",
+        "expert": "Expert"
+    },
+    "spoilers": {
+        "on": "On",
+        "off": "Off",
+        "generate": "Generate",
+        "mystery": "Mystery"
+    }
+}

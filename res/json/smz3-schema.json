@@ -1,0 +1,89 @@
+{
+    "id": "smz3",
+    "name": "Super Metroid & A Link to the Past Combo Randomizer",
+    "version": "11.2",
+    "options": [
+        {
+            "key": "smlogic",
+            "description": "Super Metroid Logic",
+            "type": "dropdown",
+            "values": {
+                "normal": "Normal",
+                "hard": "Hard"
+            },
+            "default": "normal"
+        },
+        {
+            "key": "goal",
+            "description": "Goal",
+            "type": "dropdown",
+            "values": {
+                "defeatboth": "Defeat Ganon and Mother Brain"
+            },
+            "default": "defeatboth"
+        },
+        {
+            "key": "swordlocation",
+            "description": "First Sword",
+            "type": "dropdown",
+            "values": {
+                "randomized": "Randomized",
+                "early": "Early",
+                "uncle": "Uncle assured"
+            },
+            "default": "randomized"
+        },
+        {
+            "key": "morphlocation",
+            "description": "Morph Ball",
+            "type": "dropdown",
+            "values": {
+                "randomized": "Randomized",
+                "early": "Early",
+                "original": "Original location"
+            },
+            "default": "randomized"
+        },
+        {
+            "key": "keyshuffle",
+            "description": "Key shuffle",
+            "type": "dropdown",
+            "values": {
+                "none": "None",
+                "keysanity": "Keysanity"
+            },
+            "default": "none"
+        },
+        {
+            "key": "seed",
+            "description": "Seed",
+            "type": "seed",
+            "values": null,
+            "default": null
+        },
+        {
+            "key": "race",
+            "description": "Race ROM (no spoilers)",
+            "type": "checkbox",
+            "values": {},
+            "default": "false"
+        },
+        {
+            "key": "gamemode",
+            "description": "Game mode",
+            "type": "dropdown",
+            "values": {
+                "normal": "Single player",
+                "multiworld": "Multiworld"
+            },
+            "default": "normal"
+        },
+        {
+            "key": "players",
+            "description": "Players",
+            "type": "players",
+            "values": null,
+            "default": "2"
+        }
+    ]
+}

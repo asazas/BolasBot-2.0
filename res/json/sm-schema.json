@@ -1,0 +1,67 @@
+{
+    "id": "sm",
+    "name": "Super Metroid Item Randomizer",
+    "version": "3.0",
+    "options": [
+        {
+            "key": "logic",
+            "description": "Logic",
+            "type": "dropdown",
+            "values": {
+                "casual": "Casual",
+                "tournament": "Tournament"
+            },
+            "default": "tournament"
+        },
+        {
+            "key": "goal",
+            "description": "Goal",
+            "type": "dropdown",
+            "values": {
+                "defeatmb": "Defeat Mother Brain"
+            },
+            "default": "defeatmb"
+        },
+        {
+            "key": "placement",
+            "description": "Item Placement",
+            "type": "dropdown",
+            "values": {
+                "full": "Full randomization",
+                "split": "Major/Minor split"
+            },
+            "default": "split"
+        },
+        {
+            "key": "seed",
+            "description": "Seed",
+            "type": "seed",
+            "values": null,
+            "default": null
+        },
+        {
+            "key": "race",
+            "description": "Race ROM (no spoilers)",
+            "type": "checkbox",
+            "values": {},
+            "default": "false"
+        },
+        {
+            "key": "gamemode",
+            "description": "Game mode",
+            "type": "dropdown",
+            "values": {
+                "normal": "Single player",
+                "multiworld": "Multiworld"
+            },
+            "default": "normal"
+        },
+        {
+            "key": "players",
+            "description": "Players",
+            "type": "players",
+            "values": null,
+            "default": "2"
+        }
+    ]
+}
