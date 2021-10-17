@@ -5,6 +5,7 @@ const { SlashCommandBuilder, SlashCommandStringOption } = require('@discordjs/bu
 const { generate_from_preset, generate_varia_finetune, alttpr_retrieve_from_url, sm_retrieve_from_url } = require('../src/seedgen/seedgen');
 const { alttpr_info_embed, sm_info_embed, varia_info_embed } = require('../src/seedgen/util');
 const { get_formatted_spoiler } = require('../src/seedgen/spoiler');
+const { preset_help } = require('../src/seedgen/help');
 
 
 const ALTTPR_URL_REGEX = /^https:\/\/alttpr\.com\/([a-z]{2}\/)?h\/\w{10}$/;
@@ -79,11 +80,15 @@ const preset_option = new SlashCommandStringOption();
 preset_option.setName('preset')
 	.setDescription('Preset.')
 	.setRequired(true);
+const preset_option_help = new SlashCommandStringOption();
+preset_option_help.setName('preset')
+	.setDescription('Preset del que obtener información');
 
 for (const file of preset_files) {
 	const filename = path.basename(file, '.json');
 	const dirname = path.basename(path.dirname(file)).toUpperCase();
 	preset_option.addChoice(`${dirname} - ${filename}`, filename);
+	preset_option_help.addChoice(`${dirname} - ${filename}`, filename);
 }
 
 const command = {};
@@ -123,10 +128,15 @@ command.data = new SlashCommandBuilder()
 
 	.addSubcommandGroup(subcommandGroup =>
 		subcommandGroup.setName('ayuda')
-			.setDescription('Ayuda.')
+			.setDescription('Ayuda')
 			.addSubcommand(subcommand =>
 				subcommand.setName('presets')
-					.setDescription('Preset help.')));
+					.setDescription('Ayuda de presets disponibles')
+					.addStringOption(preset_option_help))
+
+			.addSubcommand(subcommand =>
+				subcommand.setName('extra')
+					.setDescription('Ayuda de opciones extra')));
 
 
 command.execute = async function(interaction) {
@@ -139,6 +149,7 @@ command.execute = async function(interaction) {
 		await seed_info(interaction);
 		return;
 	}
+
 	else if (interaction.options.getSubcommand() == 'varia') {
 		await interaction.deferReply();
 		const settings_preset = interaction.options.getString('settings').toLowerCase();
@@ -149,6 +160,11 @@ command.execute = async function(interaction) {
 		}
 		const seed = await generate_varia_finetune(settings_preset, skills_preset, extra);
 		await interaction.editReply({ embeds: [varia_info_embed(seed, interaction, `${settings_preset} ${skills_preset}`)] });
+		return;
+	}
+
+	else if (interaction.options.getSubcommand() == 'presets') {
+		await interaction.reply({ embeds: [preset_help(interaction)] });
 		return;
 	}
 };

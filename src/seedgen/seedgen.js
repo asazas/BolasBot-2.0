@@ -170,4 +170,4 @@ async function sm_retrieve_from_url(url) {
 	return await axios.get(`https://samus.link/api/seed/${seed_uuid}`);
 }
 
-module.exports = { generate_from_preset, generate_varia_finetune, alttpr_retrieve_from_url, sm_retrieve_from_url };
+module.exports = { preset_file, generate_from_preset, generate_varia_finetune, alttpr_retrieve_from_url, sm_retrieve_from_url };
