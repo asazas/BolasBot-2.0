@@ -35,10 +35,10 @@ client.on('interactionCreate', async interaction => {
 		console.error(error);
 		const image_path = `res/almeida${Math.floor(Math.random() * 4)}.png`;
 		if (interaction.deferred) {
-			return interaction.editReply({ content: 'Error al ejecutar el comando.', files: [image_path] });
+			return interaction.editReply({ content: error, files: [image_path] });
 		}
 		else {
-			return interaction.reply({ content: 'Error al ejecutar el comando.', files: [image_path] });
+			return interaction.reply({ content: error, files: [image_path] });
 		}
 	}
 });

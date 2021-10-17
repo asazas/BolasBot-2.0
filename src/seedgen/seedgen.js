@@ -9,15 +9,30 @@ const { mystery_settings } = require('./mystery');
 function seed_info_embed(seed, interaction, preset = '') {
 	const code = get_seed_code(seed).join(' | ');
 	const url = `https://alttpr.com/h/${seed.data.hash}`;
-	const embed = new MessageEmbed()
-		.setColor('#0099ff')
-		.setTitle(preset)
-		.setURL(url)
-		.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
-		.addField('Autor', interaction.user.username)
-		.addField('URL', url)
-		.addField('Hash', code)
-		.setTimestamp();
+	let embed;
+
+	if (preset) {
+		embed = new MessageEmbed()
+			.setColor('#0099ff')
+			.setTitle(preset)
+			.setURL(url)
+			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.addField('Autor', interaction.user.username)
+			.addField('URL', url)
+			.addField('Hash', code)
+			.setTimestamp();
+	}
+	else {
+		embed = new MessageEmbed()
+			.setColor('#0099ff')
+			.setTitle(seed.data.hash)
+			.setURL(url)
+			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.addField('Solicitado por', interaction.user.username)
+			.addField('URL', url)
+			.addField('Hash', code)
+			.setTimestamp();
+	}
 	return embed;
 }
 
@@ -88,4 +103,9 @@ async function generate_from_preset(preset, extra) {
 	}
 }
 
-module.exports = { generate_from_preset, seed_info_embed };
+async function retrieve_from_url(url) {
+	const seed_hash = url.split('/').pop();
+	return await axios.get(`https://alttpr.com/hash/${seed_hash}`);
+}
+
+module.exports = { generate_from_preset, retrieve_from_url, seed_info_embed };
