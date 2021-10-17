@@ -2,78 +2,8 @@ const fs = require('fs');
 const glob = require('glob');
 const axios = require('axios').default;
 const slugid = require('slugid');
-const { MessageEmbed } = require('discord.js');
 
-const { get_seed_code } = require('./util');
 const { mystery_settings } = require('./mystery');
-
-function sm_info_embed(seed, interaction, preset = '') {
-	let seed_guid = seed['data']['guid'];
-	seed_guid = `${seed_guid.substring(0, 8)}-${seed_guid.substring(8, 12)}-${seed_guid.substring(12, 16)}-${seed_guid.substring(16, 20)}-${seed_guid.substring(20, 32)}`;
-	const slug = slugid.encode(seed_guid);
-	let url;
-	if (seed['data']['gameId'] == 'sm') {
-		url = `https://sm.samus.link/seed/${slug}`;
-	}
-	else {
-		url = `https://samus.link/seed/${slug}`;
-	}
-
-	let embed;
-	if (preset) {
-		embed = new MessageEmbed()
-			.setColor('#0099ff')
-			.setTitle(preset)
-			.setURL(url)
-			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
-			.addField('Autor', interaction.user.username)
-			.addField('URL', url)
-			.addField('Hash', seed['data']['hash'])
-			.setTimestamp();
-	}
-	else {
-		embed = new MessageEmbed()
-			.setColor('#0099ff')
-			.setTitle(slug)
-			.setURL(url)
-			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
-			.addField('Solicitado por', interaction.user.username)
-			.addField('URL', url)
-			.addField('Hash', seed['data']['hash'])
-			.setTimestamp();
-	}
-	return embed;
-}
-
-function alttpr_info_embed(seed, interaction, preset = '') {
-	const code = get_seed_code(seed).join(' | ');
-	const url = `https://alttpr.com/h/${seed.data.hash}`;
-	let embed;
-
-	if (preset) {
-		embed = new MessageEmbed()
-			.setColor('#0099ff')
-			.setTitle(preset)
-			.setURL(url)
-			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
-			.addField('Autor', interaction.user.username)
-			.addField('URL', url)
-			.addField('Hash', code)
-			.setTimestamp();
-	}
-	else {
-		embed = new MessageEmbed()
-			.setColor('#0099ff')
-			.setTitle(seed.data.hash)
-			.setURL(url)
-			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
-			.addField('Solicitado por', interaction.user.username)
-			.addField('URL', url)
-			.addField('Hash', code)
-			.setTimestamp();
-	}
-	return embed;
-}
 
 function preset_file(preset) {
 	const search_files = glob.sync(`rando-settings/**/${preset}.json`);
@@ -162,6 +92,47 @@ async function generate_smz3(preset_data, extra) {
 	return await axios.post('https://samus.link/api/randomizers/smz3/generate', preset_data['settings']);
 }
 
+
+async function generate_varia(preset_data, extra) {
+	let extra_params = [];
+	if (extra) {
+		extra_params = extra.split(/\s+/);
+	}
+
+	const default_settings = JSON.parse(fs.readFileSync('res/json/varia-default-settings.json'));
+
+	const settings = { 'randoPreset': preset_data['settings']['settings_preset'], 'origin': 'extStats' };
+	const skills = { 'preset': preset_data['settings']['skills_preset'] };
+
+	let settings_preset, skills_preset;
+	try {
+		settings_preset = await axios.post('https://randommetroidsolver.pythonanywhere.com/randoPresetWebService', settings);
+	}
+	catch (error) {
+		throw { 'message': 'El preset de ajustes indicado no existe.' };
+	}
+	try {
+		skills_preset = await axios.post('https://randommetroidsolver.pythonanywhere.com/presetWebService', skills);
+	}
+	catch (error) {
+		throw { 'message': 'El preset de habilidades indicado no existe.' };
+	}
+
+	const my_preset = { ...default_settings, ...settings_preset['data'] };
+	my_preset['preset'] = preset_data['settings']['skills_preset'];
+	my_preset['raceMode'] = extra_params.includes('spoiler') ? 'off' : 'on';
+	my_preset['paramsFileTarget'] = JSON.stringify(skills_preset['data']);
+
+	for (const key in my_preset) {
+		if (typeof my_preset[key] == 'object') {
+			my_preset[key] = my_preset[key].join();
+		}
+	}
+
+	return await axios.post('https://randommetroidsolver.pythonanywhere.com/randomizerWebService', my_preset);
+}
+
+
 async function generate_from_preset(preset, extra) {
 	const preset_file_loc = preset_file(preset);
 	if (preset_file_loc) {
@@ -175,8 +146,17 @@ async function generate_from_preset(preset, extra) {
 			return await generate_sm(preset_data, extra);
 		case 'smz3':
 			return await generate_smz3(preset_data, extra);
+		case 'varia':
+			return await generate_varia(preset_data, extra);
 		}
 	}
+}
+
+async function generate_varia_finetune(settings, skills, extra) {
+	const preset_data = JSON.parse(fs.readFileSync(preset_file('varia')));
+	preset_data['settings']['settings_preset'] = settings;
+	preset_data['settings']['skills_preset'] = skills;
+	return await generate_varia(preset_data, extra);
 }
 
 async function alttpr_retrieve_from_url(url) {
@@ -190,4 +170,4 @@ async function sm_retrieve_from_url(url) {
 	return await axios.get(`https://samus.link/api/seed/${seed_uuid}`);
 }
 
-module.exports = { generate_from_preset, alttpr_retrieve_from_url, sm_retrieve_from_url, alttpr_info_embed, sm_info_embed };
+module.exports = { generate_from_preset, generate_varia_finetune, alttpr_retrieve_from_url, sm_retrieve_from_url };

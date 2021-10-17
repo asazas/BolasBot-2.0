@@ -2,7 +2,8 @@ const glob = require('glob');
 const path = require('path');
 const { MessageAttachment } = require('discord.js');
 const { SlashCommandBuilder, SlashCommandStringOption } = require('@discordjs/builders');
-const { generate_from_preset, alttpr_retrieve_from_url, sm_retrieve_from_url, alttpr_info_embed, sm_info_embed } = require('../src/seedgen/seedgen');
+const { generate_from_preset, generate_varia_finetune, alttpr_retrieve_from_url, sm_retrieve_from_url } = require('../src/seedgen/seedgen');
+const { alttpr_info_embed, sm_info_embed, varia_info_embed } = require('../src/seedgen/util');
 const { get_formatted_spoiler } = require('../src/seedgen/spoiler');
 
 
@@ -20,8 +21,14 @@ async function seed_crear(interaction) {
 	const full_preset = extra ? preset + ' ' + extra : preset;
 	const seed = await generate_from_preset(preset, extra);
 
+	// super metroid varia randomizer
+	if (seed['data']['seedKey']) {
+		await interaction.editReply({ embeds: [varia_info_embed(seed, interaction, full_preset)] });
+		return;
+	}
+
 	// super metroid randomizer / combo randomizer
-	if (seed['data']['gameId'] == 'sm' || seed['data']['gameId'] == 'smz3') {
+	else if (seed['data']['gameId'] == 'sm' || seed['data']['gameId'] == 'smz3') {
 		await interaction.editReply({ embeds: [sm_info_embed(seed, interaction, full_preset)] });
 		return;
 	}
@@ -62,7 +69,7 @@ async function seed_info(interaction) {
 		return;
 	}
 	else {
-		throw 'La URL proporcionada no es válida.';
+		throw { 'message': 'La URL proporcionada no es válida.' };
 	}
 }
 
@@ -92,6 +99,21 @@ command.data = new SlashCommandBuilder()
 					.setDescription('Opciones extra.')))
 
 	.addSubcommand(subcommand =>
+		subcommand.setName('varia')
+			.setDescription('Seed de VARIA randomizer con configuración específica.')
+			.addStringOption(option =>
+				option.setName('settings')
+					.setDescription('Preset de ajustes')
+					.setRequired(true))
+			.addStringOption(option =>
+				option.setName('skills')
+					.setDescription('Preset de habilidades')
+					.setRequired(true))
+			.addStringOption(option =>
+				option.setName('extra')
+					.setDescription('Opciones extra.')))
+
+	.addSubcommand(subcommand =>
 		subcommand.setName('info')
 			.setDescription('Obtener información de una seed a partir de su URL.')
 			.addStringOption(option =>
@@ -115,6 +137,18 @@ command.execute = async function(interaction) {
 
 	else if (interaction.options.getSubcommand() == 'info') {
 		await seed_info(interaction);
+		return;
+	}
+	else if (interaction.options.getSubcommand() == 'varia') {
+		await interaction.deferReply();
+		const settings_preset = interaction.options.getString('settings').toLowerCase();
+		const skills_preset = interaction.options.getString('skills').toLowerCase();
+		let extra = interaction.options.getString('extra');
+		if (extra) {
+			extra = extra.toLowerCase();
+		}
+		const seed = await generate_varia_finetune(settings_preset, skills_preset, extra);
+		await interaction.editReply({ embeds: [varia_info_embed(seed, interaction, `${settings_preset} ${skills_preset}`)] });
 		return;
 	}
 };
