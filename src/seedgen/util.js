@@ -27,4 +27,4 @@ function get_seed_code(seed) {
 	return code;
 }
 
-module.exports = { get_seed_code };
+module.exports = { get_seed_code, search_in_patch };

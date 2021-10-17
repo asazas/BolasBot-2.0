@@ -1,7 +1,9 @@
 const glob = require('glob');
 const path = require('path');
+const { MessageAttachment } = require('discord.js');
 const { SlashCommandBuilder, SlashCommandStringOption } = require('@discordjs/builders');
 const { generate_from_preset, seed_info_embed } = require('../src/seedgen/seedgen');
+const { get_formatted_spoiler } = require('../src/seedgen/spoiler');
 
 const preset_files = glob.sync('rando-settings/**/*.json');
 const preset_option = new SlashCommandStringOption();
@@ -33,7 +35,15 @@ command.execute = async function(interaction) {
 	}
 	const full_preset = extra ? preset + ' ' + extra : preset;
 	const seed = await generate_from_preset(preset, extra);
-	await interaction.editReply({ embeds: [seed_info_embed(seed, interaction, full_preset)] });
+	if (seed['data']['spoiler']['meta']['spoilers'] == 'on' || seed['data']['spoiler']['meta']['spoilers'] == 'generate') {
+		const spoiler = JSON.stringify(get_formatted_spoiler(seed), null, 4);
+		const spoiler_attachment = new MessageAttachment(Buffer.from(spoiler), 'spoiler.json');
+		spoiler_attachment.setSpoiler(true);
+		await interaction.editReply({ embeds: [seed_info_embed(seed, interaction, full_preset)], files: [spoiler_attachment] });
+	}
+	else {
+		await interaction.editReply({ embeds: [seed_info_embed(seed, interaction, full_preset)] });
+	}
 };
 
 module.exports = command;
