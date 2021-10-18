@@ -5,7 +5,7 @@ const { SlashCommandBuilder, SlashCommandStringOption } = require('@discordjs/bu
 const { generate_from_preset, generate_varia_finetune, alttpr_retrieve_from_url, sm_retrieve_from_url } = require('../src/seedgen/seedgen');
 const { alttpr_info_embed, sm_info_embed, varia_info_embed } = require('../src/seedgen/util');
 const { get_formatted_spoiler } = require('../src/seedgen/spoiler');
-const { preset_help } = require('../src/seedgen/help');
+const { preset_help, extra_help } = require('../src/seedgen/help');
 
 
 const ALTTPR_URL_REGEX = /^https:\/\/alttpr\.com\/([a-z]{2}\/)?h\/\w{10}$/;
@@ -165,6 +165,10 @@ command.execute = async function(interaction) {
 
 	else if (interaction.options.getSubcommand() == 'presets') {
 		await interaction.reply({ embeds: [preset_help(interaction)] });
+		return;
+	}
+	else if (interaction.options.getSubcommand() == 'extra') {
+		await interaction.reply({ embeds: [extra_help(interaction)] });
 		return;
 	}
 };
