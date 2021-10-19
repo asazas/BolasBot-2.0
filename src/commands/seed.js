@@ -2,10 +2,10 @@ const glob = require('glob');
 const path = require('path');
 const { MessageAttachment } = require('discord.js');
 const { SlashCommandBuilder, SlashCommandStringOption } = require('@discordjs/builders');
-const { generate_from_preset, generate_varia_finetune, alttpr_retrieve_from_url, sm_retrieve_from_url } = require('../src/seedgen/seedgen');
-const { alttpr_info_embed, sm_info_embed, varia_info_embed } = require('../src/seedgen/util');
-const { get_formatted_spoiler } = require('../src/seedgen/spoiler');
-const { preset_help, extra_help } = require('../src/seedgen/help');
+const { generate_from_preset, generate_varia_finetune, alttpr_retrieve_from_url, sm_retrieve_from_url } = require('../seedgen/seedgen');
+const { alttpr_info_embed, sm_info_embed, varia_info_embed } = require('../seedgen/util');
+const { get_formatted_spoiler } = require('../seedgen/spoiler');
+const { preset_help, extra_help } = require('../seedgen/help');
 
 
 const ALTTPR_URL_REGEX = /^https:\/\/alttpr\.com\/([a-z]{2}\/)?h\/\w{10}$/;
