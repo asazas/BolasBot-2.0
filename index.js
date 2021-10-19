@@ -3,6 +3,7 @@ const fs = require('fs');
 const { Client, Collection, Intents } = require('discord.js');
 const { token } = require('./config.json');
 const { get_data_models } = require('./src/datamgmt/setup');
+const { get_or_insert_player, insert_async, get_active_async_races, get_async_by_submit, update_async_status, save_async_result } = require('./src/datamgmt/db_utils');
 
 // Create a new client instance
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_MESSAGES,
@@ -26,6 +27,16 @@ client.once('ready', async () => {
 	for (const guild_id of client.guilds.cache.map(guild => guild.id)) {
 		db[guild_id] = await get_data_models(guild_id);
 	}
+	db['test'] = await get_data_models('test');
+	const p = await get_or_insert_player(db['test'], 1, 'a', 'b', 'c');
+	const [q, _] = await get_or_insert_player(db['test'], 1);
+	const r = await get_or_insert_player(db['test'], 2);
+	await insert_async(db['test'], 'a', 1, 'b', 'c', 'd', 'e', 2, 3, 4, 5, 6);
+	const a = await get_active_async_races(db['test']);
+	const b = await get_async_by_submit(db['test'], 3);
+	const c = await update_async_status(db['test'], 1, 1);
+	const d = await save_async_result(db['test'], 1, 1, 1234, 432);
+	const e = await save_async_result(db['test'], 1, 1, 4321, 234);
 	console.log(`Ready! Logged in as ${client.user.tag}`);
 });
 
@@ -42,7 +53,7 @@ client.on('interactionCreate', async interaction => {
 	catch (error) {
 		console.error(error);
 		const image_path = `res/almeida${Math.floor(Math.random() * 4)}.png`;
-		if (interaction.deferred) {
+		if (interaction.deferred || interaction.replied) {
 			return interaction.editReply({ content: error['message'], files: [image_path] });
 		}
 		else {
