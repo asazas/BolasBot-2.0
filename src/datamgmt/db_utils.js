@@ -161,5 +161,139 @@ async function save_async_result(sequelize, race, player, time, collection_rate)
 	}
 }
 
+async function get_results_for_race(sequelize, submit_channel) {
+	const async_results = sequelize.models.AsyncResults;
+	try {
+		return await sequelize.transaction(async (t) => {
+			return await async_results.findAll({
+				include: [
+					{
+						model: sequelize.models.AsyncRaces,
+						as: 'race',
+						required: true,
+						where: {
+							SubmitChannel: submit_channel,
+						},
+					},
+					{
+						model: sequelize.models.Players,
+						as: 'player',
+					},
+				],
+				order: [
+					['Time', 'ASC'],
+					['Timestamp', 'ASC'],
+				],
+				transaction: t,
+			});
+		});
+	}
+	catch (error) {
+		console.log(error['message']);
+	}
+}
+
+async function get_global_var(sequelize) {
+	const global_var = sequelize.models.GlobalVar;
+	try {
+		return await sequelize.transaction(async (t) => {
+			return await global_var.findOne({ transaction: t });
+		});
+	}
+	catch (error) {
+		console.log(error['message']);
+	}
+}
+
+async function set_async_history_channel(sequelize, history_channel) {
+	const global_var = sequelize.models.GlobalVar;
+	try {
+		return await sequelize.transaction(async (t) => {
+			return await global_var.update({ AsyncHistoryChannel: history_channel }, { transaction: t });
+		});
+	}
+	catch (error) {
+		console.log(error['message']);
+	}
+}
+
+async function insert_private_race(sequelize, name, creator, private_channel) {
+	const private_races = sequelize.models.PrivateRaces;
+	try {
+		return await sequelize.transaction(async (t) => {
+			return await private_races.create({
+				Name: name,
+				Creator: creator,
+				StartDate: sequelize.literal('CURRENT_TIMESTAMP'),
+				PrivateChannel: private_channel,
+			}, { transaction: t });
+		});
+	}
+	catch (error) {
+		console.log(error['message']);
+	}
+}
+
+async function get_active_private_races(sequelize) {
+	const private_races = sequelize.models.PrivateRaces;
+	try {
+		return await sequelize.transaction(async (t) => {
+			return await private_races.findAll({
+				where: {
+					Status: 3,
+				},
+				transaction: t,
+			});
+		});
+	}
+	catch (error) {
+		console.log(error['message']);
+	}
+}
+
+async function get_private_race_by_channel(sequelize, channel) {
+	const private_races = sequelize.models.PrivateRaces;
+	try {
+		return await sequelize.transaction(async (t) => {
+			return await private_races.findOne({
+				where: {
+					PrivateChannel: channel,
+				},
+				transaction: t,
+			});
+		});
+	}
+	catch (error) {
+		console.log(error['message']);
+	}
+}
+
+async function update_private_status(sequelize, id, status) {
+	const private_races = sequelize.models.PrivateRaces;
+	try {
+		return await sequelize.transaction(async (t) => {
+			await private_races.findOne({
+				where: {
+					Id: id,
+				},
+				transaction: t,
+				lock: t.LOCK.UPDATE,
+			});
+			return await private_races.update({
+				Status: status,
+			}, {
+				where: {
+					Id: id,
+				},
+				transaction: t,
+			});
+		});
+	}
+	catch (error) {
+		console.log(error['message']);
+	}
+}
+
 module.exports = { get_or_insert_player, insert_async, get_active_async_races, search_async_by_name, get_async_by_submit,
-	update_async_status, save_async_result };
+	update_async_status, save_async_result, get_results_for_race, get_global_var, set_async_history_channel,
+	insert_private_race, get_active_private_races, get_private_race_by_channel, update_private_status };

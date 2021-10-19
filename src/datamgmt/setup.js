@@ -93,7 +93,7 @@ async function get_data_models(server) {
 			allowNull: false,
 		},
 	});
-	async_races.belongsTo(players, { foreignKey: 'Creator', onDelete: 'SET NULL' });
+	async_races.belongsTo(players, { as: 'creator', foreignKey: 'Creator', onDelete: 'SET NULL' });
 
 	const async_results = sequelize.define('AsyncResults', {
 		Id: {
@@ -158,9 +158,19 @@ async function get_data_models(server) {
 			allowNull: false,
 		},
 	});
-	private_races.belongsTo(players, { foreignKey: 'Creator', onDelete: 'SET NULL' });
+	private_races.belongsTo(players, { as: 'creator', foreignKey: 'Creator', onDelete: 'SET NULL' });
 
 	await sequelize.sync({ 'force': true });
+
+	await sequelize.transaction(async (t) => {
+		try {
+			return await sequelize.models.GlobalVar.create({ ServerId: server }, { transaction: t });
+		}
+		catch (error) {
+			console.log(error['message']);
+		}
+	});
+
 	return sequelize;
 }
 
