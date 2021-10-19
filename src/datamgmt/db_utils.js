@@ -90,6 +90,12 @@ async function get_async_by_submit(sequelize, submit_channel) {
 	try {
 		return await sequelize.transaction(async (t) => {
 			return await async_races.findOne({
+				include: [
+					{
+						model: sequelize.models.Players,
+						as: 'creator',
+					},
+				],
 				where: {
 					SubmitChannel: submit_channel,
 				},

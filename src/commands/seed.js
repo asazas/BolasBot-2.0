@@ -1,15 +1,9 @@
 const glob = require('glob');
 const path = require('path');
-const { MessageAttachment } = require('discord.js');
 const { SlashCommandBuilder, SlashCommandStringOption } = require('@discordjs/builders');
-const { generate_from_preset, generate_varia_finetune, alttpr_retrieve_from_url, sm_retrieve_from_url } = require('../seedgen/seedgen');
-const { alttpr_info_embed, sm_info_embed, varia_info_embed } = require('../seedgen/util');
-const { get_formatted_spoiler } = require('../seedgen/spoiler');
+const { generate_from_preset, generate_varia_finetune, retrieve_from_url } = require('../seedgen/seedgen');
+const { seed_info_embed, varia_info_embed } = require('../seedgen/info_embeds');
 const { preset_help, extra_help } = require('../seedgen/help');
-
-
-const ALTTPR_URL_REGEX = /^https:\/\/alttpr\.com\/([a-z]{2}\/)?h\/\w{10}$/;
-const SMZ3_URL_REGEX = /^https:\/\/(sm\.)?samus\.link\/seed\/[A-Za-z0-9_-]{8}[Q-T][A-Za-z0-9_-][CGKOSWaeimquy26-][A-Za-z0-9_-]{10}[AQgw]$/;
 
 
 async function seed_crear(interaction) {
@@ -22,52 +16,29 @@ async function seed_crear(interaction) {
 	const full_preset = extra ? preset + ' ' + extra : preset;
 	const seed = await generate_from_preset(preset, extra);
 
-	// super metroid varia randomizer
-	if (seed['data']['seedKey']) {
-		await interaction.editReply({ embeds: [varia_info_embed(seed, interaction, full_preset)] });
-		return;
-	}
-
-	// super metroid randomizer / combo randomizer
-	else if (seed['data']['gameId'] == 'sm' || seed['data']['gameId'] == 'smz3') {
-		await interaction.editReply({ embeds: [sm_info_embed(seed, interaction, full_preset)] });
-		return;
-	}
-
-	else if (seed['data']['spoiler']['meta']['spoilers'] == 'on' || seed['data']['spoiler']['meta']['spoilers'] == 'generate') {
-		const spoiler = JSON.stringify(get_formatted_spoiler(seed), null, 4);
-		const spoiler_attachment = new MessageAttachment(Buffer.from(spoiler), 'spoiler.json');
-		spoiler_attachment.setSpoiler(true);
-		await interaction.editReply({ embeds: [alttpr_info_embed(seed, interaction, full_preset)], files: [spoiler_attachment] });
+	const info_embed = seed_info_embed(seed, interaction, full_preset);
+	if (info_embed[1]) {
+		await interaction.editReply({ embeds: [info_embed[0]], files: [info_embed[1]] });
 	}
 	else {
-		await interaction.editReply({ embeds: [alttpr_info_embed(seed, interaction, full_preset)] });
+		await interaction.editReply({ embeds: [info_embed[0]] });
 	}
 }
 
 
 async function seed_info(interaction) {
 	const url = interaction.options.getString('url');
-	if (ALTTPR_URL_REGEX.test(url)) {
-		await interaction.deferReply();
-		const seed = await alttpr_retrieve_from_url(url);
-		if (seed['data']['spoiler']['meta']['spoilers'] == 'on' || seed['data']['spoiler']['meta']['spoilers'] == 'generate') {
-			const spoiler = JSON.stringify(get_formatted_spoiler(seed), null, 4);
-			const spoiler_attachment = new MessageAttachment(Buffer.from(spoiler), 'spoiler.json');
-			spoiler_attachment.setSpoiler(true);
-			await interaction.editReply({ embeds: [alttpr_info_embed(seed, interaction)], files: [spoiler_attachment] });
+	await interaction.deferReply();
+	const seed = await retrieve_from_url(url);
+
+	if (seed) {
+		const info_embed = seed_info_embed(seed, interaction);
+		if (info_embed[1]) {
+			await interaction.editReply({ embeds: [info_embed[0]], files: [info_embed[1]] });
 		}
 		else {
-			await interaction.editReply({ embeds: [alttpr_info_embed(seed, interaction)] });
+			await interaction.editReply({ embeds: [info_embed[0]] });
 		}
-		return;
-	}
-
-	else if (SMZ3_URL_REGEX.test(url)) {
-		await interaction.deferReply();
-		const seed = await sm_retrieve_from_url(url);
-		await interaction.editReply({ embeds: [sm_info_embed(seed, interaction)] });
-		return;
 	}
 	else {
 		throw { 'message': 'La URL proporcionada no es válida.' };

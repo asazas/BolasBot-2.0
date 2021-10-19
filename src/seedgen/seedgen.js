@@ -159,15 +159,20 @@ async function generate_varia_finetune(settings, skills, extra) {
 	return await generate_varia(preset_data, extra);
 }
 
-async function alttpr_retrieve_from_url(url) {
-	const seed_hash = url.split('/').pop();
-	return await axios.get(`https://alttpr.com/hash/${seed_hash}`);
+const ALTTPR_URL_REGEX = /^https:\/\/alttpr\.com\/([a-z]{2}\/)?h\/\w{10}$/;
+const SMZ3_URL_REGEX = /^https:\/\/(sm\.)?samus\.link\/seed\/[A-Za-z0-9_-]{8}[Q-T][A-Za-z0-9_-][CGKOSWaeimquy26-][A-Za-z0-9_-]{10}[AQgw]$/;
+
+async function retrieve_from_url(url) {
+	if (ALTTPR_URL_REGEX.test(url)) {
+		const seed_hash = url.split('/').pop();
+		return await axios.get(`https://alttpr.com/hash/${seed_hash}`);
+	}
+	else if (SMZ3_URL_REGEX.test(url)) {
+		const seed_slugid = url.split('/').pop();
+		const seed_uuid = slugid.decode(seed_slugid).replaceAll('-', '');
+		return await axios.get(`https://samus.link/api/seed/${seed_uuid}`);
+	}
+	return null;
 }
 
-async function sm_retrieve_from_url(url) {
-	const seed_slugid = url.split('/').pop();
-	const seed_uuid = slugid.decode(seed_slugid).replaceAll('-', '');
-	return await axios.get(`https://samus.link/api/seed/${seed_uuid}`);
-}
-
-module.exports = { preset_file, generate_from_preset, generate_varia_finetune, alttpr_retrieve_from_url, sm_retrieve_from_url };
+module.exports = { preset_file, generate_from_preset, generate_varia_finetune, retrieve_from_url };
