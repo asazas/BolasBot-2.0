@@ -22,7 +22,9 @@ module.exports = {
 		const command = process.platform == 'win32' ? 'wsl fortune es' : 'fortune es';
 		try {
 			const output = await exec(command);
-			ans.setDescription(output['stdout']);
+			let stdout = output['stdout'];
+			stdout = stdout.replaceAll('\n', ' ').replace('\t\t', '\n').replaceAll('\t\t', '');
+			ans.setDescription(stdout);
 		}
 		catch (error) {
 			console.log(error);
