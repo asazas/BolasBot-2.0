@@ -2,8 +2,9 @@ const util = require('util');
 const { Permissions, MessageEmbed } = require('discord.js');
 
 const { generate_from_preset, retrieve_from_url } = require('../seedgen/seedgen');
-const { get_active_async_races, get_results_for_race, get_or_insert_player, insert_async, get_async_by_submit } = require('../datamgmt/db_utils');
+const { get_active_async_races, get_results_for_race, get_or_insert_player, insert_async, get_async_by_submit, update_async_status, get_private_race_by_channel, update_private_status, get_global_var, set_async_history_channel } = require('../datamgmt/db_utils');
 const { seed_raw_data } = require('../seedgen/info_embeds');
+
 
 async function get_results_text(db, submit_channel) {
 	const results = await get_results_for_race(db, submit_channel);
@@ -233,4 +234,146 @@ async function async_crear(interaction, db) {
 	await interaction.editReply({ embeds: [text_ans] });
 }
 
-module.exports = { async_crear };
+async function async_cerrar(interaction, db) {
+	const race = await get_async_by_submit(db, interaction.channelId);
+	if (!race) {
+		throw { 'message': 'Este comando solo puede ser usado en canales de carreras.' };
+	}
+
+	if (!interaction.memberPermissions.has(Permissions.FLAGS.MANAGE_CHANNELS) && interaction.user.id != race.Creator) {
+		throw { 'message': 'Solo el creador de la carrera o un moderador pueden ejecutar este comando.' };
+	}
+
+	if (race.Status == 0) {
+		const creator = interaction.user;
+		await get_or_insert_player(db, creator.id, creator.username, creator.discriminator, `${creator}`);
+		await update_async_status(db, race.Id, 1);
+		const ans_embed = new MessageEmbed()
+			.setColor('#0099ff')
+			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setDescription('Esta carrera ha sido cerrada.')
+			.setTimestamp();
+		await interaction.reply({ embeds: [ans_embed] });
+	}
+	else {
+		throw { 'message': 'Esta carrera no está abierta.' };
+	}
+}
+
+async function async_reabrir(interaction, db) {
+	const race = await get_async_by_submit(db, interaction.channelId);
+	if (!race) {
+		throw { 'message': 'Este comando solo puede ser usado en canales de carreras.' };
+	}
+
+	if (!interaction.memberPermissions.has(Permissions.FLAGS.MANAGE_CHANNELS) && interaction.user.id != race.Creator) {
+		throw { 'message': 'Solo el creador de la carrera o un moderador pueden ejecutar este comando.' };
+	}
+
+	if (race.Status == 1) {
+		const creator = interaction.user;
+		await get_or_insert_player(db, creator.id, creator.username, creator.discriminator, `${creator}`);
+		await update_async_status(db, race.Id, 0);
+		const ans_embed = new MessageEmbed()
+			.setColor('#0099ff')
+			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setDescription('Esta carrera ha sido reabierta.')
+			.setTimestamp();
+		await interaction.reply({ embeds: [ans_embed] });
+	}
+	else {
+		throw { 'message': 'Esta carrera no está cerrada.' };
+	}
+}
+
+async function async_purgar(interaction, db) {
+	let race = await get_async_by_submit(db, interaction.channelId);
+	if (!race) {
+		race = get_private_race_by_channel(db, interaction.channelId);
+		if (race) {
+			if (!interaction.memberPermissions.has(Permissions.FLAGS.MANAGE_CHANNELS) && interaction.user.id != race.Creator) {
+				throw { 'message': 'Solo el creador de la carrera o un moderador pueden ejecutar este comando.' };
+			}
+
+			const ans_embed = new MessageEmbed()
+				.setColor('#0099ff')
+				.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+				.setDescription('Purgando...')
+				.setTimestamp();
+			await interaction.reply({ embeds: [ans_embed] });
+
+			const creator = interaction.user;
+			await get_or_insert_player(db, creator.id, creator.username, creator.discriminator, `${creator}`);
+			await update_private_status(db, race.Id, 2);
+
+			const race_channel = interaction.guild.channels.resolve(race.PrivateChannel);
+			await race_channel.delete();
+			return;
+		}
+		else {
+			throw { 'message': 'Este comando solo puede ser usado en canales de carreras.' };
+		}
+	}
+
+	if (!interaction.memberPermissions.has(Permissions.FLAGS.MANAGE_CHANNELS) && interaction.user.id != race.Creator) {
+		throw { 'message': 'Solo el creador de la carrera o un moderador pueden ejecutar este comando.' };
+	}
+
+	if (race.Status == 1) {
+		const ans_embed = new MessageEmbed()
+			.setColor('#0099ff')
+			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setDescription('Purgando...')
+			.setTimestamp();
+		await interaction.reply({ embeds: [ans_embed] });
+
+		const creator = interaction.user;
+		await get_or_insert_player(db, creator.id, creator.username, creator.discriminator, `${creator}`);
+		await update_async_status(db, race.Id, 2);
+
+		// Copia de resultados al historial, si los hay
+		const submit_channel = interaction.guild.channels.cache.get(`${race.SubmitChannel}`);
+		const results = await get_results_for_race(db, submit_channel.id);
+		if (results && results.length > 0) {
+			const global_var = await get_global_var(db);
+			let my_hist_channel = null;
+			if (!global_var.AsyncHistoryChannel || !interaction.guild.channels.cache.get(`${global_var.AsyncHistoryChannel}`)) {
+				my_hist_channel = await interaction.guild.channels.create('async-historico', {
+					permissionOverwrites: [
+						{
+							id: interaction.guild.roles.everyone,
+							deny: [Permissions.FLAGS.SEND_MESSAGES],
+						},
+						{
+							id: interaction.guild.me,
+							allow: [Permissions.FLAGS.SEND_MESSAGES],
+						},
+					],
+				});
+				await set_async_history_channel(db, my_hist_channel.id);
+			}
+			else {
+				my_hist_channel = interaction.guild.channels.cache.get(`${global_var.AsyncHistoryChannel}`);
+			}
+
+			await my_hist_channel.send(get_results_text(db, submit_channel.id), { embeds: [get_async_data_embed(db. submit_channel.id)] });
+		}
+
+		if (race.RoleId) {
+			const async_role = interaction.guild.roles.cache.get(`${race.RoleId}`);
+			await async_role.delete();
+		}
+		const category = submit_channel.parent;
+		await submit_channel.delete();
+		const results_channel = interaction.guild.channels.cache.get(`${race.ResultsChannel}`);
+		await results_channel.delete();
+		const spoilers_channel = interaction.guild.channels.cache.get(`${race.SpoilersChannel}`);
+		await spoilers_channel.delete();
+		await category.delete();
+	}
+	else {
+		throw { 'message': 'La carrera debe cerrarse antes de ser purgada.' };
+	}
+}
+
+module.exports = { async_crear, async_cerrar, async_reabrir, async_purgar };

@@ -5,17 +5,17 @@ async function get_data_models(server) {
 
 	sequelize.define('GlobalVar', {
 		ServerId: {
-			type: DataTypes.INTEGER,
+			type: DataTypes.TEXT,
 			primaryKey: true,
 		},
 		AsyncHistoryChannel: {
-			type: DataTypes.INTEGER,
+			type: DataTypes.TEXT,
 		},
 	});
 
 	const players = sequelize.define('Players', {
 		DiscordId: {
-			type: DataTypes.INTEGER,
+			type: DataTypes.TEXT,
 			primaryKey: true,
 		},
 		Name: {
@@ -43,7 +43,7 @@ async function get_data_models(server) {
 			allowNull: false,
 		},
 		Creator: {
-			type: DataTypes.INTEGER,
+			type: DataTypes.TEXT,
 		},
 		StartDate: {
 			type: DataTypes.TEXT,
@@ -74,22 +74,22 @@ async function get_data_models(server) {
 			type: DataTypes.TEXT,
 		},
 		RoleId: {
-			type: DataTypes.INTEGER,
+			type: DataTypes.TEXT,
 		},
 		SubmitChannel: {
-			type: DataTypes.INTEGER,
+			type: DataTypes.TEXT,
 			allowNull: false,
 		},
 		ResultsChannel: {
-			type: DataTypes.INTEGER,
+			type: DataTypes.TEXT,
 			allowNull: false,
 		},
 		ResultsMessage: {
-			type: DataTypes.INTEGER,
+			type: DataTypes.TEXT,
 			allowNull: false,
 		},
 		SpoilersChannel: {
-			type: DataTypes.INTEGER,
+			type: DataTypes.TEXT,
 			allowNull: false,
 		},
 	});
@@ -102,11 +102,11 @@ async function get_data_models(server) {
 			autoIncrement: true,
 		},
 		Race: {
-			type: DataTypes.INTEGER,
+			type: DataTypes.TEXT,
 			unique: 'UniqueKey',
 		},
 		Player: {
-			type: DataTypes.INTEGER,
+			type: DataTypes.TEXT,
 			unique: 'UniqueKey',
 		},
 		Timestamp: {
@@ -138,7 +138,7 @@ async function get_data_models(server) {
 			allowNull: false,
 		},
 		Creator: {
-			type: DataTypes.INTEGER,
+			type: DataTypes.TEXT,
 		},
 		StartDate: {
 			type: DataTypes.TEXT,
@@ -154,7 +154,7 @@ async function get_data_models(server) {
 			defaultValue: 3,
 		},
 		PrivateChannel: {
-			type: DataTypes.INTEGER,
+			type: DataTypes.TEXT,
 			allowNull: false,
 		},
 	});

@@ -1,7 +1,7 @@
 const glob = require('glob');
 const path = require('path');
 const { SlashCommandBuilder, SlashCommandStringOption } = require('@discordjs/builders');
-const { async_crear } = require('../racing/async');
+const { async_crear, async_cerrar, async_reabrir, async_purgar } = require('../racing/async_util');
 
 
 const preset_files = glob.sync('rando-settings/**/*.json');
@@ -52,7 +52,15 @@ command.data = new SlashCommandBuilder()
 command.execute = async function(interaction, db) {
 	if (interaction.options.getSubcommand() == 'crear') {
 		await async_crear(interaction, db);
-		return;
+	}
+	else if (interaction.options.getSubcommand() == 'cerrar') {
+		await async_cerrar(interaction, db);
+	}
+	else if (interaction.options.getSubcommand() == 'reabrir') {
+		await async_reabrir(interaction, db);
+	}
+	else if (interaction.options.getSubcommand() == 'purgar') {
+		await async_purgar(interaction, db);
 	}
 };
 
