@@ -1,8 +1,8 @@
 const glob = require('glob');
 const path = require('path');
 const { SlashCommandBuilder, SlashCommandStringOption } = require('@discordjs/builders');
-const { async_cerrar, async_reabrir, async_purgar } = require('../racing/async_util');
-const { carrera_crear } = require('../racing/carrera_util');
+const { async_purgar } = require('../racing/async_util');
+const { carrera_crear, carrera_entrar, carrera_salir, carrera_listo, carrera_no_listo } = require('../racing/carrera_util');
 
 
 const preset_files = glob.sync('rando-settings/**/*.json');
@@ -34,6 +34,19 @@ command.data = new SlashCommandBuilder()
 				option.setName('url')
 					.setDescription('URL de la seed. Tiene precedencia sobre el preset.')))
 
+	.addSubcommand(subcommand =>
+		subcommand.setName('entrar')
+			.setDescription('Unirme a una carrera.'))
+	.addSubcommand(subcommand =>
+		subcommand.setName('salir')
+			.setDescription('Salir de la carrera.'))
+	.addSubcommand(subcommand =>
+		subcommand.setName('listo')
+			.setDescription('Declararme como listo para iniciar la carrera.'))
+	.addSubcommand(subcommand =>
+		subcommand.setName('no_listo')
+			.setDescription('Retirar el estado de listo para iniciar la carrera.'))
+
 	.addSubcommandGroup(subcommand_group =>
 		subcommand_group.setName('forzar')
 			.setDescription('Forzar inicio o cierre.')
@@ -50,11 +63,17 @@ command.execute = async function(interaction, db) {
 	if (interaction.options.getSubcommand() == 'crear') {
 		await carrera_crear(interaction, db);
 	}
-	else if (interaction.options.getSubcommand() == 'cerrar') {
-		await async_cerrar(interaction, db);
+	else if (interaction.options.getSubcommand() == 'entrar') {
+		await carrera_entrar(interaction, db);
 	}
-	else if (interaction.options.getSubcommand() == 'reabrir') {
-		await async_reabrir(interaction, db);
+	else if (interaction.options.getSubcommand() == 'salir') {
+		await carrera_salir(interaction, db);
+	}
+	else if (interaction.options.getSubcommand() == 'listo') {
+		await carrera_listo(interaction, db);
+	}
+	else if (interaction.options.getSubcommand() == 'no_listo') {
+		await carrera_no_listo(interaction, db);
 	}
 	else if (interaction.options.getSubcommand() == 'purgar') {
 		await async_purgar(interaction, db);

@@ -111,13 +111,8 @@ async function get_data_models(server) {
 			},
 			defaultValue: 0,
 		},
-		Timestamp: {
-			type: DataTypes.INTEGER,
-			allowNull: false,
-		},
 		Time: {
 			type: DataTypes.INTEGER,
-			allowNull: false,
 			defaultValue: 359999,
 		},
 	});

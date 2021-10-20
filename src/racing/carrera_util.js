@@ -1,11 +1,11 @@
 const { MessageEmbed } = require('discord.js');
 
-const { get_or_insert_player, insert_race, get_race_by_submit } = require('../datamgmt/db_utils');
+const { get_or_insert_player, insert_race, get_race_by_channel, delete_race_player_if_present, get_or_insert_race_player, set_player_ready, set_player_unready } = require('../datamgmt/db_utils');
 const { random_words } = require('./async_util');
 const { seed_in_create_race } = require('./race_seed_util');
 
 async function get_race_data_embed(db, race_channel) {
-	const my_race = await get_race_by_submit(db, race_channel);
+	const my_race = await get_race_by_channel(db, race_channel);
 
 	const data_embed = new MessageEmbed()
 		.setColor('#0099ff')
@@ -72,4 +72,141 @@ async function carrera_crear(interaction, db) {
 	await interaction.editReply({ embeds: [text_ans] });
 }
 
-module.exports = { carrera_crear };
+async function carrera_entrar(interaction, db) {
+	const race = await get_race_by_channel(db, interaction.channelId);
+	if (!race) {
+		throw { 'message': 'Este comando solo puede ser usado en canales de carreras.' };
+	}
+
+	await get_or_insert_player(db, interaction.user.id, interaction.user.username, interaction.user.discriminator, `${interaction.user}`);
+	const race_player = await get_or_insert_race_player(db, race.Id, interaction.user.id);
+	let text_ans = null;
+	if (race_player[1]) {
+		text_ans = new MessageEmbed()
+			.setColor('#0099ff')
+			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setDescription(`${interaction.user} se ha unido a la carrera.`)
+			.setTimestamp();
+	}
+	else {
+		text_ans = new MessageEmbed()
+			.setColor('#0099ff')
+			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setDescription(`${interaction.user} ya está en la carrera.`)
+			.setTimestamp();
+	}
+	await interaction.reply({ embeds: [text_ans] });
+}
+
+async function carrera_salir(interaction, db) {
+	const race = await get_race_by_channel(db, interaction.channelId);
+	if (!race) {
+		throw { 'message': 'Este comando solo puede ser usado en canales de carreras.' };
+	}
+
+	await get_or_insert_player(db, interaction.user.id, interaction.user.username, interaction.user.discriminator, `${interaction.user}`);
+	const delete_code = await delete_race_player_if_present(db, race.Id, interaction.user.id);
+
+	let text_ans = null;
+	if (delete_code == -1) {
+		text_ans = new MessageEmbed()
+			.setColor('#0099ff')
+			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setDescription(`${interaction.user} no está en la carrera.`)
+			.setTimestamp();
+	}
+	else if (delete_code == -2) {
+		text_ans = new MessageEmbed()
+			.setColor('#0099ff')
+			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setDescription(`${interaction.user} no puede salir de la carrera si está listo para comenzar.`)
+			.setTimestamp();
+	}
+	else {
+		text_ans = new MessageEmbed()
+			.setColor('#0099ff')
+			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setDescription(`${interaction.user} ha salido de la carrera.`)
+			.setTimestamp();
+	}
+	await interaction.reply({ embeds: [text_ans] });
+}
+
+async function carrera_listo(interaction, db) {
+	const race = await get_race_by_channel(db, interaction.channelId);
+	if (!race) {
+		throw { 'message': 'Este comando solo puede ser usado en canales de carreras.' };
+	}
+
+	await get_or_insert_player(db, interaction.user.id, interaction.user.username, interaction.user.discriminator, `${interaction.user}`);
+	const ready_code = await set_player_ready(db, race.Id, interaction.user.id);
+
+	let text_ans = null;
+	if (ready_code == -1) {
+		text_ans = new MessageEmbed()
+			.setColor('#0099ff')
+			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setDescription(`${interaction.user} no está en la carrera.`)
+			.setTimestamp();
+	}
+	else if (ready_code == -2) {
+		text_ans = new MessageEmbed()
+			.setColor('#0099ff')
+			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setDescription(`${interaction.user} ya está listo.`)
+			.setTimestamp();
+	}
+	else {
+		text_ans = new MessageEmbed()
+			.setColor('#0099ff')
+			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setDescription(`${interaction.user} está listo para empezar. Quedan ${ready_code['all'] - ready_code['ready']} participantes.`)
+			.setTimestamp();
+	}
+	await interaction.reply({ embeds: [text_ans] });
+
+	if (ready_code['all'] >= 2 && ready_code['ready'] == 0) {
+		text_ans = new MessageEmbed()
+			.setColor('#0099ff')
+			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setDescription('Todos los jugadores están listos. Iniciando cuenta atrás. ¡Buena suerte!')
+			.setTimestamp();
+		await interaction.editReply({ embeds: [text_ans] });
+	}
+}
+
+async function carrera_no_listo(interaction, db) {
+	const race = await get_race_by_channel(db, interaction.channelId);
+	if (!race) {
+		throw { 'message': 'Este comando solo puede ser usado en canales de carreras.' };
+	}
+
+	await get_or_insert_player(db, interaction.user.id, interaction.user.username, interaction.user.discriminator, `${interaction.user}`);
+	const delete_code = await set_player_unready(db, race.Id, interaction.user.id);
+
+	let text_ans = null;
+	if (delete_code == -1) {
+		text_ans = new MessageEmbed()
+			.setColor('#0099ff')
+			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setDescription(`${interaction.user} no está en la carrera.`)
+			.setTimestamp();
+	}
+	else if (delete_code == -2) {
+		text_ans = new MessageEmbed()
+			.setColor('#0099ff')
+			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setDescription(`${interaction.user} aún no está listo.`)
+			.setTimestamp();
+	}
+	else {
+		text_ans = new MessageEmbed()
+			.setColor('#0099ff')
+			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setDescription(`${interaction.user} no está listo.`)
+			.setTimestamp();
+	}
+	await interaction.reply({ embeds: [text_ans] });
+}
+
+module.exports = { carrera_crear, carrera_entrar, carrera_salir, carrera_listo, carrera_no_listo };
