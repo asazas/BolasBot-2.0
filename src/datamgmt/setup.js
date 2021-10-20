@@ -51,9 +51,12 @@ async function get_data_models(server) {
 		Creator: {
 			type: DataTypes.TEXT,
 		},
-		StartDate: {
+		CreationDate: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
+		},
+		StartDate: {
+			type: DataTypes.INTEGER,
 		},
 		EndDate: {
 			type: DataTypes.INTEGER,

@@ -47,10 +47,10 @@ async function get_async_data_embed(db, submit_channel) {
 		.setColor('#0099ff')
 		.setTitle(`Carrera asíncrona: ${my_async.Name}`)
 		.addField('Creador', my_async.creator.Name)
-		.addField('Fecha de inicio (UTC)', `<t:${my_async.StartDate}>`)
+		.addField('Fecha de inicio', `<t:${my_async.StartDate}>`)
 		.setTimestamp();
 	if (my_async.EndDate) {
-		data_embed.addField('Fecha de cierre (UTC)', `<t:${my_async.EndDate}>`);
+		data_embed.addField('Fecha de cierre', `<t:${my_async.EndDate}>`);
 	}
 	if (my_async.Preset) {
 		data_embed.addField('Descripción', my_async.Preset);

@@ -28,7 +28,7 @@ async function insert_race(sequelize, name, creator, preset, seed_hash, seed_cod
 			return await races.create({
 				Name: name,
 				Creator: creator,
-				StartDate: Math.floor(new Date().getTime() / 1000),
+				CreationDate: Math.floor(new Date().getTime() / 1000),
 				Preset: preset,
 				SeedHash: seed_hash,
 				SeedCode: seed_code,
@@ -67,13 +67,23 @@ async function get_race_by_channel(sequelize, race_channel) {
 
 async function get_or_insert_race_player(sequelize, race, player) {
 	const race_results = sequelize.models.RaceResults;
+	const races = sequelize.models.Races;
 	try {
 		return await sequelize.transaction(async (t) => {
-			return await race_results.findOrCreate({
+			const my_race = await races.findOne({
+				where: { Id: race },
+				transaction: t,
+				lock: t.LOCK.UPDATE,
+			});
+			if (my_race.Status != 0) return -1;
+
+			const this_player = await race_results.findOrCreate({
 				where: { Race: race, Player: player },
 				transaction: t,
 				lock: t.LOCK.UPDATE,
 			});
+			if (!this_player[1]) return -2;
+			return 0;
 		});
 	}
 	catch (error) {
@@ -86,12 +96,21 @@ async function delete_race_player_if_present(sequelize, race, player) {
 	try {
 		return await sequelize.transaction(async (t) => {
 			const race_player = await race_results.findOne({
+				include: [
+					{
+						model: sequelize.models.Races,
+						as: 'race',
+					},
+				],
 				where: { Race: race, Player: player },
 				transaction: t,
 				lock: t.LOCK.UPDATE,
 			});
 			if (!race_player) {
 				return -1;
+			}
+			if (race_player.race.Status != 0) {
+				return -3;
 			}
 			if (race_player.Status != 0) {
 				return -2;
@@ -110,12 +129,21 @@ async function set_player_ready(sequelize, race, player) {
 	try {
 		return await sequelize.transaction(async (t) => {
 			const race_player = await race_results.findOne({
+				include: [
+					{
+						model: sequelize.models.Races,
+						as: 'race',
+					},
+				],
 				where: { Race: race, Player: player },
 				transaction: t,
 				lock: t.LOCK.UPDATE,
 			});
 			if (!race_player) {
 				return -1;
+			}
+			if (race_player.race.Status != 0) {
+				return -3;
 			}
 			if (race_player.Status != 0) {
 				return -2;
@@ -144,6 +172,12 @@ async function set_player_unready(sequelize, race, player) {
 	try {
 		return await sequelize.transaction(async (t) => {
 			const race_player = await race_results.findOne({
+				include: [
+					{
+						model: sequelize.models.Races,
+						as: 'race',
+					},
+				],
 				where: { Race: race, Player: player },
 				transaction: t,
 				lock: t.LOCK.UPDATE,
@@ -151,12 +185,36 @@ async function set_player_unready(sequelize, race, player) {
 			if (!race_player) {
 				return -1;
 			}
+			if (race_player.race.Status != 0) {
+				return -3;
+			}
 			if (race_player.Status != 1) {
 				return -2;
 			}
 			race_player.Status = 0;
 			await race_player.save({ transaction: t });
 			return 0;
+		});
+	}
+	catch (error) {
+		console.log(error['message']);
+	}
+}
+
+async function set_race_started(sequelize, race_channel) {
+	const races = sequelize.models.Races;
+	try {
+		return await sequelize.transaction(async (t) => {
+			const my_race = await races.findOne({
+				where: {
+					RaceChannel: race_channel,
+				},
+				transaction: t,
+				lock: t.LOCK.UPDATE,
+			});
+			my_race.Status = 1;
+			my_race.StartDate = Math.floor(new Date().getTime() / 1000);
+			return await my_race.save({ transaction: t });
 		});
 	}
 	catch (error) {
@@ -393,6 +451,7 @@ async function set_multi_settings_channel(sequelize, multi_channel) {
 }
 
 module.exports = { get_or_insert_player, insert_race, get_race_by_channel, get_or_insert_race_player,
-	delete_race_player_if_present, set_player_ready, set_player_unready, insert_async, get_active_async_races, search_async_by_name,
+	delete_race_player_if_present, set_player_ready, set_player_unready, set_race_started,
+	insert_async, get_active_async_races, search_async_by_name,
 	get_async_by_submit, update_async_status, save_async_result, get_results_for_race, get_global_var,
 	set_async_history_channel, set_multi_settings_channel };

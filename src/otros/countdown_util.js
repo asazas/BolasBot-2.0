@@ -2,7 +2,7 @@ async function countdown_en_canal(canal, tiempo) {
 	if (tiempo < 1 || tiempo > 10) {
 		tiempo = 10;
 	}
-	let msg = canal.send(tiempo.toString());
+	let msg = await canal.send(tiempo.toString());
 	for (let i = tiempo - 1; i > 0; i--) {
 		await new Promise(r => setTimeout(r, 800));
 		msg = await msg.edit(i.toString());
