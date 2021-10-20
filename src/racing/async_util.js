@@ -1,8 +1,7 @@
 const { Permissions, MessageEmbed } = require('discord.js');
 
-const { generate_from_preset, retrieve_from_url } = require('../seedgen/seedgen');
 const { get_active_async_races, get_results_for_race, get_or_insert_player, insert_async, get_async_by_submit, update_async_status, get_private_race_by_channel, update_private_status, get_global_var, set_async_history_channel } = require('../datamgmt/db_utils');
-const { seed_raw_data } = require('../seedgen/info_embeds');
+const { seed_in_create_race } = require('./race_seed_util');
 
 
 async function get_results_text(db, submit_channel) {
@@ -89,38 +88,9 @@ async function async_crear(interaction, db) {
 	name = name.substring(0, 20);
 
 	// Crear o recuperar seed
-	let seed = null;
-	let full_preset = null;
-	let seed_info = null;
-
-	const url = interaction.options.getString('url');
-	if (url) {
-		seed = await retrieve_from_url(url);
-		// failsafe para VARIA
-		if (!seed) {
-			seed_info = {};
-			seed_info['url'] = url;
-			seed_info['author'] = interaction.user.username;
-		}
-	}
-	else {
-		let preset = interaction.options.getString('preset');
-		if (preset) {
-			preset = preset.toLowerCase();
-			let extra = interaction.options.getString('extra');
-			if (extra) {
-				extra = extra.toLowerCase();
-			}
-			full_preset = extra ? preset + ' ' + extra : preset;
-			seed = await generate_from_preset(preset, extra);
-			if (!seed) {
-				throw { 'message': 'Error al crear la seed a partir del preset.' };
-			}
-		}
-	}
-	if (seed) {
-		seed_info = seed_raw_data(seed, interaction, full_preset);
-	}
+	const seed_details = await seed_in_create_race(interaction);
+	const full_preset = seed_details['full_preset'];
+	const seed_info = seed_details['seed_info'];
 
 	// Crear canales y rol para la async
 	let async_role = null;

@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 
-const { get_fernando_embed } = require('../memes/fernando_util');
+const { get_fernando_embed } = require('../otros/fernando_util');
 
 module.exports = {
 	data: new SlashCommandBuilder()
