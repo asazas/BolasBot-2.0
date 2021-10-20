@@ -1,9 +1,6 @@
-const process = require('process');
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed, MessageAttachment } = require('discord.js');
 
-const util = require('util');
-const exec = util.promisify(require('child_process').exec);
+const { get_fernando_embed } = require('../memes/fernando_util');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -12,25 +9,7 @@ module.exports = {
 
 	async execute(interaction) {
 		await interaction.deferReply();
-		const image_name = `almeida${Math.floor(Math.random() * 10)}.png`;
-		const image = new MessageAttachment(`res/${image_name}`);
-		const ans = new MessageEmbed()
-			.setColor('#0099ff')
-			.setImage(`attachment://${image_name}`)
-			.setTimestamp();
-
-		const command = process.platform == 'win32' ? 'wsl fortune es' : 'fortune es';
-		try {
-			const output = await exec(command);
-			let stdout = output['stdout'];
-			stdout = stdout.replaceAll('\n', ' ').replace('\t\t', '\n').replaceAll('\t\t', '');
-			ans.setDescription(stdout);
-		}
-		catch (error) {
-			console.log(error);
-		}
-		finally {
-			await interaction.editReply({ embeds: [ans], files: [image] });
-		}
+		const fernando_embed = await get_fernando_embed();
+		await interaction.editReply({ embeds: [fernando_embed[0]], files: [fernando_embed[1]] });
 	},
 };

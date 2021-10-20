@@ -230,6 +230,25 @@ async function set_async_history_channel(sequelize, history_channel) {
 	}
 }
 
+async function set_multi_settings_channel(sequelize, multi_channel) {
+	const global_var = sequelize.models.GlobalVar;
+	try {
+		return await sequelize.transaction(async (t) => {
+			return await global_var.update({ MultiworldSettingsChannel: multi_channel }, {
+				where: {
+					ServerId: {
+						[Op.ne]: null,
+					},
+				},
+				transaction: t,
+			});
+		});
+	}
+	catch (error) {
+		console.log(error['message']);
+	}
+}
+
 async function insert_private_race(sequelize, name, creator, private_channel) {
 	const private_races = sequelize.models.PrivateRaces;
 	try {
@@ -309,4 +328,4 @@ async function update_private_status(sequelize, id, status) {
 
 module.exports = { get_or_insert_player, insert_async, get_active_async_races, search_async_by_name, get_async_by_submit,
 	update_async_status, save_async_result, get_results_for_race, get_global_var, set_async_history_channel,
-	insert_private_race, get_active_private_races, get_private_race_by_channel, update_private_status };
+	set_multi_settings_channel, insert_private_race, get_active_private_races, get_private_race_by_channel, update_private_status };

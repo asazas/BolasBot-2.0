@@ -11,6 +11,9 @@ async function get_data_models(server) {
 		AsyncHistoryChannel: {
 			type: DataTypes.TEXT,
 		},
+		MultiworldSettingsChannel: {
+			type: DataTypes.TEXT,
+		},
 	});
 
 	const players = sequelize.define('Players', {

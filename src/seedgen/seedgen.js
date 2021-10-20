@@ -1,10 +1,7 @@
 const fs = require('fs');
 const glob = require('glob');
-const axios = require('axios').default;
+const gaxios = require('gaxios');
 const slugid = require('slugid');
-
-const axiosRetry = require('axios-retry').default;
-axiosRetry(axios, { retries: 3, retryDelay: axiosRetry.exponentialDelay });
 
 const { mystery_settings } = require('./mystery');
 
@@ -58,9 +55,9 @@ async function generate_alttpr(preset_data, extra) {
 	}
 
 	if (preset_data['customizer']) {
-		return await axios.post('https://alttpr.com/api/customizer', preset_data['settings']);
+		return await gaxios.request({ url: 'https://alttpr.com/api/customizer', method: 'POST', data: preset_data['settings'], retry: true });
 	}
-	return await axios.post('https://alttpr.com/api/randomizer', preset_data['settings']);
+	return await gaxios.request({ url: 'https://alttpr.com/api/randomizer', method: 'POST', data: preset_data['settings'], retry: true });
 }
 
 async function generate_sm(preset_data, extra) {
@@ -76,7 +73,7 @@ async function generate_sm(preset_data, extra) {
 			preset_data['settings']['placement'] = 'split';
 		}
 	}
-	return await axios.post('https://samus.link/api/randomizers/sm/generate', preset_data['settings']);
+	return await gaxios.request({ url: 'https://samus.link/api/randomizers/sm/generate', method: 'POST', data: preset_data['settings'], retry: true });
 }
 
 async function generate_smz3(preset_data, extra) {
@@ -92,7 +89,7 @@ async function generate_smz3(preset_data, extra) {
 			preset_data['settings']['keyshuffle'] = 'keysanity';
 		}
 	}
-	return await axios.post('https://samus.link/api/randomizers/smz3/generate', preset_data['settings']);
+	return await gaxios.request({ url: 'https://samus.link/api/randomizers/smz3/generate', method: 'POST', data: preset_data['settings'], retry: true });
 }
 
 
@@ -109,13 +106,15 @@ async function generate_varia(preset_data, extra) {
 
 	let settings_preset, skills_preset;
 	try {
-		settings_preset = await axios.post('https://randommetroidsolver.pythonanywhere.com/randoPresetWebService', settings);
+		settings_preset = await gaxios.request({ url: 'https://randommetroidsolver.pythonanywhere.com/randoPresetWebService',
+			method: 'POST', data: settings, retry: true });
 	}
 	catch (error) {
 		throw { 'message': 'El preset de ajustes indicado no existe.' };
 	}
 	try {
-		skills_preset = await axios.post('https://randommetroidsolver.pythonanywhere.com/presetWebService', skills);
+		skills_preset = await gaxios.request({ url: 'https://randommetroidsolver.pythonanywhere.com/presetWebService',
+			method: 'POST', data: skills, retry: true });
 	}
 	catch (error) {
 		throw { 'message': 'El preset de habilidades indicado no existe.' };
@@ -132,7 +131,8 @@ async function generate_varia(preset_data, extra) {
 		}
 	}
 
-	return await axios.post('https://randommetroidsolver.pythonanywhere.com/randomizerWebService', my_preset);
+	return await gaxios.request({ url: 'https://randommetroidsolver.pythonanywhere.com/randomizerWebService',
+		method: 'POST', data: my_preset, retry: true });
 }
 
 
@@ -168,12 +168,12 @@ const SMZ3_URL_REGEX = /^https:\/\/(sm\.)?samus\.link\/seed\/[A-Za-z0-9_-]{8}[Q-
 async function retrieve_from_url(url) {
 	if (ALTTPR_URL_REGEX.test(url)) {
 		const seed_hash = url.split('/').pop();
-		return await axios.get(`https://alttpr.com/hash/${seed_hash}`);
+		return await gaxios.request({ url: `https://alttpr.com/hash/${seed_hash}`, retry: true });
 	}
 	else if (SMZ3_URL_REGEX.test(url)) {
 		const seed_slugid = url.split('/').pop();
 		const seed_uuid = slugid.decode(seed_slugid).replaceAll('-', '');
-		return await axios.get(`https://samus.link/api/seed/${seed_uuid}`);
+		return await gaxios.request({ url: `https://samus.link/api/seed/${seed_uuid}`, retry: true });
 	}
 	return null;
 }
