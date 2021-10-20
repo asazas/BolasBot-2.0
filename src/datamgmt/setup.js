@@ -46,11 +46,11 @@ async function get_data_models(server) {
 			type: DataTypes.TEXT,
 		},
 		StartDate: {
-			type: DataTypes.TEXT,
+			type: DataTypes.INTEGER,
 			allowNull: false,
 		},
 		EndDate: {
-			type: DataTypes.TEXT,
+			type: DataTypes.INTEGER,
 		},
 		Status: {
 			type: DataTypes.INTEGER,
@@ -110,7 +110,7 @@ async function get_data_models(server) {
 			unique: 'UniqueKey',
 		},
 		Timestamp: {
-			type: DataTypes.TEXT,
+			type: DataTypes.INTEGER,
 			allowNull: false,
 		},
 		Time: {
@@ -141,7 +141,7 @@ async function get_data_models(server) {
 			type: DataTypes.TEXT,
 		},
 		StartDate: {
-			type: DataTypes.TEXT,
+			type: DataTypes.INTEGER,
 			allowNull: false,
 		},
 		Status: {

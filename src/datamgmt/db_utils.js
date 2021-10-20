@@ -29,7 +29,7 @@ async function insert_async(sequelize, name, creator, preset, seed_hash, seed_co
 			return await async_races.create({
 				Name: name,
 				Creator: creator,
-				StartDate: sequelize.literal('CURRENT_TIMESTAMP'),
+				StartDate: Math.floor(new Date().getTime() / 1000),
 				Preset: preset,
 				SeedHash: seed_hash,
 				SeedCode: seed_code,
@@ -122,7 +122,7 @@ async function update_async_status(sequelize, id, status) {
 			if (status == 1) {
 				return await async_races.update({
 					Status: status,
-					EndDate: sequelize.literal('CURRENT_TIMESTAMP'),
+					EndDate: Math.floor(new Date().getTime() / 1000),
 				}, {
 					where: {
 						Id: id,
@@ -154,7 +154,7 @@ async function save_async_result(sequelize, race, player, time, collection_rate)
 			return await async_results.upsert({
 				Race: race,
 				Player: player,
-				Timestamp: sequelize.literal('CURRENT_TIMESTAMP'),
+				Timestamp: Math.floor(new Date().getTime() / 1000),
 				Time: time,
 				CollectionRate: collection_rate,
 			}, {
@@ -237,7 +237,7 @@ async function insert_private_race(sequelize, name, creator, private_channel) {
 			return await private_races.create({
 				Name: name,
 				Creator: creator,
-				StartDate: sequelize.literal('CURRENT_TIMESTAMP'),
+				StartDate: Math.floor(new Date().getTime() / 1000),
 				PrivateChannel: private_channel,
 			}, { transaction: t });
 		});
