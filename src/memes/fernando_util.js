@@ -13,7 +13,7 @@ async function get_fernando_embed() {
 		.setImage(`attachment://${image_name}`)
 		.setTimestamp();
 
-	const command = process.platform == 'win32' ? 'wsl fortune es' : 'fortune es';
+	const command = process.platform == 'win32' ? 'wsl fortune es' : '/usr/games/fortune es';
 	try {
 		const output = await exec(command);
 		let stdout = output['stdout'];
