@@ -163,7 +163,7 @@ async function get_data_models(server) {
 	});
 	private_races.belongsTo(players, { as: 'creator', foreignKey: 'Creator', onDelete: 'SET NULL' });
 
-	await sequelize.sync({ 'force': true });
+	await sequelize.sync();
 
 	await sequelize.transaction(async (t) => {
 		try {
