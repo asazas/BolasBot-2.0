@@ -215,7 +215,14 @@ async function set_async_history_channel(sequelize, history_channel) {
 	const global_var = sequelize.models.GlobalVar;
 	try {
 		return await sequelize.transaction(async (t) => {
-			return await global_var.update({ AsyncHistoryChannel: history_channel }, { transaction: t });
+			return await global_var.update({ AsyncHistoryChannel: history_channel }, {
+				where: {
+					ServerId: {
+						[Op.ne]: null,
+					},
+				},
+				transaction: t,
+			});
 		});
 	}
 	catch (error) {

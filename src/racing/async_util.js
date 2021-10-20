@@ -1,4 +1,3 @@
-const util = require('util');
 const { Permissions, MessageEmbed } = require('discord.js');
 
 const { generate_from_preset, retrieve_from_url } = require('../seedgen/seedgen');
@@ -15,16 +14,25 @@ async function get_results_text(db, submit_channel) {
 	if (results) {
 		msg += '|' + '-'.repeat(41) + '|\n';
 		let pos = 1;
-		for (const res in results) {
+		for (const res of results) {
 			let time_str = 'Forfeit ';
 			if (res.Time < 359999) {
 				const s = res.Time % 60;
 				let m = Math.floor(res.Time / 60);
 				const h = Math.floor(m / 60);
 				m = m % 60;
-				time_str = util.format('%02d:%02d:%02d', h, m, s);
+
+				const h_str = '0'.repeat(2 - h.toString().length) + h.toString();
+				const m_str = '0'.repeat(2 - m.toString().length) + m.toString();
+				const s_str = '0'.repeat(2 - s.toString().length) + s.toString();
+				time_str = `${h_str}:${m_str}:${s_str}`;
 			}
-			msg += util.format('| %2d | %17s | %s | %3d |', pos, res.player.Name.substring(0, 17), time_str, res.CollectionRate);
+			const pos_str = ' '.repeat(2 - pos.toString().length) + pos.toString();
+			let pl_name = res.player.Name.substring(0, 17);
+			pl_name = pl_name + ' '.repeat(17 - pl_name.length);
+			let col_rate = res.CollectionRate.toString();
+			col_rate = ' '.repeat(3 - col_rate.length) + col_rate;
+			msg += `| ${pos_str} | ${pl_name} | ${time_str} | ${col_rate} |\n`;
 			pos += 1;
 		}
 		msg += '+' + '-'.repeat(41) + '+\n';
@@ -356,7 +364,9 @@ async function async_purgar(interaction, db) {
 				my_hist_channel = interaction.guild.channels.cache.get(`${global_var.AsyncHistoryChannel}`);
 			}
 
-			await my_hist_channel.send(get_results_text(db, submit_channel.id), { embeds: [get_async_data_embed(db. submit_channel.id)] });
+			const results_text = await get_results_text(db, submit_channel.id);
+			const data_embed = await get_async_data_embed(db, submit_channel.id);
+			await my_hist_channel.send({ content: results_text, embeds: [data_embed] });
 		}
 
 		if (race.RoleId) {
@@ -376,4 +386,4 @@ async function async_purgar(interaction, db) {
 	}
 }
 
-module.exports = { async_crear, async_cerrar, async_reabrir, async_purgar };
+module.exports = { async_crear, async_cerrar, async_reabrir, async_purgar, get_results_text };

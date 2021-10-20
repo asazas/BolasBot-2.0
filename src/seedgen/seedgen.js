@@ -3,6 +3,9 @@ const glob = require('glob');
 const axios = require('axios').default;
 const slugid = require('slugid');
 
+const axiosRetry = require('axios-retry').default;
+axiosRetry(axios, { retries: 3, retryDelay: axiosRetry.exponentialDelay });
+
 const { mystery_settings } = require('./mystery');
 
 function preset_file(preset) {
