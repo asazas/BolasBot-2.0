@@ -1,24 +1,10 @@
-const { MessageEmbed } = require('discord.js');
+const { MessageEmbed, Permissions } = require('discord.js');
 const { save_async_result } = require('../datamgmt/async_db_utils');
-const { get_or_insert_player } = require('../datamgmt/db_utils');
+const { get_or_insert_player, get_global_var, set_race_history_channel } = require('../datamgmt/db_utils');
 const { set_player_forfeit, set_player_done, set_race_finished, set_player_undone } = require('../datamgmt/race_db_utils');
-const { get_results_text } = require('./async_util');
+const { get_async_results_text } = require('./async_util');
+const { calcular_tiempo, get_race_results_text, get_race_data_embed } = require('./race_results_util');
 
-function calcular_tiempo(timestamp) {
-	let time_str = 'Forfeit ';
-	if (timestamp < 359999) {
-		const s = timestamp % 60;
-		let m = Math.floor(timestamp / 60);
-		const h = Math.floor(m / 60);
-		m = m % 60;
-
-		const h_str = '0'.repeat(2 - h.toString().length) + h.toString();
-		const m_str = '0'.repeat(2 - m.toString().length) + m.toString();
-		const s_str = '0'.repeat(2 - s.toString().length) + s.toString();
-		time_str = `${h_str}:${m_str}:${s_str}`;
-	}
-	return time_str;
-}
 
 async function done_async(interaction, db, race) {
 	if (race.Status == 0) {
@@ -41,7 +27,7 @@ async function done_async(interaction, db, race) {
 			await get_or_insert_player(db, author.id, author.username, author.discriminator, `${author}`);
 			await save_async_result(db, race.Id, author.id, time_s, collection);
 
-			const results_text = await get_results_text(db, race.SubmitChannel);
+			const results_text = await get_async_results_text(db, race.SubmitChannel);
 			const results_channel = interaction.guild.channels.cache.get(`${race.ResultsChannel}`);
 			const results_message = results_channel.messages.cache.get(`${race.ResultsMessage}`);
 			await results_message.edit(results_text);
@@ -138,6 +124,32 @@ async function done_race(interaction, db, race, forfeit = false) {
 		await interaction.channel.send({ embeds: [text_ans] });
 
 		await set_race_finished(db, interaction.channelId);
+
+		// Copia de resultados al historial
+		const global_var = await get_global_var(db);
+		let my_hist_channel = null;
+		if (!global_var.RaceHistoryChannel || !interaction.guild.channels.cache.get(`${global_var.RaceHistoryChannel}`)) {
+			my_hist_channel = await interaction.guild.channels.create('carrera-historico', {
+				permissionOverwrites: [
+					{
+						id: interaction.guild.roles.everyone,
+						deny: [Permissions.FLAGS.SEND_MESSAGES],
+					},
+					{
+						id: interaction.guild.me,
+						allow: [Permissions.FLAGS.SEND_MESSAGES],
+					},
+				],
+			});
+			await set_race_history_channel(db, my_hist_channel.id);
+		}
+		else {
+			my_hist_channel = interaction.guild.channels.cache.get(`${global_var.RaceHistoryChannel}`);
+		}
+
+		const results_text = await get_race_results_text(db, interaction.channelId);
+		const data_embed = await get_race_data_embed(db, interaction.channelId);
+		await my_hist_channel.send({ content: results_text, embeds: [data_embed] });
 	}
 }
 

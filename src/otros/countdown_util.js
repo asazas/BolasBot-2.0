@@ -3,10 +3,10 @@ async function countdown_en_canal(canal, tiempo) {
 		tiempo = 10;
 	}
 	let msg = null;
-	if (tiempo > 6) {
+	if (tiempo > 5) {
 		msg = await canal.send(`${tiempo}...`);
-		await new Promise(r => setTimeout(r, 1000 * (tiempo - 6)));
-		tiempo = 6;
+		await new Promise(r => setTimeout(r, 1000 * (tiempo - 5)));
+		tiempo = 5;
 	}
 	else {
 		msg = await canal.send(tiempo.toString());
@@ -23,10 +23,10 @@ async function countdown_interaction(interaction, tiempo) {
 	if (tiempo < 1 || tiempo > 10) {
 		tiempo = 10;
 	}
-	if (tiempo > 6) {
+	if (tiempo > 5) {
 		await interaction.reply(`${tiempo}...`);
-		await new Promise(r => setTimeout(r, 1000 * (tiempo - 6)));
-		tiempo = 6;
+		await new Promise(r => setTimeout(r, 1000 * (tiempo - 5)));
+		tiempo = 5;
 	}
 	else {
 		await interaction.reply(tiempo.toString());

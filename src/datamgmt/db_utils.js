@@ -52,6 +52,25 @@ async function set_async_history_channel(sequelize, history_channel) {
 	}
 }
 
+async function set_race_history_channel(sequelize, history_channel) {
+	const global_var = sequelize.models.GlobalVar;
+	try {
+		return await sequelize.transaction(async (t) => {
+			return await global_var.update({ RaceHistoryChannel: history_channel }, {
+				where: {
+					ServerId: {
+						[Op.ne]: null,
+					},
+				},
+				transaction: t,
+			});
+		});
+	}
+	catch (error) {
+		console.log(error['message']);
+	}
+}
+
 async function set_multi_settings_channel(sequelize, multi_channel) {
 	const global_var = sequelize.models.GlobalVar;
 	try {
@@ -71,4 +90,5 @@ async function set_multi_settings_channel(sequelize, multi_channel) {
 	}
 }
 
-module.exports = { get_or_insert_player, get_global_var, set_async_history_channel, set_multi_settings_channel };
+module.exports = { get_or_insert_player, get_global_var, set_async_history_channel, set_race_history_channel,
+	set_multi_settings_channel };

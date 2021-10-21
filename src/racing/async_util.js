@@ -2,68 +2,9 @@ const { Permissions, MessageEmbed } = require('discord.js');
 const { get_results_for_async, get_async_by_submit, get_active_async_races, insert_async, update_async_status } = require('../datamgmt/async_db_utils');
 
 const { get_or_insert_player, get_global_var, set_async_history_channel } = require('../datamgmt/db_utils');
+const { get_async_results_text, get_async_data_embed } = require('./race_results_util');
 const { seed_in_create_race } = require('./race_seed_util');
 
-
-async function get_results_text(db, submit_channel) {
-	const results = await get_results_for_async(db, submit_channel);
-	let msg = '```\n';
-	msg += '+' + '-'.repeat(41) + '+\n';
-	msg += '| Rk | Jugador           | Tiempo   | CR  |\n';
-
-	if (results) {
-		msg += '|' + '-'.repeat(41) + '|\n';
-		let pos = 1;
-		for (const res of results) {
-			let time_str = 'Forfeit ';
-			if (res.Time < 359999) {
-				const s = res.Time % 60;
-				let m = Math.floor(res.Time / 60);
-				const h = Math.floor(m / 60);
-				m = m % 60;
-
-				const h_str = '0'.repeat(2 - h.toString().length) + h.toString();
-				const m_str = '0'.repeat(2 - m.toString().length) + m.toString();
-				const s_str = '0'.repeat(2 - s.toString().length) + s.toString();
-				time_str = `${h_str}:${m_str}:${s_str}`;
-			}
-			const pos_str = ' '.repeat(2 - pos.toString().length) + pos.toString();
-			let pl_name = res.player.Name.substring(0, 17);
-			pl_name = pl_name + ' '.repeat(17 - pl_name.length);
-			let col_rate = res.CollectionRate.toString();
-			col_rate = ' '.repeat(3 - col_rate.length) + col_rate;
-			msg += `| ${pos_str} | ${pl_name} | ${time_str} | ${col_rate} |\n`;
-			pos += 1;
-		}
-		msg += '+' + '-'.repeat(41) + '+\n';
-		msg += '```';
-		return msg;
-	}
-}
-
-async function get_async_data_embed(db, submit_channel) {
-	const my_async = await get_async_by_submit(db, submit_channel);
-
-	const data_embed = new MessageEmbed()
-		.setColor('#0099ff')
-		.setTitle(`Carrera asíncrona: ${my_async.Name}`)
-		.addField('Creador', my_async.creator.Name)
-		.addField('Fecha de inicio', `<t:${my_async.StartDate}>`)
-		.setTimestamp();
-	if (my_async.EndDate) {
-		data_embed.addField('Fecha de cierre', `<t:${my_async.EndDate}>`);
-	}
-	if (my_async.Preset) {
-		data_embed.addField('Descripción', my_async.Preset);
-	}
-	if (my_async.SeedUrl) {
-		data_embed.addField('Seed', my_async.SeedUrl);
-	}
-	if (my_async.SeedCode) {
-		data_embed.addField('Hash', my_async.SeedCode);
-	}
-	return data_embed;
-}
 
 const random_words = ['Asazas', 'DiegoA', 'Vilxs', 'Diegolazo', 'Matkap', 'Kitsune', 'Eolina', 'Kaede',
 	'Kodama', 'Akuma', 'Cougars', 'Fantasma', 'Marco', 'Jim', 'Gio', 'Midget',
@@ -181,7 +122,7 @@ async function async_crear(interaction, db) {
 		});
 	}
 
-	const results_text = await get_results_text(db, submit_channel.id);
+	const results_text = await get_async_results_text(db, submit_channel.id);
 	const results_msg = await results_channel.send(results_text);
 
 	const creator = interaction.user;
@@ -312,7 +253,7 @@ async function async_purgar(interaction, db) {
 				my_hist_channel = interaction.guild.channels.cache.get(`${global_var.AsyncHistoryChannel}`);
 			}
 
-			const results_text = await get_results_text(db, submit_channel.id);
+			const results_text = await get_async_results_text(db, submit_channel.id);
 			const data_embed = await get_async_data_embed(db, submit_channel.id);
 			await my_hist_channel.send({ content: results_text, embeds: [data_embed] });
 		}
@@ -334,4 +275,4 @@ async function async_purgar(interaction, db) {
 	}
 }
 
-module.exports = { random_words, async_crear, async_cerrar, async_reabrir, async_purgar, get_results_text };
+module.exports = { random_words, async_crear, async_cerrar, async_reabrir, async_purgar, get_async_results_text };

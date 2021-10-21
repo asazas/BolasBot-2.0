@@ -129,6 +129,7 @@ async function set_player_ready(sequelize, race, player) {
 			await race_player.save({ transaction: t });
 
 			const all_player_count = await race_results.findAndCountAll({
+				where: { Race: race },
 				transaction: t,
 				lock: t.LOCK.UPDATE,
 			});
@@ -273,6 +274,7 @@ async function set_player_done(sequelize, race, player) {
 			const updated_res = await race_player.save({ transaction: t });
 
 			const all_player_count = await race_results.findAndCountAll({
+				where: { Race: race },
 				transaction: t,
 				lock: t.LOCK.UPDATE,
 			});
@@ -320,6 +322,7 @@ async function set_player_forfeit(sequelize, race, player) {
 			const updated_res = await race_player.save({ transaction: t });
 
 			const all_player_count = await race_results.findAndCountAll({
+				where: { Race: race },
 				transaction: t,
 				lock: t.LOCK.UPDATE,
 			});
@@ -424,6 +427,38 @@ async function set_player_undone(sequelize, race, player) {
 	}
 }
 
+async function get_results_for_race(sequelize, race_channel) {
+	const race_results = sequelize.models.RaceResults;
+	try {
+		return await sequelize.transaction(async (t) => {
+			return await race_results.findAll({
+				include: [
+					{
+						model: sequelize.models.Races,
+						as: 'race',
+						required: true,
+						where: {
+							RaceChannel: race_channel,
+						},
+					},
+					{
+						model: sequelize.models.Players,
+						as: 'player',
+						required: true,
+					},
+				],
+				order: [
+					['Time', 'ASC'],
+				],
+				transaction: t,
+			});
+		});
+	}
+	catch (error) {
+		console.log(error['message']);
+	}
+}
+
 module.exports = { insert_race, get_race_by_channel, get_or_insert_race_player,	delete_race_player_if_present,
 	set_player_ready, set_all_ready_for_force_start, set_player_unready, set_race_started, set_player_done,
-	set_player_forfeit, set_all_forfeit_for_force_end, set_race_finished, set_player_undone };
+	set_player_forfeit, set_all_forfeit_for_force_end, set_race_finished, set_player_undone, get_results_for_race };

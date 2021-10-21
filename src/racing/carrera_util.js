@@ -1,38 +1,13 @@
 const { MessageEmbed, Permissions } = require('discord.js');
 
-const { get_or_insert_player } = require('../datamgmt/db_utils');
+const { get_or_insert_player, get_global_var, set_race_history_channel } = require('../datamgmt/db_utils');
 const { get_race_by_channel, insert_race, get_or_insert_race_player, delete_race_player_if_present, set_player_ready, set_race_started,
 	set_player_unready, set_all_ready_for_force_start, set_all_forfeit_for_force_end, set_race_finished } = require('../datamgmt/race_db_utils');
 const { countdown_en_canal } = require('../otros/countdown_util');
 const { random_words } = require('./async_util');
+const { get_race_data_embed, get_race_results_text } = require('./race_results_util');
 const { seed_in_create_race } = require('./race_seed_util');
 
-async function get_race_data_embed(db, race_channel) {
-	const my_race = await get_race_by_channel(db, race_channel);
-
-	const data_embed = new MessageEmbed()
-		.setColor('#0099ff')
-		.setTitle(`Carrera: ${my_race.Name}`)
-		.addField('Creador', my_race.creator.Name)
-		.addField('Fecha de creación', `<t:${my_race.CreationDate}>`)
-		.setTimestamp();
-	if (my_race.StartDate) {
-		data_embed.addField('Fecha de inicio', `<t:${my_race.StartDate}>`);
-	}
-	if (my_race.EndDate) {
-		data_embed.addField('Fecha de cierre', `<t:${my_race.EndDate}>`);
-	}
-	if (my_race.Preset) {
-		data_embed.addField('Descripción', my_race.Preset);
-	}
-	if (my_race.SeedUrl) {
-		data_embed.addField('Seed', my_race.SeedUrl);
-	}
-	if (my_race.SeedCode) {
-		data_embed.addField('Hash', my_race.SeedCode);
-	}
-	return data_embed;
-}
 
 async function carrera_crear(interaction, db) {
 	await interaction.deferReply();
@@ -192,7 +167,7 @@ async function carrera_listo(interaction, db) {
 	}
 	await interaction.reply({ embeds: [text_ans] });
 
-	if (typeof ready_code == 'object' && ready_code['all'] >= 2 && ready_code['ready'] == ready_code['all']) {
+	if (typeof ready_code == 'object' && ready_code['ready'] == ready_code['all']) {
 		text_ans = new MessageEmbed()
 			.setColor('#0099ff')
 			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
@@ -323,6 +298,32 @@ async function carrera_forzar_final(interaction, db) {
 
 	if (force_end_code == 0) {
 		await set_race_finished(db, interaction.channelId);
+
+		// Copia de resultados al historial
+		const global_var = await get_global_var(db);
+		let my_hist_channel = null;
+		if (!global_var.RaceHistoryChannel || !interaction.guild.channels.cache.get(`${global_var.RaceHistoryChannel}`)) {
+			my_hist_channel = await interaction.guild.channels.create('carrera-historico', {
+				permissionOverwrites: [
+					{
+						id: interaction.guild.roles.everyone,
+						deny: [Permissions.FLAGS.SEND_MESSAGES],
+					},
+					{
+						id: interaction.guild.me,
+						allow: [Permissions.FLAGS.SEND_MESSAGES],
+					},
+				],
+			});
+			await set_race_history_channel(db, my_hist_channel.id);
+		}
+		else {
+			my_hist_channel = interaction.guild.channels.cache.get(`${global_var.RaceHistoryChannel}`);
+		}
+
+		const results_text = await get_race_results_text(db, interaction.channelId);
+		const data_embed = await get_race_data_embed(db, interaction.channelId);
+		await my_hist_channel.send({ content: results_text, embeds: [data_embed] });
 	}
 }
 
