@@ -218,9 +218,9 @@ async function get_data_models(server) {
 	async_results.belongsTo(players, { as: 'player', foreignKey: 'Player', onDelete: 'SET NULL' });
 
 	// SYNC PARA DEBUG
-	await sequelize.sync({ force: true });
+	// await sequelize.sync({ force: true });
 
-	// await sequelize.sync();
+	await sequelize.sync();
 
 	await sequelize.transaction(async (t) => {
 		try {
