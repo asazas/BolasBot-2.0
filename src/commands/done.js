@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { get_async_by_submit, get_race_by_channel } = require('../datamgmt/db_utils');
+const { get_async_by_submit } = require('../datamgmt/async_db_utils');
+const { get_race_by_channel } = require('../datamgmt/race_db_utils');
 const { done_async, done_race } = require('../racing/done_util');
 
 module.exports = {

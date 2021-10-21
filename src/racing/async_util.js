@@ -1,11 +1,12 @@
 const { Permissions, MessageEmbed } = require('discord.js');
+const { get_results_for_async, get_async_by_submit, get_active_async_races, insert_async, update_async_status } = require('../datamgmt/async_db_utils');
 
-const { get_active_async_races, get_results_for_race, get_or_insert_player, insert_async, get_async_by_submit, update_async_status, get_private_race_by_channel, update_private_status, get_global_var, set_async_history_channel } = require('../datamgmt/db_utils');
+const { get_or_insert_player, get_global_var, set_async_history_channel } = require('../datamgmt/db_utils');
 const { seed_in_create_race } = require('./race_seed_util');
 
 
 async function get_results_text(db, submit_channel) {
-	const results = await get_results_for_race(db, submit_channel);
+	const results = await get_results_for_async(db, submit_channel);
 	let msg = '```\n';
 	msg += '+' + '-'.repeat(41) + '+\n';
 	msg += '| Rk | Jugador           | Tiempo   | CR  |\n';
@@ -265,32 +266,9 @@ async function async_reabrir(interaction, db) {
 }
 
 async function async_purgar(interaction, db) {
-	let race = await get_async_by_submit(db, interaction.channelId);
+	const race = await get_async_by_submit(db, interaction.channelId);
 	if (!race) {
-		race = get_private_race_by_channel(db, interaction.channelId);
-		if (race) {
-			if (!interaction.memberPermissions.has(Permissions.FLAGS.MANAGE_CHANNELS) && interaction.user.id != race.Creator) {
-				throw { 'message': 'Solo el creador de la carrera o un moderador pueden ejecutar este comando.' };
-			}
-
-			const ans_embed = new MessageEmbed()
-				.setColor('#0099ff')
-				.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
-				.setDescription('Purgando...')
-				.setTimestamp();
-			await interaction.reply({ embeds: [ans_embed] });
-
-			const creator = interaction.user;
-			await get_or_insert_player(db, creator.id, creator.username, creator.discriminator, `${creator}`);
-			await update_private_status(db, race.Id, 2);
-
-			const race_channel = interaction.guild.channels.resolve(race.PrivateChannel);
-			await race_channel.delete();
-			return;
-		}
-		else {
-			throw { 'message': 'Este comando solo puede ser usado en canales de carreras.' };
-		}
+		throw { 'message': 'Este comando solo puede ser usado en canales de carreras.' };
 	}
 
 	if (!interaction.memberPermissions.has(Permissions.FLAGS.MANAGE_CHANNELS) && interaction.user.id != race.Creator) {
@@ -311,7 +289,7 @@ async function async_purgar(interaction, db) {
 
 		// Copia de resultados al historial, si los hay
 		const submit_channel = interaction.guild.channels.cache.get(`${race.SubmitChannel}`);
-		const results = await get_results_for_race(db, submit_channel.id);
+		const results = await get_results_for_async(db, submit_channel.id);
 		if (results && results.length > 0) {
 			const global_var = await get_global_var(db);
 			let my_hist_channel = null;

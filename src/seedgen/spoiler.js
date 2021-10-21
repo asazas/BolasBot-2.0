@@ -1,4 +1,4 @@
-const { search_in_patch } = require('./util');
+const { search_in_patch } = require('./seedgen_util');
 
 const translation = {
 	'BigKeyP1': 'BigKeyP1-EasternPalace',

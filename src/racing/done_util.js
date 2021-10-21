@@ -1,5 +1,7 @@
 const { MessageEmbed } = require('discord.js');
-const { get_or_insert_player, save_async_result, set_player_done, set_player_forfeit, set_race_finished, set_player_undone } = require('../datamgmt/db_utils');
+const { save_async_result } = require('../datamgmt/async_db_utils');
+const { get_or_insert_player } = require('../datamgmt/db_utils');
+const { set_player_forfeit, set_player_done, set_race_finished, set_player_undone } = require('../datamgmt/race_db_utils');
 const { get_results_text } = require('./async_util');
 
 function calcular_tiempo(timestamp) {

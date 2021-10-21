@@ -1,6 +1,8 @@
 const { MessageEmbed, Permissions } = require('discord.js');
 
-const { get_or_insert_player, insert_race, get_race_by_channel, delete_race_player_if_present, get_or_insert_race_player, set_player_ready, set_player_unready, set_race_started, set_all_ready_for_force_start, set_all_forfeit_for_force_end, set_race_finished } = require('../datamgmt/db_utils');
+const { get_or_insert_player } = require('../datamgmt/db_utils');
+const { get_race_by_channel, insert_race, get_or_insert_race_player, delete_race_player_if_present, set_player_ready, set_race_started,
+	set_player_unready, set_all_ready_for_force_start, set_all_forfeit_for_force_end, set_race_finished } = require('../datamgmt/race_db_utils');
 const { countdown_en_canal } = require('../otros/countdown_util');
 const { random_words } = require('./async_util');
 const { seed_in_create_race } = require('./race_seed_util');

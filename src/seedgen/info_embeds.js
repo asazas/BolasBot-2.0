@@ -2,7 +2,7 @@ const { MessageEmbed, MessageAttachment } = require('discord.js');
 const slugid = require('slugid');
 
 const { get_formatted_spoiler } = require('./spoiler');
-const { get_seed_code } = require('./util');
+const { get_seed_code } = require('./seedgen_util');
 
 function sm_info_embed(seed, interaction, preset = '') {
 	let seed_guid = seed['data']['guid'];
