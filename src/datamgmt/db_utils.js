@@ -167,6 +167,44 @@ async function set_player_ready(sequelize, race, player) {
 	}
 }
 
+async function set_all_ready_for_force_start(sequelize, race) {
+	const race_results = sequelize.models.RaceResults;
+	const races = sequelize.models.Races;
+	try {
+		return await sequelize.transaction(async (t) => {
+			const my_race = await races.findOne({
+				where: {
+					Id: race,
+				},
+				transaction: t,
+				lock: t.LOCK.UPDATE,
+			});
+			const race_players = await race_results.findAndCountAll({
+				where: { Race: race },
+				transaction: t,
+				lock: t.LOCK.UPDATE,
+			});
+
+			if (race_players.count < 2) {
+				return -1;
+			}
+			if (my_race.Status != 0) {
+				return -2;
+			}
+
+			await race_results.update({ Status: 1 }, {
+				where: { Status: 0 },
+				transaction: t,
+			});
+
+			return 0;
+		});
+	}
+	catch (error) {
+		console.log(error['message']);
+	}
+}
+
 async function set_player_unready(sequelize, race, player) {
 	const race_results = sequelize.models.RaceResults;
 	try {
@@ -313,6 +351,36 @@ async function set_player_forfeit(sequelize, race, player) {
 				if (p.Status == 2) done_player_count += 1;
 			}
 			return { 'result': updated_res, 'position': done_player_count, 'player_count': all_player_count.count };
+		});
+	}
+	catch (error) {
+		console.log(error['message']);
+	}
+}
+
+async function set_all_forfeit_for_force_end(sequelize, race) {
+	const race_results = sequelize.models.RaceResults;
+	const races = sequelize.models.Races;
+	try {
+		return await sequelize.transaction(async (t) => {
+			const my_race = await races.findOne({
+				where: {
+					Id: race,
+				},
+				transaction: t,
+				lock: t.LOCK.UPDATE,
+			});
+
+			if (my_race.Status != 1) {
+				return -1;
+			}
+
+			await race_results.update({ Status: 2, Time: 359999 }, {
+				where: { Status: 1 },
+				transaction: t,
+			});
+
+			return 0;
 		});
 	}
 	catch (error) {
@@ -609,7 +677,8 @@ async function set_multi_settings_channel(sequelize, multi_channel) {
 }
 
 module.exports = { get_or_insert_player, insert_race, get_race_by_channel, get_or_insert_race_player,
-	delete_race_player_if_present, set_player_ready, set_player_unready, set_race_started, set_player_done,
-	set_player_forfeit, set_race_finished, set_player_undone, insert_async, get_active_async_races,
-	search_async_by_name, get_async_by_submit, update_async_status, save_async_result, get_results_for_race,
-	get_global_var,	set_async_history_channel, set_multi_settings_channel };
+	delete_race_player_if_present, set_player_ready, set_all_ready_for_force_start, set_player_unready,
+	set_race_started, set_player_done, set_player_forfeit, set_all_forfeit_for_force_end,
+	set_race_finished, set_player_undone, insert_async, get_active_async_races, search_async_by_name,
+	get_async_by_submit, update_async_status, save_async_result, get_results_for_race, get_global_var,
+	set_async_history_channel, set_multi_settings_channel };

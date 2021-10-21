@@ -1,8 +1,7 @@
 const glob = require('glob');
 const path = require('path');
 const { SlashCommandBuilder, SlashCommandStringOption } = require('@discordjs/builders');
-const { async_purgar } = require('../racing/async_util');
-const { carrera_crear, carrera_entrar, carrera_salir, carrera_listo, carrera_no_listo } = require('../racing/carrera_util');
+const { carrera_crear, carrera_entrar, carrera_salir, carrera_listo, carrera_no_listo, carrera_forzar_inicio, carrera_forzar_final } = require('../racing/carrera_util');
 
 
 const preset_files = glob.sync('rando-settings/**/*.json');
@@ -75,8 +74,11 @@ command.execute = async function(interaction, db) {
 	else if (interaction.options.getSubcommand() == 'no_listo') {
 		await carrera_no_listo(interaction, db);
 	}
-	else if (interaction.options.getSubcommand() == 'purgar') {
-		await async_purgar(interaction, db);
+	else if (interaction.options.getSubcommand() == 'inicio') {
+		await carrera_forzar_inicio(interaction, db);
+	}
+	else if (interaction.options.getSubcommand() == 'final') {
+		await carrera_forzar_final(interaction, db);
 	}
 };
 

@@ -1,6 +1,6 @@
-const { MessageEmbed } = require('discord.js');
+const { MessageEmbed, Permissions } = require('discord.js');
 
-const { get_or_insert_player, insert_race, get_race_by_channel, delete_race_player_if_present, get_or_insert_race_player, set_player_ready, set_player_unready, set_race_started } = require('../datamgmt/db_utils');
+const { get_or_insert_player, insert_race, get_race_by_channel, delete_race_player_if_present, get_or_insert_race_player, set_player_ready, set_player_unready, set_race_started, set_all_ready_for_force_start, set_all_forfeit_for_force_end, set_race_finished } = require('../datamgmt/db_utils');
 const { countdown_en_canal } = require('../otros/countdown_util');
 const { random_words } = require('./async_util');
 const { seed_in_create_race } = require('./race_seed_util');
@@ -244,4 +244,85 @@ async function carrera_no_listo(interaction, db) {
 	await interaction.reply({ embeds: [text_ans] });
 }
 
-module.exports = { carrera_crear, carrera_entrar, carrera_salir, carrera_listo, carrera_no_listo };
+async function carrera_forzar_inicio(interaction, db) {
+	const race = await get_race_by_channel(db, interaction.channelId);
+	if (!race) {
+		throw { 'message': 'Este comando solo puede ser usado en canales de carreras.' };
+	}
+
+	if (!interaction.memberPermissions.has(Permissions.FLAGS.MANAGE_CHANNELS) && interaction.user.id != race.Creator) {
+		throw { 'message': 'Solo el creador de la carrera o un moderador pueden ejecutar este comando.' };
+	}
+
+	await get_or_insert_player(db, interaction.user.id, interaction.user.username, interaction.user.discriminator, `${interaction.user}`);
+	const force_start_code = await set_all_ready_for_force_start(db, race.Id, interaction.user.id);
+
+	let text_ans = null;
+	if (force_start_code == -1) {
+		text_ans = new MessageEmbed()
+			.setColor('#0099ff')
+			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setDescription('No hay suficientes jugadores para iniciar la carrera.')
+			.setTimestamp();
+	}
+	else if (force_start_code == -2) {
+		text_ans = new MessageEmbed()
+			.setColor('#0099ff')
+			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setDescription('Esta carrera no está abierta.')
+			.setTimestamp();
+	}
+	else {
+		text_ans = new MessageEmbed()
+			.setColor('#0099ff')
+			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setDescription('Forzado inicio de la carrera.')
+			.setTimestamp();
+	}
+
+	await interaction.reply({ embeds: [text_ans] });
+
+	if (force_start_code == 0) {
+		await set_race_started(db, interaction.channelId);
+		await countdown_en_canal(interaction.channel, 10);
+	}
+}
+
+async function carrera_forzar_final(interaction, db) {
+	const race = await get_race_by_channel(db, interaction.channelId);
+	if (!race) {
+		throw { 'message': 'Este comando solo puede ser usado en canales de carreras.' };
+	}
+
+	if (!interaction.memberPermissions.has(Permissions.FLAGS.MANAGE_CHANNELS) && interaction.user.id != race.Creator) {
+		throw { 'message': 'Solo el creador de la carrera o un moderador pueden ejecutar este comando.' };
+	}
+
+	await get_or_insert_player(db, interaction.user.id, interaction.user.username, interaction.user.discriminator, `${interaction.user}`);
+	const force_end_code = await set_all_forfeit_for_force_end(db, race.Id, interaction.user.id);
+
+	let text_ans = null;
+	if (force_end_code == -1) {
+		text_ans = new MessageEmbed()
+			.setColor('#0099ff')
+			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setDescription('Esta carrera no está en curso.')
+			.setTimestamp();
+	}
+	else {
+		text_ans = new MessageEmbed()
+			.setColor('#0099ff')
+			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setDescription('Forzado final de la carrera.')
+			.setTimestamp();
+	}
+
+	await interaction.reply({ embeds: [text_ans] });
+
+	if (force_end_code == 0) {
+		await set_race_finished(db, interaction.channelId);
+	}
+
+}
+
+module.exports = { carrera_crear, carrera_entrar, carrera_salir, carrera_listo, carrera_no_listo, carrera_forzar_inicio, carrera_forzar_final };
