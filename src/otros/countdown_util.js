@@ -2,7 +2,15 @@ async function countdown_en_canal(canal, tiempo) {
 	if (tiempo < 1 || tiempo > 10) {
 		tiempo = 10;
 	}
-	let msg = await canal.send(tiempo.toString());
+	let msg = null;
+	if (tiempo > 6) {
+		msg = await canal.send(`${tiempo}...`);
+		await new Promise(r => setTimeout(r, 1000 * (tiempo - 6)));
+		tiempo = 6;
+	}
+	else {
+		msg = await canal.send(tiempo.toString());
+	}
 	for (let i = tiempo - 1; i > 0; i--) {
 		await new Promise(r => setTimeout(r, 800));
 		msg = await msg.edit(i.toString());
@@ -15,7 +23,14 @@ async function countdown_interaction(interaction, tiempo) {
 	if (tiempo < 1 || tiempo > 10) {
 		tiempo = 10;
 	}
-	await interaction.reply(tiempo.toString());
+	if (tiempo > 6) {
+		await interaction.reply(`${tiempo}...`);
+		await new Promise(r => setTimeout(r, 1000 * (tiempo - 6)));
+		tiempo = 6;
+	}
+	else {
+		await interaction.reply(tiempo.toString());
+	}
 	for (let i = tiempo - 1; i > 0; i--) {
 		await new Promise(r => setTimeout(r, 800));
 		await interaction.editReply(i.toString());

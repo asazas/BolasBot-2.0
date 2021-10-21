@@ -116,7 +116,6 @@ async function get_data_models(server) {
 		},
 		Time: {
 			type: DataTypes.INTEGER,
-			defaultValue: 359999,
 		},
 	});
 	race_results.belongsTo(races, { as: 'race', foreignKey: 'Race', onDelete: 'SET NULL' });

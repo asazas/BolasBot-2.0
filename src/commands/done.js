@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { get_async_by_submit } = require('../datamgmt/db_utils');
-const { done_async } = require('../racing/done_util');
+const { get_async_by_submit, get_race_by_channel } = require('../datamgmt/db_utils');
+const { done_async, done_race } = require('../racing/done_util');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -14,12 +14,18 @@ module.exports = {
 				.setDescription('En carreras asíncronas, ratio de colección de ítems.')),
 
 	async execute(interaction, db) {
-		const race = await get_async_by_submit(db, interaction.channelId);
+		let race = await get_race_by_channel(db, interaction.channelId);
 		if (!race) {
-			throw { 'message': 'Este comando solo puede ser usado en canales de carreras.' };
+			race = await get_async_by_submit(db, interaction.channelId);
+			if (!race) {
+				throw { 'message': 'Este comando solo puede ser usado en canales de carreras.' };
+			}
+
+			// carrera asíncrona
+			await done_async(interaction, db, race);
 		}
 
-		// carrera asíncrona
-		await done_async(interaction, db, race);
+		// carrera normal
+		await done_race(interaction, db, race);
 	},
 };
