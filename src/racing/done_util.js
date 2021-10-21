@@ -115,7 +115,7 @@ async function done_race(interaction, db, race, forfeit = false) {
 	}
 	await interaction.reply({ embeds: [text_ans] });
 
-	if (typeof done_code == 'object' && done_code['position'] == done_code['player_count']) {
+	if (typeof done_code == 'object' && done_code['done_count'] == done_code['player_count']) {
 		text_ans = new MessageEmbed()
 			.setColor('#0099ff')
 			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())

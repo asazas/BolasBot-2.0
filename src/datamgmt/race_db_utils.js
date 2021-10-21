@@ -279,10 +279,12 @@ async function set_player_done(sequelize, race, player) {
 				lock: t.LOCK.UPDATE,
 			});
 			let done_player_count = 0;
+			let pos = 0;
 			for (const p of all_player_count.rows) {
 				if (p.Status == 2) done_player_count += 1;
+				if (p.Status == 2 && p.Time < 359999) pos += 1;
 			}
-			return { 'result': updated_res, 'position': done_player_count, 'player_count': all_player_count.count };
+			return { 'result': updated_res, 'position': pos, 'done_count': done_player_count, 'player_count': all_player_count.count };
 		});
 	}
 	catch (error) {
@@ -330,7 +332,7 @@ async function set_player_forfeit(sequelize, race, player) {
 			for (const p of all_player_count.rows) {
 				if (p.Status == 2) done_player_count += 1;
 			}
-			return { 'result': updated_res, 'position': done_player_count, 'player_count': all_player_count.count };
+			return { 'result': updated_res, 'done_count': done_player_count, 'player_count': all_player_count.count };
 		});
 	}
 	catch (error) {

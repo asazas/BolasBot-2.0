@@ -167,7 +167,7 @@ async function carrera_listo(interaction, db) {
 	}
 	await interaction.reply({ embeds: [text_ans] });
 
-	if (typeof ready_code == 'object' && ready_code['ready'] == ready_code['all']) {
+	if (typeof ready_code == 'object' && ready_code['all'] >= 2 && ready_code['ready'] == ready_code['all']) {
 		text_ans = new MessageEmbed()
 			.setColor('#0099ff')
 			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
