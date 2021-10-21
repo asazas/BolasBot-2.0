@@ -322,7 +322,33 @@ async function carrera_forzar_final(interaction, db) {
 	if (force_end_code == 0) {
 		await set_race_finished(db, interaction.channelId);
 	}
-
 }
 
-module.exports = { carrera_crear, carrera_entrar, carrera_salir, carrera_listo, carrera_no_listo, carrera_forzar_inicio, carrera_forzar_final };
+async function carrera_forzar_cancelar(interaction, db) {
+	const race = await get_race_by_channel(db, interaction.channelId);
+	if (!race) {
+		throw { 'message': 'Este comando solo puede ser usado en canales de carreras.' };
+	}
+
+	if (!interaction.memberPermissions.has(Permissions.FLAGS.MANAGE_CHANNELS) && interaction.user.id != race.Creator) {
+		throw { 'message': 'Solo el creador de la carrera o un moderador pueden ejecutar este comando.' };
+	}
+
+	if (race.Status != 0) {
+		throw { 'message': 'Solo se pueden anular carreras no empezadas.' };
+	}
+
+	const text_ans = new MessageEmbed()
+		.setColor('#0099ff')
+		.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+		.setDescription('Anulando carrera...')
+		.setTimestamp();
+
+	await interaction.reply({ embeds: [text_ans] });
+
+	await get_or_insert_player(db, interaction.user.id, interaction.user.username, interaction.user.discriminator, `${interaction.user}`);
+	await set_race_finished(db, interaction.channelId);
+	await interaction.channel.delete();
+}
+
+module.exports = { carrera_crear, carrera_entrar, carrera_salir, carrera_listo, carrera_no_listo, carrera_forzar_inicio, carrera_forzar_final, carrera_forzar_cancelar };

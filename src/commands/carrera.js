@@ -1,7 +1,7 @@
 const glob = require('glob');
 const path = require('path');
 const { SlashCommandBuilder, SlashCommandStringOption } = require('@discordjs/builders');
-const { carrera_crear, carrera_entrar, carrera_salir, carrera_listo, carrera_no_listo, carrera_forzar_inicio, carrera_forzar_final } = require('../racing/carrera_util');
+const { carrera_crear, carrera_entrar, carrera_salir, carrera_listo, carrera_no_listo, carrera_forzar_inicio, carrera_forzar_final, carrera_forzar_cancelar } = require('../racing/carrera_util');
 
 
 const preset_files = glob.sync('rando-settings/**/*.json');
@@ -55,7 +55,11 @@ command.data = new SlashCommandBuilder()
 
 			.addSubcommand(subcommand =>
 				subcommand.setName('final')
-					.setDescription('Forzar el final inmediato de la carrera.')));
+					.setDescription('Forzar el final inmediato de la carrera.'))
+
+			.addSubcommand(subcommand =>
+				subcommand.setName('cancelar')
+					.setDescription('Cancelar la carrera.')));
 
 
 command.execute = async function(interaction, db) {
@@ -79,6 +83,9 @@ command.execute = async function(interaction, db) {
 	}
 	else if (interaction.options.getSubcommand() == 'final') {
 		await carrera_forzar_final(interaction, db);
+	}
+	else if (interaction.options.getSubcommand() == 'cancelar') {
+		await carrera_forzar_cancelar(interaction, db);
 	}
 };
 
