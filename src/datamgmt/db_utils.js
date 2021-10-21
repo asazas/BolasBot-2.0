@@ -341,6 +341,45 @@ async function set_race_finished(sequelize, race_channel) {
 	}
 }
 
+async function set_player_undone(sequelize, race, player) {
+	const race_results = sequelize.models.RaceResults;
+	try {
+		return await sequelize.transaction(async (t) => {
+			const race_player = await race_results.findOne({
+				include: [
+					{
+						model: sequelize.models.Races,
+						as: 'race',
+					},
+				],
+				where: { Race: race, Player: player },
+				transaction: t,
+				lock: t.LOCK.UPDATE,
+			});
+			if (!race_player) {
+				return -1;
+			}
+			if (race_player.race.Status != 1) {
+				return -3;
+			}
+			if (race_player.Status == 0) {
+				return -2;
+			}
+			if (race_player.Status == 1) {
+				return -4;
+			}
+			race_player.Status = 1;
+			race_player.Time = null;
+			await race_player.save({ transaction: t });
+			return 0;
+		});
+	}
+	catch (error) {
+		console.log(error['message']);
+	}
+}
+
+
 async function insert_async(sequelize, name, creator, preset, seed_hash, seed_code, seed_url,
 	role_id, submit_channel, results_channel, results_message, spoilers_channel) {
 	const async_races = sequelize.models.AsyncRaces;
@@ -571,6 +610,6 @@ async function set_multi_settings_channel(sequelize, multi_channel) {
 
 module.exports = { get_or_insert_player, insert_race, get_race_by_channel, get_or_insert_race_player,
 	delete_race_player_if_present, set_player_ready, set_player_unready, set_race_started, set_player_done,
-	set_player_forfeit, set_race_finished, insert_async, get_active_async_races, search_async_by_name,
-	get_async_by_submit, update_async_status, save_async_result, get_results_for_race, get_global_var,
-	set_async_history_channel, set_multi_settings_channel };
+	set_player_forfeit, set_race_finished, set_player_undone, insert_async, get_active_async_races,
+	search_async_by_name, get_async_by_submit, update_async_status, save_async_result, get_results_for_race,
+	get_global_var,	set_async_history_channel, set_multi_settings_channel };

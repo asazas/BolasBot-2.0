@@ -1,5 +1,5 @@
 const { MessageEmbed } = require('discord.js');
-const { get_or_insert_player, save_async_result, set_player_done, set_player_forfeit, set_race_finished } = require('../datamgmt/db_utils');
+const { get_or_insert_player, save_async_result, set_player_done, set_player_forfeit, set_race_finished, set_player_undone } = require('../datamgmt/db_utils');
 const { get_results_text } = require('./async_util');
 
 function calcular_tiempo(timestamp) {
@@ -139,4 +139,47 @@ async function done_race(interaction, db, race, forfeit = false) {
 	}
 }
 
-module.exports = { done_async, done_race };
+async function undone_race(interaction, db, race) {
+	await get_or_insert_player(db, interaction.user.id, interaction.user.username, interaction.user.discriminator, `${interaction.user}`);
+	const undone_code = await set_player_undone(db, race.Id, interaction.user.id);
+
+	let text_ans = null;
+	if (undone_code == -1) {
+		text_ans = new MessageEmbed()
+			.setColor('#0099ff')
+			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setDescription(`${interaction.user} no está en la carrera.`)
+			.setTimestamp();
+	}
+	else if (undone_code == -2) {
+		text_ans = new MessageEmbed()
+			.setColor('#0099ff')
+			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setDescription(`${interaction.user} no está participando en la carrera.`)
+			.setTimestamp();
+	}
+	else if (undone_code == -3) {
+		text_ans = new MessageEmbed()
+			.setColor('#0099ff')
+			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setDescription('La carrera no está en curso.')
+			.setTimestamp();
+	}
+	else if (undone_code == -4) {
+		text_ans = new MessageEmbed()
+			.setColor('#0099ff')
+			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setDescription(`${interaction.user} aún no ha terminado.`)
+			.setTimestamp();
+	}
+	else {
+		text_ans = new MessageEmbed()
+			.setColor('#0099ff')
+			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setDescription(`${interaction.user} continúa la carrera.`)
+			.setTimestamp();
+	}
+	await interaction.reply({ embeds: [text_ans] });
+}
+
+module.exports = { done_async, done_race, undone_race };
