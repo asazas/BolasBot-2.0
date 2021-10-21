@@ -15,6 +15,10 @@ module.exports = {
 				.setDescription('En carreras asíncronas, ratio de colección de ítems.')),
 
 	async execute(interaction, db) {
+		if (!interaction.inGuild()) {
+			throw { 'message': 'Este comando no puede ser usado en mensajes directos.' };
+		}
+
 		let race = await get_race_by_channel(db, interaction.channelId);
 		if (!race) {
 			race = await get_async_by_submit(db, interaction.channelId);

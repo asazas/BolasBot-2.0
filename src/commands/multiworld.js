@@ -23,6 +23,10 @@ module.exports = {
 
 
 	async execute(interaction, db) {
+		if (!interaction.inGuild()) {
+			throw { 'message': 'Este comando no puede ser usado en mensajes directos.' };
+		}
+
 		if (interaction.options.getSubcommand() == 'yaml_channel') {
 			await set_multi_settings_channel(db, interaction.channelId);
 			const ans_embed = new MessageEmbed()

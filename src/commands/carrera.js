@@ -63,6 +63,10 @@ command.data = new SlashCommandBuilder()
 
 
 command.execute = async function(interaction, db) {
+	if (!interaction.inGuild()) {
+		throw { 'message': 'Este comando no puede ser usado en mensajes directos.' };
+	}
+
 	if (interaction.options.getSubcommand() == 'crear') {
 		await carrera_crear(interaction, db);
 	}

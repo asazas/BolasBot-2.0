@@ -8,6 +8,10 @@ module.exports = {
 		.setDescription('Usar cuando se quiera deshacer un done de una carrera.'),
 
 	async execute(interaction, db) {
+		if (!interaction.inGuild()) {
+			throw { 'message': 'Este comando no puede ser usado en mensajes directos.' };
+		}
+
 		const race = await get_race_by_channel(db, interaction.channelId);
 		if (!race) {
 			throw { 'message': 'Este comando solo puede ser usado en canales de carreras.' };
