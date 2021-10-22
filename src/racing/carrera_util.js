@@ -302,7 +302,10 @@ async function carrera_forzar_final(interaction, db) {
 		// Copia de resultados al historial
 		const global_var = await get_global_var(db);
 		let my_hist_channel = null;
-		if (!global_var.RaceHistoryChannel || !interaction.guild.channels.cache.get(`${global_var.RaceHistoryChannel}`)) {
+		if (global_var.RaceHistoryChannel) {
+			my_hist_channel = await interaction.guild.channels.fetch(`${global_var.RaceHistoryChannel}`);
+		}
+		if (!my_hist_channel) {
 			my_hist_channel = await interaction.guild.channels.create('carrera-historico', {
 				permissionOverwrites: [
 					{
@@ -316,9 +319,6 @@ async function carrera_forzar_final(interaction, db) {
 				],
 			});
 			await set_race_history_channel(db, my_hist_channel.id);
-		}
-		else {
-			my_hist_channel = interaction.guild.channels.cache.get(`${global_var.RaceHistoryChannel}`);
 		}
 
 		const results_text = await get_race_results_text(db, interaction.channelId);

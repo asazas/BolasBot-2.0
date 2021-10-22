@@ -229,12 +229,15 @@ async function async_purgar(interaction, db) {
 		await update_async_status(db, race.Id, 2);
 
 		// Copia de resultados al historial, si los hay
-		const submit_channel = interaction.guild.channels.cache.get(`${race.SubmitChannel}`);
+		const submit_channel = await interaction.guild.channels.fetch(`${race.SubmitChannel}`);
 		const results = await get_results_for_async(db, submit_channel.id);
 		if (results && results.length > 0) {
 			const global_var = await get_global_var(db);
 			let my_hist_channel = null;
-			if (!global_var.AsyncHistoryChannel || !interaction.guild.channels.cache.get(`${global_var.AsyncHistoryChannel}`)) {
+			if (global_var.AsyncHistoryChannel) {
+				my_hist_channel = await interaction.guild.channels.fetch(`${global_var.AsyncHistoryChannel}`);
+			}
+			if (!my_hist_channel) {
 				my_hist_channel = await interaction.guild.channels.create('async-historico', {
 					permissionOverwrites: [
 						{
@@ -249,9 +252,6 @@ async function async_purgar(interaction, db) {
 				});
 				await set_async_history_channel(db, my_hist_channel.id);
 			}
-			else {
-				my_hist_channel = interaction.guild.channels.cache.get(`${global_var.AsyncHistoryChannel}`);
-			}
 
 			const results_text = await get_async_results_text(db, submit_channel.id);
 			const data_embed = await get_async_data_embed(db, submit_channel.id);
@@ -259,14 +259,14 @@ async function async_purgar(interaction, db) {
 		}
 
 		if (race.RoleId) {
-			const async_role = interaction.guild.roles.cache.get(`${race.RoleId}`);
+			const async_role = await interaction.guild.roles.fetch(`${race.RoleId}`);
 			await async_role.delete();
 		}
 		const category = submit_channel.parent;
 		await submit_channel.delete();
-		const results_channel = interaction.guild.channels.cache.get(`${race.ResultsChannel}`);
+		const results_channel = await interaction.guild.channels.fetch(`${race.ResultsChannel}`);
 		await results_channel.delete();
-		const spoilers_channel = interaction.guild.channels.cache.get(`${race.SpoilersChannel}`);
+		const spoilers_channel = await interaction.guild.channels.fetch(`${race.SpoilersChannel}`);
 		await spoilers_channel.delete();
 		await category.delete();
 	}

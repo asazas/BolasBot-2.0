@@ -28,12 +28,12 @@ async function done_async(interaction, db, race) {
 			await save_async_result(db, race.Id, author.id, time_s, collection);
 
 			const results_text = await get_async_results_text(db, race.SubmitChannel);
-			const results_channel = interaction.guild.channels.cache.get(`${race.ResultsChannel}`);
-			const results_message = results_channel.messages.cache.get(`${race.ResultsMessage}`);
+			const results_channel = await interaction.guild.channels.fetch(`${race.ResultsChannel}`);
+			const results_message = await results_channel.messages.fetch(`${race.ResultsMessage}`);
 			await results_message.edit(results_text);
 
 			if (race.RoleId) {
-				const async_role = interaction.guild.roles.cache.get(`${race.RoleId}`);
+				const async_role = await interaction.guild.roles.fetch(`${race.RoleId}`);
 				await interaction.member.roles.add(async_role);
 			}
 
@@ -128,7 +128,10 @@ async function done_race(interaction, db, race, forfeit = false) {
 		// Copia de resultados al historial
 		const global_var = await get_global_var(db);
 		let my_hist_channel = null;
-		if (!global_var.RaceHistoryChannel || !interaction.guild.channels.cache.get(`${global_var.RaceHistoryChannel}`)) {
+		if (global_var.RaceHistoryChannel) {
+			my_hist_channel = await interaction.guild.channels.fetch(`${global_var.RaceHistoryChannel}`);
+		}
+		if (!my_hist_channel) {
 			my_hist_channel = await interaction.guild.channels.create('carrera-historico', {
 				permissionOverwrites: [
 					{
@@ -142,9 +145,6 @@ async function done_race(interaction, db, race, forfeit = false) {
 				],
 			});
 			await set_race_history_channel(db, my_hist_channel.id);
-		}
-		else {
-			my_hist_channel = interaction.guild.channels.cache.get(`${global_var.RaceHistoryChannel}`);
 		}
 
 		const results_text = await get_race_results_text(db, interaction.channelId);

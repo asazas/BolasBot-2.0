@@ -45,7 +45,7 @@ async function crear_multiworld(interaction, db) {
 	if (!global_var.MultiworldSettingsChannel) {
 		throw { 'message': 'No hay un canal fijado para buscar ajustes de multiworld.' };
 	}
-	const yaml_channel = interaction.guild.channels.cache.get(`${global_var.MultiworldSettingsChannel}`);
+	const yaml_channel = await interaction.guild.channels.fetch(`${global_var.MultiworldSettingsChannel}`);
 	if (!yaml_channel) {
 		throw { 'message': 'No hay un canal fijado para buscar ajustes de multiworld.' };
 	}
