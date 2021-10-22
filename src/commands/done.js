@@ -28,6 +28,7 @@ module.exports = {
 
 			// carrera asíncrona
 			await done_async(interaction, db, race);
+			return;
 		}
 
 		// carrera normal
