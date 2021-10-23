@@ -40,11 +40,11 @@ command.data = new SlashCommandBuilder()
 			.addStringOption(plantillas));
 
 command.execute = async function(interaction, db) {
-	if (!interaction.inGuild()) {
-		throw { 'message': 'Este comando no puede ser usado en mensajes directos.' };
-	}
 
 	if (interaction.options.getSubcommand() == 'yaml_channel') {
+		if (!interaction.inGuild()) {
+			throw { 'message': 'Este comando no puede ser usado en mensajes directos.' };
+		}
 		await set_multi_settings_channel(db, interaction.channelId);
 		const ans_embed = new MessageEmbed()
 			.setColor('#0099ff')
@@ -55,6 +55,9 @@ command.execute = async function(interaction, db) {
 		return;
 	}
 	else if (interaction.options.getSubcommand() == 'crear') {
+		if (!interaction.inGuild()) {
+			throw { 'message': 'Este comando no puede ser usado en mensajes directos.' };
+		}
 		await crear_multiworld(interaction, db);
 		return;
 	}
