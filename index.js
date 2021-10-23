@@ -43,10 +43,10 @@ client.on('interactionCreate', async interaction => {
 		console.error(error);
 		const image_path = `res/almeida${Math.floor(Math.random() * 4)}.png`;
 		if (interaction.deferred || interaction.replied) {
-			return interaction.editReply({ content: error['message'], files: [image_path], ephemeral: true });
+			return await interaction.editReply({ content: error['message'], files: [image_path], ephemeral: true });
 		}
 		else {
-			return interaction.reply({ content: error['message'], files: [image_path], ephemeral: true });
+			return await interaction.reply({ content: error['message'], files: [image_path], ephemeral: true });
 		}
 	}
 });

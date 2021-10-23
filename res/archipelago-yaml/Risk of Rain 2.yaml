@@ -1,0 +1,191 @@
+# What is this file?
+# This file contains options which allow you to configure your multiworld experience while allowing others
+# to play how they want as well.
+
+# How do I use it?
+# The options in this file are weighted. This means the higher number you assign to a value, the more
+# chances you have for that option to be chosen. For example, an option like this:
+#
+# map_shuffle:
+#   on: 5
+#   off: 15
+#
+# Means you have 5 chances for map shuffle to occur, and 15 chances for map shuffle to be turned off
+
+# I've never seen a file like this before. What characters am I allowed to use?
+# This is a .yaml file. You are allowed to use most characters.
+# To test if your yaml is valid or not, you can use this website:
+# http://www.yamllint.com/
+
+description: Default Risk of Rain 2 Template # Used to describe your yaml. Useful if you have multiple files
+# Your name in-game. Spaces will be replaced with underscores and there is a 16 character limit
+name: YourName{number}
+#{player} will be replaced with the player's slot number.
+#{PLAYER} will be replaced with the player's slot number if that slot number is greater than 1.
+#{number} will be replaced with the counter value of the name.
+#{NUMBER} will be replaced with the counter value of the name if the counter value is greater than 1.
+game:
+  Risk of Rain 2: 1
+requires:
+  version: 0.1.9 # Version of Archipelago required for this yaml to work as expected.
+# Shared Options supported by all games:
+accessibility:
+  items: 0 # Guarantees you will be able to acquire all items, but you may not be able to access all locations
+  locations: 50 # Guarantees you will be able to access all locations, and therefore all items
+  none: 0 # Guarantees only that the game is beatable. You may not be able to access all locations or acquire all items
+progression_balancing:
+  on: 50 # A system to reduce BK, as in times during which you can't do anything by moving your items into an earlier access sphere to make it likely you have stuff to do
+  off: 0 # Turn this off if you don't mind a longer multiworld, or can glitch/sequence break around missing items.
+Risk of Rain 2:
+  total_locations: # Number of location checks which are added to the Risk of Rain playthrough.
+    # you can add additional values between minimum and maximum
+    10: 0 # minimum value
+    100: 0 # maximum value
+    random: 0
+    random-low: 0
+    random-high: 0
+    20: 50
+  total_revivals: # Number of `Dio's Best Friend` item put in the item pool.
+    # you can add additional values between minimum and maximum
+    0: 0 # minimum value
+    10: 0 # maximum value
+    random: 0
+    random-low: 0
+    random-high: 0
+    4: 50
+  start_with_revive: # Start the game with a `Dio's Best Friend` item.
+    false: 0
+    true: 50
+  item_pickup_step: # Number of items to pick up before an AP Check is completed.
+    #    Setting to 1 means every other pickup.
+    #    Setting to 2 means every third pickup. So on...
+    # you can add additional values between minimum and maximum
+    0: 0 # minimum value
+    5: 0 # maximum value
+    random: 0
+    random-low: 0
+    random-high: 0
+    2: 50
+  enable_lunar: # Allows Lunar items in the item pool.
+    false: 0
+    true: 50
+  item_weights: # Preset choices for determining the weights of the item pool.<br>
+    #    New is a test for a potential adjustment to the default weights.<br>
+    #    Uncommon puts a large number of uncommon items in the pool.<br>
+    #    Legendary puts a large number of legendary items in the pool.<br>
+    #    Lunartic makes everything a lunar item.<br>
+    #    Chaos generates the pool completely at random with rarer items having a slight cap to prevent this option being too easy.<br>
+    #    No Scraps removes all scrap items from the item pool.<br>
+    #    Even generates the item pool with every item having an even weight.<br>
+    #    Scraps Only will be only scrap items in the item pool.
+    default: 50
+    new: 0
+    uncommon: 0
+    legendary: 0
+    lunartic: 0
+    chaos: 0
+    no_scraps: 0
+    even: 0
+    scraps_only: 0
+  item_pool_presets: # Will use the item weight presets when set to true, otherwise will use the custom set item pool weights.
+    false: 0
+    true: 50
+  green_scrap: # Weight of Green Scraps in the item pool.
+    # you can add additional values between minimum and maximum
+    0: 0 # minimum value
+    100: 0 # maximum value
+    random: 0
+    random-low: 0
+    random-high: 0
+    16: 50
+  red_scrap: # Weight of Red Scraps in the item pool.
+    # you can add additional values between minimum and maximum
+    0: 0 # minimum value
+    100: 0 # maximum value
+    random: 0
+    random-low: 0
+    random-high: 0
+    4: 50
+  yellow_scrap: # Weight of yellow scraps in the item pool.
+    # you can add additional values between minimum and maximum
+    0: 0 # minimum value
+    100: 0 # maximum value
+    random: 0
+    random-low: 0
+    random-high: 0
+    1: 50
+  white_scrap: # Weight of white scraps in the item pool.
+    # you can add additional values between minimum and maximum
+    0: 0 # minimum value
+    100: 0 # maximum value
+    random: 0
+    random-low: 0
+    random-high: 0
+    32: 50
+  common_item: # Weight of common items in the item pool.
+    # you can add additional values between minimum and maximum
+    0: 0 # minimum value
+    100: 0 # maximum value
+    random: 0
+    random-low: 0
+    random-high: 0
+    64: 50
+  uncommon_item: # Weight of uncommon items in the item pool.
+    # you can add additional values between minimum and maximum
+    0: 0 # minimum value
+    100: 0 # maximum value
+    random: 0
+    random-low: 0
+    random-high: 0
+    32: 50
+  legendary_item: # Weight of legendary items in the item pool.
+    # you can add additional values between minimum and maximum
+    0: 0 # minimum value
+    100: 0 # maximum value
+    random: 0
+    random-low: 0
+    random-high: 0
+    8: 50
+  boss_item: # Weight of boss items in the item pool.
+    # you can add additional values between minimum and maximum
+    0: 0 # minimum value
+    100: 0 # maximum value
+    random: 0
+    random-low: 0
+    random-high: 0
+    4: 50
+  lunar_item: # Weight of lunar items in the item pool.
+    # you can add additional values between minimum and maximum
+    0: 0 # minimum value
+    100: 0 # maximum value
+    random: 0
+    random-low: 0
+    random-high: 0
+    16: 50
+  equipment: # Weight of equipment items in the item pool.
+    # you can add additional values between minimum and maximum
+    0: 0 # minimum value
+    100: 0 # maximum value
+    random: 0
+    random-low: 0
+    random-high: 0
+    32: 50
+  local_items: # Forces these items to be in their native world.
+    []
+
+  non_local_items: # Forces these items to be outside their native world.
+    []
+
+  start_inventory: # Start with these items.
+    {}
+
+  start_hints: # Start with these item's locations prefilled into the !hint command.
+    []
+
+  start_location_hints:
+    []
+
+  exclude_locations:
+    []
+
+  

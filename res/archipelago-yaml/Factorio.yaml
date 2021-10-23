@@ -1,0 +1,209 @@
+# What is this file?
+# This file contains options which allow you to configure your multiworld experience while allowing others
+# to play how they want as well.
+
+# How do I use it?
+# The options in this file are weighted. This means the higher number you assign to a value, the more
+# chances you have for that option to be chosen. For example, an option like this:
+#
+# map_shuffle:
+#   on: 5
+#   off: 15
+#
+# Means you have 5 chances for map shuffle to occur, and 15 chances for map shuffle to be turned off
+
+# I've never seen a file like this before. What characters am I allowed to use?
+# This is a .yaml file. You are allowed to use most characters.
+# To test if your yaml is valid or not, you can use this website:
+# http://www.yamllint.com/
+
+description: Default Factorio Template # Used to describe your yaml. Useful if you have multiple files
+# Your name in-game. Spaces will be replaced with underscores and there is a 16 character limit
+name: YourName{number}
+#{player} will be replaced with the player's slot number.
+#{PLAYER} will be replaced with the player's slot number if that slot number is greater than 1.
+#{number} will be replaced with the counter value of the name.
+#{NUMBER} will be replaced with the counter value of the name if the counter value is greater than 1.
+game:
+  Factorio: 1
+requires:
+  version: 0.1.9 # Version of Archipelago required for this yaml to work as expected.
+# Shared Options supported by all games:
+accessibility:
+  items: 0 # Guarantees you will be able to acquire all items, but you may not be able to access all locations
+  locations: 50 # Guarantees you will be able to access all locations, and therefore all items
+  none: 0 # Guarantees only that the game is beatable. You may not be able to access all locations or acquire all items
+progression_balancing:
+  on: 50 # A system to reduce BK, as in times during which you can't do anything by moving your items into an earlier access sphere to make it likely you have stuff to do
+  off: 0 # Turn this off if you don't mind a longer multiworld, or can glitch/sequence break around missing items.
+Factorio:
+  max_science_pack: # Maximum level of science pack required to complete the game.
+    automation_science_pack: 0
+    logistic_science_pack: 0
+    military_science_pack: 0
+    chemical_science_pack: 0
+    production_science_pack: 0
+    utility_science_pack: 0
+    space_science_pack: 50
+  tech_tree_layout: # Selects how the tech tree nodes are interwoven.
+    single: 50
+    small_diamonds: 0
+    medium_diamonds: 0
+    large_diamonds: 0
+    small_pyramids: 0
+    medium_pyramids: 0
+    large_pyramids: 0
+    small_funnels: 0
+    medium_funnels: 0
+    large_funnels: 0
+  tech_cost: # How expensive are the technologies.
+    very_easy: 0
+    easy: 0
+    kind: 0
+    normal: 50
+    hard: 0
+    very_hard: 0
+    insane: 0
+  silo: # Ingredients to craft rocket silo or auto-place if set to spawn.
+    vanilla: 50
+    randomize_recipe: 0
+    spawn: 0
+  free_samples: # Get free items with your technologies.
+    none: 0
+    single_craft: 0
+    half_stack: 0
+    stack: 50
+  tech_tree_information: # How much information should be displayed in the tech tree.
+    none: 0
+    advancement: 0
+    full: 50
+  starting_items:
+    burner-mining-drill: 19
+    stone-furnace: 19
+
+  recipe_time: # randomize the time it takes for any recipe to craft, this includes smelting, chemical lab, hand crafting etc.
+    vanilla: 50
+    fast: 0
+    normal: 0
+    slow: 0
+    chaos: 0
+  recipe_ingredients: # Select if rocket, or rocket + science pack ingredients should be random.
+    rocket: 50
+    science_pack: 0
+  imported_blueprints:
+    false: 0
+    true: 50
+  world_gen:
+    autoplace_controls:
+      coal:
+        frequency: 1
+        richness: 6
+        size: 3
+      copper-ore:
+        frequency: 1
+        richness: 6
+        size: 3
+      crude-oil:
+        frequency: 1
+        richness: 6
+        size: 3
+      enemy-base:
+        frequency: 1
+        richness: 1
+        size: 1
+      iron-ore:
+        frequency: 1
+        richness: 6
+        size: 3
+      stone:
+        frequency: 1
+        richness: 6
+        size: 3
+      trees:
+        frequency: 1
+        richness: 1
+        size: 1
+      uranium-ore:
+        frequency: 1
+        richness: 6
+        size: 3
+    cliff_settings:
+      cliff_elevation_0: 10
+      cliff_elevation_interval: 40
+      name: cliff
+      richness: 1
+    enemy_evolution:
+      destroy_factor: 0.002
+      enabled: true
+      pollution_factor: 9.0e-07
+      time_factor: 4.0e-06
+    enemy_expansion:
+      enabled: true
+      max_expansion_cooldown: 216000
+      max_expansion_distance: 7
+      min_expansion_cooldown: 14400
+      settler_group_max_size: 20
+      settler_group_min_size: 5
+    peaceful_mode: false
+    pollution:
+      ageing: 1
+      diffusion_ratio: 0.02
+      enabled: true
+      enemy_attack_pollution_consumption_modifier: 1
+      min_pollution_to_damage_trees: 60
+      pollution_restored_per_tree_damage: 10
+    property_expression_names:
+      control-setting:aux:bias: 0
+      control-setting:aux:frequency:multiplier: 1
+      control-setting:moisture:bias: 0
+      control-setting:moisture:frequency:multiplier: 1
+    seed: null
+    starting_area: 1
+    terrain_segmentation: 0.5
+    water: 1.5
+
+  progressive:
+    off: 0
+    grouped_random: 0
+    on: 50
+  evolution_traps: # Trap items that when received increase the enemy evolution.
+    # you can add additional values between minimum and maximum
+    0: 50 # minimum value
+    4: 0 # maximum value
+    random: 0
+    random-low: 0
+    random-high: 0
+  attack_traps: # Trap items that when received trigger an attack on your base.
+    # you can add additional values between minimum and maximum
+    0: 50 # minimum value
+    4: 0 # maximum value
+    random: 0
+    random-low: 0
+    random-high: 0
+  evolution_trap_increase:
+    # you can add additional values between minimum and maximum
+    1: 0 # minimum value
+    100: 0 # maximum value
+    random: 0
+    random-low: 0
+    random-high: 0
+    10: 50
+  local_items: # Forces these items to be in their native world.
+    []
+
+  non_local_items: # Forces these items to be outside their native world.
+    []
+
+  start_inventory: # Start with these items.
+    {}
+
+  start_hints: # Start with these item's locations prefilled into the !hint command.
+    []
+
+  start_location_hints:
+    []
+
+  exclude_locations:
+    []
+
+  
