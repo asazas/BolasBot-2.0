@@ -146,6 +146,16 @@ async function async_crear(interaction, db) {
 	}
 	await data_msg.pin();
 
+	const instructions = new MessageEmbed()
+		.setColor('#0099ff')
+		.setTitle(`Envío de resultados: ${name}`)
+		.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+		.setDescription(`Enviad resultados usando el comando \`/done\`, rellenando el tiempo y colección de ítems en los campos correspondientes.
+		Usad preferiblemente tiempo real, no in-game time.
+		Por favor, mantened este canal lo más limpio posible y SIN SPOILERS.`)
+		.setTimestamp();
+	await submit_channel.send({ embeds: [instructions] });
+
 	const text_ans = new MessageEmbed()
 		.setColor('#0099ff')
 		.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())

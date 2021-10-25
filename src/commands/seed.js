@@ -1,7 +1,7 @@
 const glob = require('glob');
 const path = require('path');
 const { SlashCommandBuilder, SlashCommandStringOption } = require('@discordjs/builders');
-const { generate_from_preset, generate_varia_finetune, retrieve_from_url } = require('../seedgen/seedgen');
+const { generate_from_preset, generate_varia_finetune, retrieve_from_url, preset_file } = require('../seedgen/seedgen');
 const { seed_info_embed, varia_info_embed } = require('../seedgen/info_embeds');
 const { preset_help, extra_help } = require('../seedgen/help');
 
@@ -97,6 +97,11 @@ command.data = new SlashCommandBuilder()
 					.setDescription('URL de la seed.')
 					.setRequired(true)))
 
+	.addSubcommand(subcommand =>
+		subcommand.setName('config')
+			.setDescription('Obtener el archivo de configuración de un preset.')
+			.addStringOption(preset_option))
+
 	.addSubcommandGroup(subcommandGroup =>
 		subcommandGroup.setName('ayuda')
 			.setDescription('Ayuda')
@@ -131,6 +136,13 @@ command.execute = async function(interaction) {
 		}
 		const seed = await generate_varia_finetune(settings_preset, skills_preset, extra);
 		await interaction.editReply({ embeds: [varia_info_embed(seed, interaction, `${settings_preset} ${skills_preset}`)] });
+		return;
+	}
+
+	else if (interaction.options.getSubcommand() == 'config') {
+		const preset = interaction.options.getString('preset').toLowerCase();
+		const file = preset_file(preset);
+		await interaction.reply({ files: [file] });
 		return;
 	}
 
