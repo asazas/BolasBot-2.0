@@ -154,6 +154,16 @@ async function async_crear(interaction, db) {
 		Usad preferiblemente tiempo real, no in-game time.
 		Por favor, mantened este canal lo más limpio posible y SIN SPOILERS.`)
 		.setTimestamp();
+	if (blind) {
+		instructions.addField('Retransmisión de carrera asíncrona',
+			`Al cierre de esta carrera, se eligirán hasta un máximo de 4 jugadores para su retransmisión.
+			Para poder ser elegible, el VOD de la partida debe cumplir las siguientes condiciones:
+			- El temporizador debe tener el valor inicial de -2 minutos.
+			- El VOD debe terminar en la pantalla final de los créditos.
+			- El ALTTPR Community Tracker debe estar visible → https://alttprtracker.dunka.net/
+			- Únicamente el audio del juego debe estar presente.
+			- El VOD debe ser subido a YouTube como vídeo no listado.`);
+	}
 	await submit_channel.send({ embeds: [instructions] });
 
 	const text_ans = new MessageEmbed()
