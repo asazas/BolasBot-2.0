@@ -48,7 +48,7 @@ async function carrera_crear(interaction, db) {
 	const text_ans = new MessageEmbed()
 		.setColor('#0099ff')
 		.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
-		.setDescription(`Abierta carrera asíncrona con nombre: ${name}. Participa en ${race_channel}.`)
+		.setDescription(`Abierta carrera con nombre: ${name}. Participa en ${race_channel}.`)
 		.setTimestamp();
 	await interaction.editReply({ embeds: [text_ans] });
 }
