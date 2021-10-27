@@ -49,6 +49,9 @@ async function crear_multiworld(interaction, db) {
 	if (!yaml_channel) {
 		throw { 'message': 'No hay un canal fijado para buscar ajustes de multiworld.' };
 	}
+	if (interaction.channel.isThread()) {
+		throw { 'message': 'Este comando no puede ser usado en hilos.' };
+	}
 
 	await interaction.deferReply();
 

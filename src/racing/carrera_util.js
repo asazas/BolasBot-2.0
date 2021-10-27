@@ -10,6 +10,10 @@ const { seed_in_create_race } = require('./race_seed_util');
 
 
 async function carrera_crear(interaction, db) {
+	if (interaction.channel.isThread()) {
+		throw { 'message': 'Este comando no puede ser usado en hilos.' };
+	}
+
 	await interaction.deferReply();
 
 	// Nombre de la carrera
