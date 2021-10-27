@@ -104,6 +104,10 @@ async function get_data_models(server) {
 			type: DataTypes.TEXT,
 			unique: 'UniqueKey',
 		},
+		Timestamp: {
+			type: DataTypes.INTEGER,
+			allowNull: false,
+		},
 		// 0: unido, 1: listo, 2: terminado
 		Status: {
 			type: DataTypes.INTEGER,

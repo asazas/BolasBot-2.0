@@ -55,7 +55,11 @@ async function get_or_insert_race_player(sequelize, race, player) {
 			if (my_race.Status != 0) return -1;
 
 			const this_player = await race_results.findOrCreate({
-				where: { Race: race, Player: player },
+				where: {
+					Race: race,
+					Player: player,
+					Timestamp: Math.floor(new Date().getTime() / 1000),
+				},
 				transaction: t,
 				lock: t.LOCK.UPDATE,
 			});
@@ -126,6 +130,7 @@ async function set_player_ready(sequelize, race, player) {
 				return -2;
 			}
 			race_player.Status = 1;
+			race_player.Timestamp = Math.floor(new Date().getTime() / 1000);
 			await race_player.save({ transaction: t });
 
 			const all_player_count = await race_results.findAndCountAll({
@@ -170,7 +175,7 @@ async function set_all_ready_for_force_start(sequelize, race) {
 				return -2;
 			}
 
-			await race_results.update({ Status: 1 }, {
+			await race_results.update({ Status: 1, Timestamp: Math.floor(new Date().getTime() / 1000) }, {
 				where: { Status: 0 },
 				transaction: t,
 			});
@@ -208,6 +213,7 @@ async function set_player_unready(sequelize, race, player) {
 				return -2;
 			}
 			race_player.Status = 0;
+			race_player.Timestamp = Math.floor(new Date().getTime() / 1000);
 			await race_player.save({ transaction: t });
 			return 0;
 		});
@@ -266,11 +272,13 @@ async function set_player_done(sequelize, race, player) {
 				return -4;
 			}
 			race_player.Status = 2;
-			const new_time = Math.floor(new Date().getTime() / 1000) - race_player.race.StartDate;
+			const tstamp = Math.floor(new Date().getTime() / 1000);
+			const new_time = tstamp - race_player.race.StartDate;
 			if (new_time <= 0) {
 				return -5;
 			}
 			race_player.Time = new_time;
+			race_player.Timestamp = tstamp;
 			const updated_res = await race_player.save({ transaction: t });
 
 			const all_player_count = await race_results.findAndCountAll({
@@ -321,6 +329,7 @@ async function set_player_forfeit(sequelize, race, player) {
 			}
 			race_player.Status = 2;
 			race_player.Time = 359999;
+			race_player.Timestamp = Math.floor(new Date().getTime() / 1000);
 			const updated_res = await race_player.save({ transaction: t });
 
 			const all_player_count = await race_results.findAndCountAll({
@@ -357,7 +366,7 @@ async function set_all_forfeit_for_force_end(sequelize, race) {
 				return -1;
 			}
 
-			await race_results.update({ Status: 2, Time: 359999 }, {
+			await race_results.update({ Status: 2, Time: 359999, Timestamp: Math.floor(new Date().getTime() / 1000) }, {
 				where: { Status: 1 },
 				transaction: t,
 			});
@@ -420,6 +429,7 @@ async function set_player_undone(sequelize, race, player) {
 			}
 			race_player.Status = 1;
 			race_player.Time = null;
+			race_player.Timestamp = Math.floor(new Date().getTime() / 1000);
 			await race_player.save({ transaction: t });
 			return 0;
 		});
@@ -451,6 +461,7 @@ async function get_results_for_race(sequelize, race_channel) {
 				],
 				order: [
 					['Time', 'ASC'],
+					['Timestamp', 'ASC'],
 				],
 				transaction: t,
 			});
