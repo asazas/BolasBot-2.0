@@ -1,11 +1,11 @@
 const { MessageEmbed, Permissions } = require('discord.js');
 
-const { get_or_insert_player, get_global_var, set_race_history_channel } = require('../datamgmt/db_utils');
+const { get_or_insert_player, get_global_var, set_race_history_channel, set_player_score_channel } = require('../datamgmt/db_utils');
 const { get_race_by_channel, insert_race, get_or_insert_race_player, delete_race_player_if_present, set_player_ready, set_race_started,
 	set_player_unready, set_all_ready_for_force_start, set_all_forfeit_for_force_end, set_race_finished } = require('../datamgmt/race_db_utils');
 const { countdown_en_canal } = require('../otros/countdown_util');
 const { random_words } = require('./async_util');
-const { get_race_data_embed, get_race_results_text } = require('./race_results_util');
+const { get_race_data_embed, get_race_results_text, calculate_player_scores, get_player_ranking_text } = require('./race_results_util');
 const { seed_in_create_race } = require('./race_seed_util');
 
 
@@ -327,7 +327,36 @@ async function carrera_forzar_final(interaction, db) {
 
 		const results_text = await get_race_results_text(db, interaction.channelId);
 		const data_embed = await get_race_data_embed(db, interaction.channelId);
-		await my_hist_channel.send({ content: results_text, embeds: [data_embed] });
+		const hist_msg = await my_hist_channel.send({ content: results_text, embeds: [data_embed] });
+
+		let my_score_channel = null;
+		if (global_var.PlayerScoreChannel) {
+			my_score_channel = await interaction.guild.channels.fetch(`${global_var.PlayerScoreChannel}`);
+		}
+		if (!my_score_channel) {
+			my_score_channel = await interaction.guild.channels.create('ranking-jugadores', {
+				permissionOverwrites: [
+					{
+						id: interaction.guild.roles.everyone,
+						deny: [Permissions.FLAGS.SEND_MESSAGES],
+					},
+					{
+						id: interaction.guild.me,
+						allow: [Permissions.FLAGS.SEND_MESSAGES],
+					},
+				],
+			});
+			await set_player_score_channel(db, my_score_channel.id);
+		}
+		const score_embed = new MessageEmbed()
+			.setColor('#0099ff')
+			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setTitle(`Ranking tras ${race.Name}`)
+			.setURL(hist_msg.url)
+			.setTimestamp();
+		await calculate_player_scores(db, interaction.channelId, false);
+		const score_text = await get_player_ranking_text(db);
+		await my_score_channel.send({ content: score_text, embeds: [score_embed] });
 	}
 }
 

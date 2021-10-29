@@ -1,9 +1,9 @@
 const { MessageEmbed, Permissions } = require('discord.js');
 const { save_async_result } = require('../datamgmt/async_db_utils');
-const { get_or_insert_player, get_global_var, set_race_history_channel } = require('../datamgmt/db_utils');
+const { get_or_insert_player, get_global_var, set_race_history_channel, set_player_score_channel } = require('../datamgmt/db_utils');
 const { set_player_forfeit, set_player_done, set_race_finished, set_player_undone } = require('../datamgmt/race_db_utils');
 const { get_async_results_text } = require('./async_util');
-const { calcular_tiempo, get_race_results_text, get_race_data_embed } = require('./race_results_util');
+const { calcular_tiempo, get_race_results_text, get_race_data_embed, calculate_player_scores, get_player_ranking_text } = require('./race_results_util');
 
 
 async function done_async(interaction, db, race) {
@@ -149,7 +149,36 @@ async function done_race(interaction, db, race, forfeit = false) {
 
 		const results_text = await get_race_results_text(db, interaction.channelId);
 		const data_embed = await get_race_data_embed(db, interaction.channelId);
-		await my_hist_channel.send({ content: results_text, embeds: [data_embed] });
+		const hist_msg = await my_hist_channel.send({ content: results_text, embeds: [data_embed] });
+
+		let my_score_channel = null;
+		if (global_var.PlayerScoreChannel) {
+			my_score_channel = await interaction.guild.channels.fetch(`${global_var.PlayerScoreChannel}`);
+		}
+		if (!my_score_channel) {
+			my_score_channel = await interaction.guild.channels.create('ranking-jugadores', {
+				permissionOverwrites: [
+					{
+						id: interaction.guild.roles.everyone,
+						deny: [Permissions.FLAGS.SEND_MESSAGES],
+					},
+					{
+						id: interaction.guild.me,
+						allow: [Permissions.FLAGS.SEND_MESSAGES],
+					},
+				],
+			});
+			await set_player_score_channel(db, my_score_channel.id);
+		}
+		const score_embed = new MessageEmbed()
+			.setColor('#0099ff')
+			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setTitle(`Ranking tras ${race.Name}`)
+			.setURL(hist_msg.url)
+			.setTimestamp();
+		await calculate_player_scores(db, interaction.channelId, false);
+		const score_text = await get_player_ranking_text(db);
+		await my_score_channel.send({ content: score_text, embeds: [score_embed] });
 	}
 }
 

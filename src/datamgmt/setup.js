@@ -14,6 +14,9 @@ async function get_data_models(server) {
 		AsyncHistoryChannel: {
 			type: DataTypes.TEXT,
 		},
+		PlayerScoreChannel: {
+			type: DataTypes.TEXT,
+		},
 		MultiworldSettingsChannel: {
 			type: DataTypes.TEXT,
 		},
@@ -35,6 +38,16 @@ async function get_data_models(server) {
 		Mention: {
 			type: DataTypes.TEXT,
 			allowNull: false,
+		},
+		Score: {
+			type: DataTypes.INTEGER,
+			allowNull: false,
+			defaultValue: 1500,
+		},
+		Races: {
+			type: DataTypes.INTEGER,
+			allowNull: false,
+			defaultValue: 0,
 		},
 	});
 
