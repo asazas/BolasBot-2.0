@@ -6,7 +6,7 @@ const { seed_info_embed, varia_info_embed } = require('../seedgen/info_embeds');
 const { preset_help, extra_help } = require('../seedgen/help');
 
 
-async function seed_crear(interaction) {
+async function seed_crear(interaction, jugadores = 1, nombres = '') {
 	await interaction.deferReply();
 	const preset = interaction.options.getString('preset').toLowerCase();
 	let extra = interaction.options.getString('extra');
@@ -14,7 +14,7 @@ async function seed_crear(interaction) {
 		extra = extra.toLowerCase();
 	}
 	const full_preset = extra ? preset + ' ' + extra : preset;
-	const seed = await generate_from_preset(preset, extra);
+	const seed = await generate_from_preset(preset, extra, jugadores, nombres);
 
 	const info_embed = seed_info_embed(seed, interaction, full_preset);
 	if (info_embed[1]) {
@@ -62,6 +62,17 @@ for (const file of preset_files) {
 	preset_option_help.addChoice(`${dirname} - ${filename}`, filename);
 }
 
+const sm_preset_files = glob.sync('rando-settings/sm*/*.json');
+const preset_multi = new SlashCommandStringOption();
+preset_multi.setName('preset')
+	.setDescription('Preset.')
+	.setRequired(true);
+for (const file of sm_preset_files) {
+	const filename = path.basename(file, '.json');
+	const dirname = path.basename(path.dirname(file)).toUpperCase();
+	preset_multi.addChoice(`${dirname} - ${filename}`, filename);
+}
+
 const command = {};
 command.data = new SlashCommandBuilder()
 	.setName('seed')
@@ -85,6 +96,21 @@ command.data = new SlashCommandBuilder()
 				option.setName('skills')
 					.setDescription('Preset de habilidades')
 					.setRequired(true))
+			.addStringOption(option =>
+				option.setName('extra')
+					.setDescription('Opciones extra.')))
+
+	.addSubcommand(subcommand =>
+		subcommand.setName('multi')
+			.setDescription('Crear partida de multiworld via SMZ3.')
+			.addStringOption(preset_multi)
+			.addIntegerOption(option =>
+				option.setName('jugadores')
+					.setDescription('Número de jugadores, máximo 20')
+					.setRequired(true))
+			.addStringOption(option =>
+				option.setName('nombres')
+					.setDescription('Lista de nombres de jugadores, separados por comas'))
 			.addStringOption(option =>
 				option.setName('extra')
 					.setDescription('Opciones extra.')))
@@ -118,6 +144,15 @@ command.data = new SlashCommandBuilder()
 command.execute = async function(interaction) {
 	if (interaction.options.getSubcommand() == 'crear') {
 		await seed_crear(interaction);
+		return;
+	}
+
+	else if (interaction.options.getSubcommand() == 'multi') {
+		let jugadores = interaction.options.getInteger('jugadores');
+		if (jugadores > 20) jugadores = 20;
+		if (jugadores < 1) jugadores = 1;
+		const nombres = interaction.options.getString('nombres');
+		await seed_crear(interaction, jugadores, nombres);
 		return;
 	}
 

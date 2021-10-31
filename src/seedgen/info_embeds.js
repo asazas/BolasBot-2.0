@@ -10,7 +10,17 @@ function sm_info_embed(seed, interaction, preset = '') {
 	const slug = slugid.encode(seed_guid);
 	let url;
 	if (seed['data']['gameId'] == 'sm') {
-		url = `https://sm.samus.link/seed/${slug}`;
+		if (seed['data']['mode'] == 'multiworld') {
+			preset += ' multi';
+			url = `https://sm.samus.link/multiworld/${slug}`;
+		}
+		else {
+			url = `https://sm.samus.link/seed/${slug}`;
+		}
+	}
+	else if (seed['data']['mode'] == 'multiworld') {
+		preset += ' multi';
+		url = `https://samus.link/multiworld/${slug}`;
 	}
 	else {
 		url = `https://samus.link/seed/${slug}`;

@@ -60,7 +60,25 @@ async function generate_alttpr(preset_data, extra) {
 	return await gaxios.request({ url: 'https://alttpr.com/api/randomizer', method: 'POST', data: preset_data['settings'], retry: true });
 }
 
-async function generate_sm(preset_data, extra) {
+async function generate_sm(preset_data, extra, jugadores = 1, nombres = '') {
+	if (jugadores > 1) {
+		preset_data['settings']['gamemode'] = 'multiworld';
+		preset_data['settings']['players'] = `${jugadores}`;
+		let cuenta_jugadores = 0;
+		if (nombres) {
+			const lista_nombres = nombres.split(',');
+			for (const n of lista_nombres) {
+				if (cuenta_jugadores >= jugadores) break;
+				preset_data['settings'][`player-${cuenta_jugadores}`] = n;
+				cuenta_jugadores++;
+			}
+		}
+		while (cuenta_jugadores < jugadores) {
+			preset_data['settings'][`player-${cuenta_jugadores}`] = `Jugador ${cuenta_jugadores + 1}`;
+			cuenta_jugadores++;
+		}
+	}
+
 	if (extra) {
 		const extra_params = extra.split(/\s+/);
 		if (extra_params.includes('spoiler')) {
@@ -76,7 +94,25 @@ async function generate_sm(preset_data, extra) {
 	return await gaxios.request({ url: 'https://samus.link/api/randomizers/sm/generate', method: 'POST', data: preset_data['settings'], retry: true });
 }
 
-async function generate_smz3(preset_data, extra) {
+async function generate_smz3(preset_data, extra, jugadores = 1, nombres = '') {
+	if (jugadores > 1) {
+		preset_data['settings']['gamemode'] = 'multiworld';
+		preset_data['settings']['players'] = `${jugadores}`;
+		let cuenta_jugadores = 0;
+		if (nombres) {
+			const lista_nombres = nombres.split(',');
+			for (const n of lista_nombres) {
+				if (cuenta_jugadores >= jugadores) break;
+				preset_data['settings'][`player-${cuenta_jugadores}`] = n.trim();
+				cuenta_jugadores++;
+			}
+		}
+		while (cuenta_jugadores < jugadores) {
+			preset_data['settings'][`player-${cuenta_jugadores}`] = `Jugador ${cuenta_jugadores + 1}`;
+			cuenta_jugadores++;
+		}
+	}
+
 	if (extra) {
 		const extra_params = extra.split(/\s+/);
 		if (extra_params.includes('spoiler')) {
@@ -136,7 +172,7 @@ async function generate_varia(preset_data, extra) {
 }
 
 
-async function generate_from_preset(preset, extra) {
+async function generate_from_preset(preset, extra, jugadores = 1, nombres = '') {
 	const preset_file_loc = preset_file(preset);
 	if (preset_file_loc) {
 		const preset_data = JSON.parse(fs.readFileSync(preset_file_loc));
@@ -146,9 +182,9 @@ async function generate_from_preset(preset, extra) {
 		case 'mystery':
 			return await generate_alttpr(mystery_settings(preset_data), extra);
 		case 'sm':
-			return await generate_sm(preset_data, extra);
+			return await generate_sm(preset_data, extra, jugadores, nombres);
 		case 'smz3':
-			return await generate_smz3(preset_data, extra);
+			return await generate_smz3(preset_data, extra, jugadores, nombres);
 		case 'varia':
 			return await generate_varia(preset_data, extra);
 		}
