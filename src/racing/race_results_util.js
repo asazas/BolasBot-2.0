@@ -157,7 +157,7 @@ async function get_player_ranking_text(db) {
 function calculate_score_change(my_player_score, other_player_score, result) {
 	const diff_ratio = (other_player_score - my_player_score) / 400;
 	const my_expected = (1 + 10 ** diff_ratio) ** -1;
-	return 200 * (result - my_expected);
+	return 100 * (result - my_expected);
 }
 
 async function calculate_player_scores(db, race_channel, async) {
