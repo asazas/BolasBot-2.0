@@ -43,6 +43,7 @@ async function done_async(interaction, db, race) {
 				.setDescription(`GG ${author}, tu resultado se ha registrado.`)
 				.setTimestamp();
 			await interaction.editReply({ embeds: [ans_embed], ephemeral: true });
+			await interaction.channel.send(`${author} ha registrado un resultado.`);
 		}
 		else {
 			throw { 'message': 'Parámetros inválidos.' };
