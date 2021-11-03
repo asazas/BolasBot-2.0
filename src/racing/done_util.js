@@ -15,8 +15,19 @@ async function done_async(interaction, db, race) {
 		}
 		let time = interaction.options.getString('tiempo');
 		if (!time) {
-			time = '99:59:59';
-			collection = 0;
+			if (interaction.commandName === 'forfeit') {
+				time = '99:59:59';
+				collection = 0;
+			}
+			else {
+				const error_embed = new MessageEmbed()
+					.setColor('#0099ff')
+					.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+					.setDescription(`${interaction.user}, tu resultado no se ha registrado. Asegúrate de rellenar los parámetros del comando correctamente.`)
+					.setTimestamp();
+				await interaction.editReply({ embeds: [error_embed], ephemeral: true });
+				return;
+			}
 		}
 
 		if (/^\d?\d:[0-5]\d:[0-5]\d$/.test(time) && collection >= 0) {
