@@ -21,7 +21,7 @@ async function carrera_crear(interaction, db) {
 	if (!name) {
 		name = `${random_words[Math.floor(Math.random() * random_words.length)]}${random_words[Math.floor(Math.random() * random_words.length)]}`;
 	}
-	name = name.substring(0, 20);
+	const channel_name = name.substring(0, 20);
 
 	// Crear o recuperar seed
 	const seed_details = await seed_in_create_race(interaction);
@@ -30,7 +30,7 @@ async function carrera_crear(interaction, db) {
 
 	// Crear hilo para la carrera
 	const race_channel = await interaction.channel.threads.create({
-		name: name,
+		name: channel_name,
 		autoArchiveDuration: 1440,
 	});
 

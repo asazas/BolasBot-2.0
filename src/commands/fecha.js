@@ -46,7 +46,7 @@ module.exports = {
 		const response_embed = new MessageEmbed()
 			.setColor('#0099ff')
 			.setTitle(`<t:${tstamp}>`)
-			.addField('Timestamp', `${tstamp}`)
+			.addField('Timestamp', `\`\`\`<t:${tstamp}>\`\`\``)
 			.setTimestamp();
 		await interaction.reply({ embeds: [response_embed] });
 	},
