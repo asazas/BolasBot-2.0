@@ -190,7 +190,7 @@ async function generate_random(preset_data, extra, recursion = 0) {
 	for (const o of options) {
 		accum += o['chance'];
 		if (rng < accum) {
-			if (o['extra']) extra = o['extra'] + ' ' + extra;
+			if (o['extra']) extra = extra ? o['extra'] + ' ' + extra : o['extra'];
 			return await generate_from_preset(o['preset'], extra, undefined, undefined, recursion + 1);
 		}
 	}
