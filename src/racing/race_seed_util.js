@@ -24,8 +24,7 @@ async function seed_in_create_race(interaction) {
 			if (extra) {
 				extra = extra.toLowerCase();
 			}
-			full_preset = extra ? preset + ' ' + extra : preset;
-			seed = await generate_from_preset(preset, extra);
+			[full_preset, seed] = await generate_from_preset(preset, extra);
 			if (!seed) {
 				throw { 'message': 'Error al crear la seed a partir del preset.' };
 			}

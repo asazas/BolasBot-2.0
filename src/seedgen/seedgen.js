@@ -171,22 +171,49 @@ async function generate_varia(preset_data, extra) {
 		method: 'POST', data: my_preset, retry: true });
 }
 
+async function generate_random(preset_data, extra, recursion = 0) {
+	if (recursion > 3) {
+		throw { 'message': 'Superado límite de recursión.' };
+	}
 
-async function generate_from_preset(preset, extra, jugadores = 1, nombres = '') {
+	const options = [];
+	let chance_total = 0;
+	for (const option of preset_data['presets']) {
+		if (option['preset'] && preset_file(option['preset']) && option['chance']) {
+			options.push(option);
+			chance_total += option['chance'];
+		}
+	}
+
+	const rng = Math.random() * chance_total;
+	let accum = 0;
+	for (const o of options) {
+		accum += o['chance'];
+		if (rng < accum) {
+			if (o['extra']) extra = o['extra'] + ' ' + extra;
+			return await generate_from_preset(o['preset'], extra, undefined, undefined, recursion + 1);
+		}
+	}
+}
+
+async function generate_from_preset(preset, extra, jugadores = 1, nombres = '', recursion = 0) {
+	const full_preset = extra ? preset + ' ' + extra : preset;
 	const preset_file_loc = preset_file(preset);
 	if (preset_file_loc) {
 		const preset_data = JSON.parse(fs.readFileSync(preset_file_loc));
 		switch (preset_data['randomizer']) {
 		case 'alttp':
-			return await generate_alttpr(preset_data, extra);
+			return [full_preset, await generate_alttpr(preset_data, extra)];
 		case 'mystery':
-			return await generate_alttpr(mystery_settings(preset_data), extra);
+			return [full_preset, await generate_alttpr(mystery_settings(preset_data), extra)];
 		case 'sm':
-			return await generate_sm(preset_data, extra, jugadores, nombres);
+			return [full_preset, await generate_sm(preset_data, extra, jugadores, nombres)];
 		case 'smz3':
-			return await generate_smz3(preset_data, extra, jugadores, nombres);
+			return [full_preset, await generate_smz3(preset_data, extra, jugadores, nombres)];
 		case 'varia':
-			return await generate_varia(preset_data, extra);
+			return [full_preset, await generate_varia(preset_data, extra)];
+		case 'random':
+			return await generate_random(preset_data, extra, recursion);
 		}
 	}
 }

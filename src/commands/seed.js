@@ -13,8 +13,7 @@ async function seed_crear(interaction, jugadores = 1, nombres = '') {
 	if (extra) {
 		extra = extra.toLowerCase();
 	}
-	const full_preset = extra ? preset + ' ' + extra : preset;
-	const seed = await generate_from_preset(preset, extra, jugadores, nombres);
+	const [full_preset, seed] = await generate_from_preset(preset, extra, jugadores, nombres);
 
 	const info_embed = seed_info_embed(seed, interaction, full_preset);
 	if (info_embed[1]) {

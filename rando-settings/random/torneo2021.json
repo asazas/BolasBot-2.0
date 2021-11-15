@@ -1,0 +1,37 @@
+{
+    "randomizer": "random",
+    "name": "torneo",
+    "description": "Modo escogido al azar entre los permitidos en el torneo ALTTPR Español 2021.",
+    "presets": [
+        {
+            "preset": "ambrosia",
+            "chance": 1
+        },
+        {
+            "preset": "casual",
+            "extra": "botas",
+            "chance": 1
+        },
+        {
+            "preset": "mc",
+            "chance": 1
+        },
+        {
+            "preset": "open",
+            "chance": 1
+        },
+        {
+            "preset": "standard",
+            "chance": 1
+        },
+        {
+            "preset": "open",
+            "extra": "ad",
+            "chance": 1
+        },
+        {
+            "preset": "keysanity",
+            "chance": 1
+        }
+    ]
+}
