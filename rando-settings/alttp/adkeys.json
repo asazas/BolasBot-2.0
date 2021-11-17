@@ -1,0 +1,37 @@
+{
+  "randomizer": "alttp",
+  "goal_name": "keysanity",
+  "customizer": false,
+  "description": "Igual que Open, pero todos los ítems de las mazmorras (mapas, brújulas, llaves pequeñas y grandes) están incluidas en el pool general de ítems, y por tanto pueden aparecer fuera de sus mazmorras. Los premios de las mazmorras (cristales y colgantes) no se revelan en el mapa del mundo hasta conseguir el mapa de esa mazmorra.",
+  "settings": {
+    "name": "keysanity",
+    "notes": "Keysanity",
+    "allow_quickswap": true,
+    "goal": "dungeons",
+    "item": {
+      "pool": "normal",
+      "functionality": "normal"
+    },
+    "lang": "es",
+    "mode": "open",
+    "hints": "off",
+    "weapons": "randomized",
+    "crystals": {
+      "ganon": "7",
+      "tower": "7"
+    },
+    "enemizer": {
+      "boss_shuffle": "none",
+      "enemy_damage": "default",
+      "enemy_health": "default",
+      "enemy_shuffle": "none"
+    },
+    "glitches": "none",
+    "spoilers": false,
+    "entrances": "none",
+    "tournament": true,
+    "accessibility": "items",
+    "dungeon_items": "full",
+    "item_placement": "advanced"
+  }
+}
