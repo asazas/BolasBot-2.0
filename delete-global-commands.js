@@ -1,14 +1,14 @@
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
-const { clientId, token } = require('./config.json');
+const { discordClientId, discordToken } = require('./config.json');
 
-const rest = new REST({ version: '9' }).setToken(token);
+const rest = new REST({ version: '9' }).setToken(discordToken);
 
-rest.get(Routes.applicationCommands(clientId))
+rest.get(Routes.applicationCommands(discordClientId))
 	.then(data => {
 		const promises = [];
 		for (const command of data) {
-			const deleteUrl = `${Routes.applicationCommands(clientId)}/${command.id}`;
+			const deleteUrl = `${Routes.applicationCommands(discordClientId)}/${command.id}`;
 			promises.push(rest.delete(deleteUrl));
 		}
 		return Promise.all(promises);

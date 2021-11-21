@@ -12,7 +12,11 @@
   "dependencies": {
     "@discordjs/builders": "^0.6.0",
     "@discordjs/rest": "^0.1.0-canary.0",
+    "@twurple/api": "^5.0.9",
+    "@twurple/auth": "^5.0.9",
+    "@twurple/eventsub": "^5.0.9",
     "axios": "^0.23.0",
+    "cron": "^1.8.2",
     "discord-api-types": "^0.23.1",
     "discord.js": "^13.2.0",
     "gaxios": "^4.3.2",

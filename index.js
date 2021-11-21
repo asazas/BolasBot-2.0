@@ -1,38 +1,71 @@
 const fs = require('fs');
 // Require the necessary discord.js classes
 const { Client, Collection, Intents } = require('discord.js');
-const { token } = require('./config.json');
+const { ClientCredentialsAuthProvider } = require('@twurple/auth');
+const { ApiClient } = require('@twurple/api');
+const { CronJob } = require('cron');
+const { discordToken, twitchClientId, twitchClientSecret } = require('./config.json');
 const { get_data_models } = require('./src/datamgmt/setup');
+const { announce_live_streams, streams_data, get_twitch_streams_info } = require('./src/streams/streams_util');
 
-// Create a new client instance
-const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_MESSAGES,
+// Create a new Discord client instance
+const discord_client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_MESSAGES,
 	Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_MESSAGE_TYPING, Intents.FLAGS.DIRECT_MESSAGES,
 	Intents.FLAGS.DIRECT_MESSAGE_REACTIONS, Intents.FLAGS.DIRECT_MESSAGE_TYPING] });
 
-client.commands = new Collection();
+discord_client.commands = new Collection();
 const commandFiles = fs.readdirSync('./src/commands').filter(file => file.endsWith('.js'));
 
 for (const file of commandFiles) {
 	const command = require(`./src/commands/${file}`);
-	client.commands.set(command.data.name, command);
+	discord_client.commands.set(command.data.name, command);
 }
+
+// Prepare Twitch client
+const twitch_auth_provider = new ClientCredentialsAuthProvider(twitchClientId, twitchClientSecret);
+const twitch_api_client = new ApiClient({ authProvider: twitch_auth_provider });
 
 const db = {};
 
 // When the client is ready, run this code (only once)
-client.once('ready', async () => {
+discord_client.once('ready', async () => {
 
 	// initialize databases
-	for (const guild_id of client.guilds.cache.map(guild => guild.id)) {
+	for (const guild_id of discord_client.guilds.cache.map(guild => guild.id)) {
 		db[guild_id] = await get_data_models(guild_id);
 	}
-	console.log(`Ready! Logged in as ${client.user.tag}`);
+
+	// schedule stream alerts
+	const job = new CronJob('0 */12 * * * *', async function() {
+		try {
+			let all_streams = {};
+			const guild_streams_list = [];
+			for (const my_guild of discord_client.guilds.cache.map(guild => guild)) {
+				const my_guild_streams = await streams_data(db[my_guild.id]);
+				if (Object.entries(my_guild_streams).length > 0) {
+					all_streams = { ...all_streams, ...my_guild_streams };
+					guild_streams_list.push([my_guild, my_guild_streams]);
+				}
+			}
+			if (Object.entries(all_streams).length === 0) return;
+			const twitch_info = await get_twitch_streams_info(Object.keys(all_streams), twitch_api_client);
+			for (const [my_guild, my_guild_streams] of guild_streams_list) {
+				await announce_live_streams(my_guild, my_guild_streams, db[my_guild.id], twitch_info);
+			}
+		}
+		catch (error) {
+			console.log(error);
+		}
+	});
+	job.start();
+
+	console.log(`Ready! Logged in as ${discord_client.user.tag}`);
 });
 
-client.on('interactionCreate', async interaction => {
+discord_client.on('interactionCreate', async interaction => {
 	if (!interaction.isCommand()) return;
 
-	const command = client.commands.get(interaction.commandName);
+	const command = discord_client.commands.get(interaction.commandName);
 
 	if (!command) return;
 
@@ -52,4 +85,4 @@ client.on('interactionCreate', async interaction => {
 });
 
 // Login to Discord with your client's token
-client.login(token);
+discord_client.login(discordToken);

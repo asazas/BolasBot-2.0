@@ -1,5 +1,7 @@
 {
-    "clientId": "CLIENT_ID",
-    "guildId": "GUILD_ID",
-    "token": "BOT_TOKEN"
+    "discordClientId": "DISCORD_CLIENT_ID",
+    "discordGuildId": "DISCORD_GUILD_ID",
+    "discordToken": "DISCORD_BOT_TOKEN",
+    "twitchClientId": "TWITCH_CLIENT_ID",
+    "twitchClientSecret": "TWITCH_CLIENT_SECRET"
 }

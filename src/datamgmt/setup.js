@@ -20,6 +20,12 @@ async function get_data_models(server) {
 		MultiworldSettingsChannel: {
 			type: DataTypes.TEXT,
 		},
+		StreamAlertsChannel: {
+			type: DataTypes.TEXT,
+		},
+		StreamAlertsRole: {
+			type: DataTypes.TEXT,
+		},
 	});
 
 	const players = sequelize.define('Players', {
@@ -50,6 +56,29 @@ async function get_data_models(server) {
 			defaultValue: 0,
 		},
 	});
+
+	const streams = sequelize.define('Streams', {
+		Id: {
+			type: DataTypes.INTEGER,
+			primaryKey: true,
+			autoIncrement: true,
+		},
+		Owner: {
+			type: DataTypes.TEXT,
+			allowNull: false,
+		},
+		TwitchUser: {
+			type: DataTypes.TEXT,
+			allowNull: false,
+			unique: true,
+		},
+		Live: {
+			type: DataTypes.BOOLEAN,
+			allowNull: false,
+			defaultValue: false,
+		},
+	});
+	streams.belongsTo(players, { as: 'owner', foreignKey: 'Owner', onDelete: 'CASCADE' });
 
 	const races = sequelize.define('Races', {
 		Id: {
