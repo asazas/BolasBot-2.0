@@ -106,7 +106,7 @@ async function announce_live_streams(guild, guild_streams, db, twitch_info) {
 		await update_stream_live(db, set_live, true);
 	}
 	if (set_not_live.length > 0) {
-		await update_stream_live(db, set_live, false);
+		await update_stream_live(db, set_not_live, false);
 	}
 
 	if (messages.length > 0) {
