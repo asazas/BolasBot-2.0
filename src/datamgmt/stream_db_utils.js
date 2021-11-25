@@ -97,7 +97,7 @@ async function update_stream_live(sequelize, twitch_user, status) {
 	const streams = sequelize.models.Streams;
 	try {
 		return await sequelize.transaction(async (t) => {
-			const stream = await streams.findOne({
+			const stream = await streams.findAll({
 				where: {
 					TwitchUser: twitch_user,
 				},
