@@ -97,14 +97,15 @@ async function update_stream_live(sequelize, twitch_user, status) {
 	const streams = sequelize.models.Streams;
 	try {
 		return await sequelize.transaction(async (t) => {
-			return await streams.update({
-				Live: status,
-			}, {
-				where: {
-					TwitchUser: twitch_user,
-				},
-				transaction: t,
-			});
+			return await streams.update(
+				{
+					Live: status,
+				}, {
+					where: {
+						TwitchUser: twitch_user,
+					},
+					transaction: t,
+				});
 		});
 	}
 	catch (error) {
