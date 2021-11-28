@@ -27,7 +27,7 @@ name: YourName{number}
 game:
   Factorio: 1
 requires:
-  version: 0.1.9 # Version of Archipelago required for this yaml to work as expected.
+  version: 0.2.0 # Version of Archipelago required for this yaml to work as expected.
 # Shared Options supported by all games:
 accessibility:
   items: 0 # Guarantees you will be able to acquire all items, but you may not be able to access all locations
@@ -188,6 +188,9 @@ Factorio:
     random-low: 0
     random-high: 0
     10: 50
+  death_link: # When you die, everyone dies. Of course the reverse is true too.
+    false: 50
+    true: 0
   local_items: # Forces these items to be in their native world.
     []
 
