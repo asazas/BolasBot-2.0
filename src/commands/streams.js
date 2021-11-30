@@ -9,14 +9,13 @@ command.data = new SlashCommandBuilder()
 	.addSubcommand(subcommand =>
 		subcommand.setName('alta')
 			.setDescription('Registra un stream de Twitch para realizar avisos en el servidor.')
-			.addUserOption(option =>
-				option.setName('usuario')
-					.setDescription('@ del usuario en Discord.')
-					.setRequired(true))
 			.addStringOption(option =>
 				option.setName('stream')
 					.setDescription('Nombre de usuario en Twitch (nombre del canal)')
-					.setRequired(true)))
+					.setRequired(true))
+			.addUserOption(option =>
+				option.setName('usuario')
+					.setDescription('@ del usuario en Discord.')))
 
 	.addSubcommand(subcommand =>
 		subcommand.setName('baja')

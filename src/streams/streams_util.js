@@ -3,10 +3,15 @@ const { get_or_insert_player, get_global_var } = require('../datamgmt/db_utils')
 const { register_stream, unregister_stream, set_stream_alerts_role, get_streams, update_stream_live, set_stream_alerts_channel } = require('../datamgmt/stream_db_utils');
 
 async function stream_alta(interaction, db) {
-	const owner = interaction.options.getUser('usuario');
-	await get_or_insert_player(db, owner.id, owner.username, owner.discriminator, `${owner}`);
 	const stream = interaction.options.getString('stream');
-	await register_stream(db, owner.id, stream.toLowerCase());
+	const owner = interaction.options.getUser('usuario');
+	if (owner) {
+		await get_or_insert_player(db, owner.id, owner.username, owner.discriminator, `${owner}`);
+		await register_stream(db, owner.id, stream.toLowerCase());
+	}
+	else {
+		await register_stream(db, null, stream.toLowerCase());
+	}
 	const ans_embed = new MessageEmbed()
 		.setColor('#0099ff')
 		.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
@@ -78,11 +83,15 @@ async function announce_live_streams(guild, guild_streams, db, twitch_info) {
 		// channel went live, prepare to send alert
 		if (twitch_info[channel_name] && (!stream_db_status['live'])) {
 			try {
+				let title = `¡${twitch_info[channel_name].userName} está en directo!`;
 				const member = await guild.members.fetch(stream_db_status['owner']);
+				if (member) {
+					title = `¡${member.user.username} está en directo!`;
+				}
 				const ans_embed = new MessageEmbed()
 					.setColor('#0099ff')
 					.setAuthor(guild.me.user.username, guild.me.user.avatarURL())
-					.setTitle(`¡${member.user.username} está en directo!`)
+					.setTitle(title)
 					.setURL(`https://www.twitch.tv/${twitch_info[channel_name].userName}`)
 					.setDescription(`${twitch_info[channel_name].title}`)
 					.setImage(`${twitch_info[channel_name].thumbnailUrl.replace('-{width}x{height}', '')}`)

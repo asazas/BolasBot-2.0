@@ -65,7 +65,6 @@ async function get_data_models(server) {
 		},
 		Owner: {
 			type: DataTypes.TEXT,
-			allowNull: false,
 		},
 		TwitchUser: {
 			type: DataTypes.TEXT,
