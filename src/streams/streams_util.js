@@ -84,8 +84,8 @@ async function announce_live_streams(guild, guild_streams, db, twitch_info) {
 		if (twitch_info[channel_name] && (!stream_db_status['live'])) {
 			try {
 				let title = `¡${twitch_info[channel_name].userName} está en directo!`;
-				const member = await guild.members.fetch(stream_db_status['owner']);
-				if (member) {
+				if (stream_db_status['owner']) {
+					const member = await guild.members.fetch(stream_db_status['owner']);
 					title = `¡${member.user.username} está en directo!`;
 				}
 				const ans_embed = new MessageEmbed()
