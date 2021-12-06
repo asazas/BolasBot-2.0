@@ -2,16 +2,16 @@
   "randomizer": "alttp",
   "goal_name": "ludicrous speed",
   "customizer": true,
-  "description": "Open All Dungeons, pero hay cuatro copias de cada ítem de progresión.",
+  "description": "Igual que Open, pero hay cuatro copias de cada ítem de progresión.",
   "settings": {
     "name": "ludicrous speed",
-    "notes": "Open All Dungeons, pero hay cuatro copias de cada ítem de progresión.",
+    "notes": "Igual que Open, pero hay cuatro copias de cada ítem de progresión.",
     "allow_quickswap": true,
     "glitches": "none",
     "item_placement": "advanced",
     "dungeon_items": "standard",
     "accessibility": "items",
-    "goal": "dungeons",
+    "goal": "ganon",
     "crystals": {
       "ganon": "7",
       "tower": "7"
