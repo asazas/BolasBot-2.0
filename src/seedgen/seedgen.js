@@ -19,8 +19,8 @@ function add_default_customizer(preset_data) {
 	if (!('l' in preset_data['settings'])) {
 		const default_customizer = JSON.parse(fs.readFileSync('res/default-customizer.json'));
 		preset_data['settings'] = { ...preset_data['settings'], ...default_customizer };
-		return preset_data;
 	}
+	return preset_data;
 }
 
 async function generate_alttpr(preset_data, extra) {
@@ -48,7 +48,12 @@ async function generate_alttpr(preset_data, extra) {
 				preset_data['settings']['eq'].push('PegasusBoots');
 				if (preset_data['settings']['custom']['item']['count']['PegasusBoots'] > 0) {
 					preset_data['settings']['custom']['item']['count']['PegasusBoots'] -= 1;
-					preset_data['settings']['custom']['item']['count']['TwentyRupees2'] += 1;
+					if (preset_data['settings']['custom']['item']['count']['TwentyRupees2']) {
+						preset_data['settings']['custom']['item']['count']['TwentyRupees2'] += 1;
+					}
+					else {
+						preset_data['settings']['custom']['item']['count']['TwentyRupees2'] = 1;
+					}
 				}
 			}
 		}
