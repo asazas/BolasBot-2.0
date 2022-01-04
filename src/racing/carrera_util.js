@@ -16,6 +16,12 @@ async function carrera_crear(interaction, db) {
 
 	await interaction.deferReply();
 
+	const creator = interaction.user;
+	const creator_in_db = await get_or_insert_player(db, creator.id, creator.username, creator.discriminator, `${creator}`);
+	if (creator_in_db[0].Banned) {
+		throw { 'message': 'Este usuario no puede crear carreras porque está vetado.' };
+	}
+
 	// Nombre de la carrera
 	let name = interaction.options.getString('nombre');
 	if (!name) {
@@ -34,8 +40,6 @@ async function carrera_crear(interaction, db) {
 		autoArchiveDuration: 1440,
 	});
 
-	const creator = interaction.user;
-	await get_or_insert_player(db, creator.id, creator.username, creator.discriminator, `${creator}`);
 	await insert_race(db, name, creator.id, full_preset, seed_info ? seed_info['hash'] : null, seed_info ? seed_info['code'] : null,
 		seed_info ? seed_info['url'] : null, race_channel.id);
 
@@ -63,7 +67,12 @@ async function carrera_entrar(interaction, db) {
 		throw { 'message': 'Este comando solo puede ser usado en canales de carreras.' };
 	}
 
-	await get_or_insert_player(db, interaction.user.id, interaction.user.username, interaction.user.discriminator, `${interaction.user}`);
+	const creator = interaction.user;
+	const creator_in_db = await get_or_insert_player(db, creator.id, creator.username, creator.discriminator, `${creator}`);
+	if (creator_in_db[0].Banned) {
+		throw { 'message': 'Este usuario no puede participar en carreras porque está vetado.' };
+	}
+
 	const race_player = await get_or_insert_race_player(db, race.Id, interaction.user.id);
 	let text_ans = null;
 	if (race_player == -1) {

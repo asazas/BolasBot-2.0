@@ -16,6 +16,12 @@ const random_words = ['Asazas', 'DiegoA', 'Vilxs', 'Diegolazo', 'Matkap', 'Kitsu
 async function async_crear(interaction, db) {
 	await interaction.deferReply();
 
+	const creator = interaction.user;
+	const creator_in_db = await get_or_insert_player(db, creator.id, creator.username, creator.discriminator, `${creator}`);
+	if (creator_in_db[0].Banned) {
+		throw { 'message': 'Este usuario no puede crear carreras porque está vetado.' };
+	}
+
 	// Límite de carreras asíncronas: máximo 10 en el servidor
 	const asyncs = await get_active_async_races(db);
 	if (asyncs && asyncs.length >= 10) {
@@ -125,8 +131,6 @@ async function async_crear(interaction, db) {
 	const results_text = await get_async_results_text(db, submit_channel.id);
 	const results_msg = await results_channel.send(results_text);
 
-	const creator = interaction.user;
-	await get_or_insert_player(db, creator.id, creator.username, creator.discriminator, `${creator}`);
 	if (blind) {
 		await insert_async(db, name, creator.id, full_preset, seed_info ? seed_info['hash'] : null, seed_info ? seed_info['code'] : null,
 			seed_info ? seed_info['url'] : null, null, submit_channel.id, results_channel.id, results_msg.id, spoilers_channel.id);

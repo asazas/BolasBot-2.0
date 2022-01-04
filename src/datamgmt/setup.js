@@ -55,6 +55,11 @@ async function get_data_models(server) {
 			allowNull: false,
 			defaultValue: 0,
 		},
+		Banned: {
+			type: DataTypes.BOOLEAN,
+			allowNull: false,
+			defaultValue: false,
+		},
 	});
 
 	const streams = sequelize.define('Streams', {

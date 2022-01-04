@@ -7,6 +7,13 @@ const { calcular_tiempo, get_race_results_text, get_race_data_embed, calculate_p
 
 
 async function done_async(interaction, db, race) {
+
+	const author = interaction.user;
+	const creator_in_db = await get_or_insert_player(db, author.id, author.username, author.discriminator, `${author}`);
+	if (creator_in_db[0].Banned) {
+		throw { 'message': 'Este usuario no puede participar en carreras porque está vetado.' };
+	}
+
 	if (race.Status == 0) {
 		await interaction.deferReply({ ephemeral: true });
 		let collection = interaction.options.getInteger('collection');
@@ -34,8 +41,6 @@ async function done_async(interaction, db, race) {
 			const time_arr = time.split(':');
 			const time_s = 3600 * parseInt(time_arr[0]) + 60 * parseInt(time_arr[1]) + parseInt(time_arr[2]);
 
-			const author = interaction.user;
-			await get_or_insert_player(db, author.id, author.username, author.discriminator, `${author}`);
 			await save_async_result(db, race.Id, author.id, time_s, collection);
 
 			const results_text = await get_async_results_text(db, race.SubmitChannel);
@@ -66,7 +71,13 @@ async function done_async(interaction, db, race) {
 }
 
 async function done_race(interaction, db, race, forfeit = false) {
-	await get_or_insert_player(db, interaction.user.id, interaction.user.username, interaction.user.discriminator, `${interaction.user}`);
+
+	const author = interaction.user;
+	const creator_in_db = await get_or_insert_player(db, author.id, author.username, author.discriminator, `${author}`);
+	if (creator_in_db[0].Banned) {
+		throw { 'message': 'Este usuario no puede participar en carreras porque está vetado.' };
+	}
+
 	let done_code = null;
 	if (forfeit) {
 		done_code = await set_player_forfeit(db, race.Id, interaction.user.id);
