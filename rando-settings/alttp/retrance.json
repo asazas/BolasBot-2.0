@@ -1,11 +1,11 @@
 {
   "randomizer": "alttp",
-  "goal_name": "crosskeys",
+  "goal_name": "retrance",
   "customizer": false,
-  "description": "Crossworld Keysanity. Combina modo open keysanity con randomizador de entradas en modo cruzado.",
+  "description": "Crossworld Keysanity + Retro. Las llaves pequeñas pueden comprarse en tiendas y ser usadas en cualquier mazmorra.",
   "settings": {
-    "name": "crosskeys",
-    "notes": "Crosskeys",
+    "name": "retrance",
+    "notes": "Retrance",
     "allow_quickswap": true,
     "goal": "fast_ganon",
     "item": {
@@ -13,9 +13,9 @@
       "functionality": "normal"
     },
     "lang": "es",
-    "mode": "open",
+    "mode": "retro",
     "hints": "off",
-    "weapons": "randomized",
+    "weapons": "assured",
     "crystals": {
       "ganon": "7",
       "tower": "7"
