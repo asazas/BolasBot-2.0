@@ -56,7 +56,9 @@ async function done_async(interaction, db, race) {
 			const ans_embed = new MessageEmbed()
 				.setColor('#0099ff')
 				.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
-				.setDescription(`GG ${author}, tu resultado se ha registrado.`)
+				.setDescription(`GG ${author}, tu resultado se ha registrado.
+				Tiempo: ${calcular_tiempo(time_s)}
+				CR: ${collection}`)
 				.setTimestamp();
 			await interaction.editReply({ embeds: [ans_embed], ephemeral: true });
 			await interaction.channel.send(`${author} ha registrado un resultado.`);
