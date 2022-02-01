@@ -8,6 +8,9 @@ async function get_data_models(server) {
 			type: DataTypes.TEXT,
 			primaryKey: true,
 		},
+		AsyncSubmitCategory: {
+			type: DataTypes.TEXT,
+		},
 		RaceHistoryChannel: {
 			type: DataTypes.TEXT,
 		},
