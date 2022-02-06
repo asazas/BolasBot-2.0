@@ -38,7 +38,7 @@ command.execute = async function(interaction, db) {
 		throw { 'message': 'Este comando no puede ser usado en mensajes directos.' };
 	}
 	if (!interaction.memberPermissions.has(Permissions.FLAGS.MANAGE_CHANNELS)) {
-		throw { 'message': 'Solo un moderador pueden ejecutar este comando.' };
+		throw { 'message': 'Solo un moderador puede ejecutar este comando.' };
 	}
 
 	if (interaction.options.getSubcommand() == 'alta') {
