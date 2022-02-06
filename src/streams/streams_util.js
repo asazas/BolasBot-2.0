@@ -14,7 +14,7 @@ async function stream_alta(interaction, db) {
 	}
 	const ans_embed = new MessageEmbed()
 		.setColor('#0099ff')
-		.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+		.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 		.setDescription(`Añadido el stream ${stream} a la lista de alertas.`)
 		.setTimestamp();
 	await interaction.reply({ embeds: [ans_embed] });
@@ -28,7 +28,7 @@ async function stream_baja(interaction, db) {
 	}
 	const ans_embed = new MessageEmbed()
 		.setColor('#0099ff')
-		.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+		.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 		.setDescription(`Eliminado el stream ${stream} de la lista de alertas.`)
 		.setTimestamp();
 	await interaction.reply({ embeds: [ans_embed] });
@@ -40,7 +40,7 @@ async function set_stream_role(interaction, db) {
 		await set_stream_alerts_role(db, role.id);
 		const ans_embed = new MessageEmbed()
 			.setColor('#0099ff')
-			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 			.setDescription(`Registrado el rol ${role} para pings de alertas de stream.`)
 			.setTimestamp();
 		await interaction.reply({ embeds: [ans_embed] });
@@ -49,7 +49,7 @@ async function set_stream_role(interaction, db) {
 		await set_stream_alerts_role(db, null);
 		const ans_embed = new MessageEmbed()
 			.setColor('#0099ff')
-			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 			.setDescription('No se enviarán pings para alertas de stream.')
 			.setTimestamp();
 		await interaction.reply({ embeds: [ans_embed] });

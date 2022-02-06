@@ -55,7 +55,7 @@ async function carrera_crear(interaction, db) {
 
 	const text_ans = new MessageEmbed()
 		.setColor('#0099ff')
-		.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+		.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 		.setDescription(`Abierta carrera con nombre: ${name}. Participa en ${race_channel}.`)
 		.setTimestamp();
 	await interaction.editReply({ embeds: [text_ans] });
@@ -78,21 +78,21 @@ async function carrera_entrar(interaction, db) {
 	if (race_player == -1) {
 		text_ans = new MessageEmbed()
 			.setColor('#0099ff')
-			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 			.setDescription('Esta carrera no está abierta.')
 			.setTimestamp();
 	}
 	else if (race_player == -2) {
 		text_ans = new MessageEmbed()
 			.setColor('#0099ff')
-			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 			.setDescription(`${interaction.user} ya está en la carrera.`)
 			.setTimestamp();
 	}
 	else {
 		text_ans = new MessageEmbed()
 			.setColor('#0099ff')
-			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 			.setDescription(`${interaction.user} se ha unido a la carrera.`)
 			.setTimestamp();
 	}
@@ -112,28 +112,28 @@ async function carrera_salir(interaction, db) {
 	if (delete_code == -1) {
 		text_ans = new MessageEmbed()
 			.setColor('#0099ff')
-			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 			.setDescription(`${interaction.user} no está en la carrera.`)
 			.setTimestamp();
 	}
 	else if (delete_code == -2) {
 		text_ans = new MessageEmbed()
 			.setColor('#0099ff')
-			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 			.setDescription(`${interaction.user} no puede salir de la carrera si está listo para comenzar.`)
 			.setTimestamp();
 	}
 	else if (delete_code == -3) {
 		text_ans = new MessageEmbed()
 			.setColor('#0099ff')
-			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 			.setDescription('No se puede salir de una carrera ya comenzada.')
 			.setTimestamp();
 	}
 	else {
 		text_ans = new MessageEmbed()
 			.setColor('#0099ff')
-			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 			.setDescription(`${interaction.user} ha salido de la carrera.`)
 			.setTimestamp();
 	}
@@ -153,28 +153,28 @@ async function carrera_listo(interaction, db) {
 	if (ready_code == -1) {
 		text_ans = new MessageEmbed()
 			.setColor('#0099ff')
-			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 			.setDescription(`${interaction.user} no está en la carrera.`)
 			.setTimestamp();
 	}
 	else if (ready_code == -2) {
 		text_ans = new MessageEmbed()
 			.setColor('#0099ff')
-			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 			.setDescription(`${interaction.user} ya está listo.`)
 			.setTimestamp();
 	}
 	else if (ready_code == -3) {
 		text_ans = new MessageEmbed()
 			.setColor('#0099ff')
-			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 			.setDescription('No se puede realizar esta acción una carrera ya comenzada.')
 			.setTimestamp();
 	}
 	else {
 		text_ans = new MessageEmbed()
 			.setColor('#0099ff')
-			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 			.setDescription(`${interaction.user} está listo para empezar. Quedan ${ready_code['all'] - ready_code['ready']} participantes.`)
 			.setTimestamp();
 	}
@@ -183,7 +183,7 @@ async function carrera_listo(interaction, db) {
 	if (typeof ready_code == 'object' && ready_code['all'] >= 2 && ready_code['ready'] == ready_code['all']) {
 		text_ans = new MessageEmbed()
 			.setColor('#0099ff')
-			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 			.setDescription('Todos los jugadores están listos. Iniciando cuenta atrás. ¡Buena suerte!')
 			.setTimestamp();
 		await interaction.editReply({ embeds: [text_ans] });
@@ -206,28 +206,28 @@ async function carrera_no_listo(interaction, db) {
 	if (unready_code == -1) {
 		text_ans = new MessageEmbed()
 			.setColor('#0099ff')
-			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 			.setDescription(`${interaction.user} no está en la carrera.`)
 			.setTimestamp();
 	}
 	else if (unready_code == -2) {
 		text_ans = new MessageEmbed()
 			.setColor('#0099ff')
-			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 			.setDescription(`${interaction.user} aún no está listo.`)
 			.setTimestamp();
 	}
 	else if (unready_code == -3) {
 		text_ans = new MessageEmbed()
 			.setColor('#0099ff')
-			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 			.setDescription('No se puede realizar esta acción una carrera ya comenzada.')
 			.setTimestamp();
 	}
 	else {
 		text_ans = new MessageEmbed()
 			.setColor('#0099ff')
-			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 			.setDescription(`${interaction.user} no está listo.`)
 			.setTimestamp();
 	}
@@ -251,21 +251,21 @@ async function carrera_forzar_inicio(interaction, db) {
 	if (force_start_code == -1) {
 		text_ans = new MessageEmbed()
 			.setColor('#0099ff')
-			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 			.setDescription('No hay suficientes jugadores para iniciar la carrera.')
 			.setTimestamp();
 	}
 	else if (force_start_code == -2) {
 		text_ans = new MessageEmbed()
 			.setColor('#0099ff')
-			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 			.setDescription('Esta carrera no está abierta.')
 			.setTimestamp();
 	}
 	else {
 		text_ans = new MessageEmbed()
 			.setColor('#0099ff')
-			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 			.setDescription('Forzado inicio de la carrera.')
 			.setTimestamp();
 	}
@@ -295,14 +295,14 @@ async function carrera_forzar_final(interaction, db) {
 	if (force_end_code == -1) {
 		text_ans = new MessageEmbed()
 			.setColor('#0099ff')
-			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 			.setDescription('Esta carrera no está en curso.')
 			.setTimestamp();
 	}
 	else {
 		text_ans = new MessageEmbed()
 			.setColor('#0099ff')
-			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 			.setDescription('Forzado final de la carrera.')
 			.setTimestamp();
 	}
@@ -359,7 +359,7 @@ async function carrera_forzar_final(interaction, db) {
 		}
 		const score_embed = new MessageEmbed()
 			.setColor('#0099ff')
-			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 			.setTitle(`Ranking tras ${race.Name}`)
 			.setURL(hist_msg.url)
 			.setTimestamp();
@@ -385,7 +385,7 @@ async function carrera_forzar_cancelar(interaction, db) {
 
 	const text_ans = new MessageEmbed()
 		.setColor('#0099ff')
-		.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+		.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 		.setDescription('Anulando carrera...')
 		.setTimestamp();
 

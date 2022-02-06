@@ -76,7 +76,7 @@ async function crear_multiworld(interaction, db) {
 					.setColor('#0099ff')
 					.setTitle('Multiworld')
 					.setURL(game.data.url)
-					.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+					.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 					.addField('URL', game.data.url)
 					.setTimestamp();
 				const multi_msg = await multi_thread.send({ embeds: [thread_embed] });
@@ -85,7 +85,7 @@ async function crear_multiworld(interaction, db) {
 				const main_embed = new MessageEmbed()
 					.setColor('#0099ff')
 					.setTitle('Éxito')
-					.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+					.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 					.setDescription(`Nueva partida de multiworld iniciada en ${multi_thread}`)
 					.setTimestamp();
 				await interaction.editReply({ embeds: [main_embed] });
@@ -97,7 +97,7 @@ async function crear_multiworld(interaction, db) {
 				const embed = new MessageEmbed()
 					.setColor('#0099ff')
 					.setTitle('Error')
-					.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+					.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 					.setDescription(`${game.status} ${game.statusText}`)
 					.addField('Detalles', game.data.text)
 					.setImage(`attachment://${image_name}`)

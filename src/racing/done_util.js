@@ -29,7 +29,7 @@ async function done_async(interaction, db, race) {
 			else {
 				const error_embed = new MessageEmbed()
 					.setColor('#0099ff')
-					.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+					.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 					.setDescription(`${interaction.user}, tu resultado no se ha registrado. Asegúrate de rellenar los parámetros del comando correctamente.`)
 					.setTimestamp();
 				await interaction.editReply({ embeds: [error_embed], ephemeral: true });
@@ -55,7 +55,7 @@ async function done_async(interaction, db, race) {
 
 			const ans_embed = new MessageEmbed()
 				.setColor('#0099ff')
-				.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+				.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 				.setDescription(`GG ${author}, tu resultado se ha registrado.`)
 				.addFields(
 					{ name: 'Tiempo', value: `${calcular_tiempo(time_s)}`, inline: true },
@@ -94,35 +94,35 @@ async function done_race(interaction, db, race, forfeit = false) {
 	if (done_code == -1) {
 		text_ans = new MessageEmbed()
 			.setColor('#0099ff')
-			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 			.setDescription(`${interaction.user} no está en la carrera.`)
 			.setTimestamp();
 	}
 	else if (done_code == -2) {
 		text_ans = new MessageEmbed()
 			.setColor('#0099ff')
-			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 			.setDescription(`${interaction.user} no está participando en la carrera.`)
 			.setTimestamp();
 	}
 	else if (done_code == -3) {
 		text_ans = new MessageEmbed()
 			.setColor('#0099ff')
-			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 			.setDescription('La carrera no está en curso.')
 			.setTimestamp();
 	}
 	else if (done_code == -4) {
 		text_ans = new MessageEmbed()
 			.setColor('#0099ff')
-			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 			.setDescription(`${interaction.user} ya ha terminado.`)
 			.setTimestamp();
 	}
 	else if (done_code == -5) {
 		text_ans = new MessageEmbed()
 			.setColor('#0099ff')
-			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 			.setDescription('¡La carrera aún no ha comenzado')
 			.setTimestamp();
 	}
@@ -136,7 +136,7 @@ async function done_race(interaction, db, race, forfeit = false) {
 		}
 		text_ans = new MessageEmbed()
 			.setColor('#0099ff')
-			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 			.setDescription(time_text)
 			.setTimestamp();
 	}
@@ -145,7 +145,7 @@ async function done_race(interaction, db, race, forfeit = false) {
 	if (typeof done_code == 'object' && done_code['done_count'] == done_code['player_count']) {
 		text_ans = new MessageEmbed()
 			.setColor('#0099ff')
-			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 			.setDescription('Todos los jugadores han terminado. Cerrando la carrera. ¡GG!')
 			.setTimestamp();
 		await interaction.channel.send({ embeds: [text_ans] });
@@ -199,7 +199,7 @@ async function done_race(interaction, db, race, forfeit = false) {
 		}
 		const score_embed = new MessageEmbed()
 			.setColor('#0099ff')
-			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 			.setTitle(`Ranking tras ${race.Name}`)
 			.setURL(hist_msg.url)
 			.setTimestamp();
@@ -217,35 +217,35 @@ async function undone_race(interaction, db, race) {
 	if (undone_code == -1) {
 		text_ans = new MessageEmbed()
 			.setColor('#0099ff')
-			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 			.setDescription(`${interaction.user} no está en la carrera.`)
 			.setTimestamp();
 	}
 	else if (undone_code == -2) {
 		text_ans = new MessageEmbed()
 			.setColor('#0099ff')
-			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 			.setDescription(`${interaction.user} no está participando en la carrera.`)
 			.setTimestamp();
 	}
 	else if (undone_code == -3) {
 		text_ans = new MessageEmbed()
 			.setColor('#0099ff')
-			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 			.setDescription('La carrera no está en curso.')
 			.setTimestamp();
 	}
 	else if (undone_code == -4) {
 		text_ans = new MessageEmbed()
 			.setColor('#0099ff')
-			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 			.setDescription(`${interaction.user} aún no ha terminado.`)
 			.setTimestamp();
 	}
 	else {
 		text_ans = new MessageEmbed()
 			.setColor('#0099ff')
-			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 			.setDescription(`${interaction.user} continúa la carrera.`)
 			.setTimestamp();
 	}

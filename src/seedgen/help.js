@@ -29,7 +29,7 @@ function preset_help(interaction) {
 			return new MessageEmbed()
 				.setColor('#0099ff')
 				.setTitle(content['goal_name'])
-				.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+				.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 				.setDescription(content['description'])
 				.setTimestamp();
 		}
@@ -39,7 +39,7 @@ function preset_help(interaction) {
 	const output = new MessageEmbed()
 		.setColor('#0099ff')
 		.setTitle('Lista de presets')
-		.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+		.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 		.setTimestamp();
 
 	for (const cat of categories) {
@@ -56,7 +56,7 @@ function extra_help(interaction) {
 	return new MessageEmbed()
 		.setColor('#0099ff')
 		.setTitle('Opciones extra')
-		.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+		.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 		.addField('ALTTP y Mystery', extra_alttp)
 		.addField('SM', extra_sm)
 		.addField('SMZ3', extra_smz3)

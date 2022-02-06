@@ -48,7 +48,7 @@ command.execute = async function(interaction, db) {
 		await set_multi_settings_channel(db, interaction.channelId);
 		const ans_embed = new MessageEmbed()
 			.setColor('#0099ff')
-			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 			.setDescription(`Fijado este canal (${interaction.channel}) para búsqueda de configuraciones YAML.`)
 			.setTimestamp();
 		await interaction.reply({ embeds: [ans_embed] });

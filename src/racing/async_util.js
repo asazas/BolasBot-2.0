@@ -171,7 +171,7 @@ async function async_crear(interaction, db) {
 	const instructions = new MessageEmbed()
 		.setColor('#0099ff')
 		.setTitle(`Envío de resultados: ${name}`)
-		.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+		.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 		.setDescription(`Enviad resultados usando el comando \`/done\`, rellenando el tiempo y colección de ítems en los campos correspondientes; o \`/forfeit\` para registrar un abandono.
 		Usad preferiblemente tiempo real, no in-game time.
 		Por favor, mantened este canal lo más limpio posible y SIN SPOILERS.`)
@@ -190,7 +190,7 @@ async function async_crear(interaction, db) {
 
 	const text_ans = new MessageEmbed()
 		.setColor('#0099ff')
-		.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+		.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 		.setDescription(`Abierta carrera asíncrona con nombre: ${name}. Envía resultados en ${submit_channel}.`)
 		.setTimestamp();
 	await interaction.editReply({ embeds: [text_ans] });
@@ -212,7 +212,7 @@ async function async_cerrar(interaction, db) {
 		await update_async_status(db, race.Id, 1);
 		const ans_embed = new MessageEmbed()
 			.setColor('#0099ff')
-			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 			.setDescription('Esta carrera ha sido cerrada.')
 			.setTimestamp();
 		await interaction.reply({ embeds: [ans_embed] });
@@ -238,7 +238,7 @@ async function async_reabrir(interaction, db) {
 		await update_async_status(db, race.Id, 0);
 		const ans_embed = new MessageEmbed()
 			.setColor('#0099ff')
-			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 			.setDescription('Esta carrera ha sido reabierta.')
 			.setTimestamp();
 		await interaction.reply({ embeds: [ans_embed] });
@@ -261,7 +261,7 @@ async function async_purgar(interaction, db) {
 	if (race.Status == 1) {
 		const ans_embed = new MessageEmbed()
 			.setColor('#0099ff')
-			.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 			.setDescription('Purgando...')
 			.setTimestamp();
 		await interaction.reply({ embeds: [ans_embed] });
@@ -320,7 +320,7 @@ async function async_purgar(interaction, db) {
 			}
 			const score_embed = new MessageEmbed()
 				.setColor('#0099ff')
-				.setAuthor(interaction.client.user.username, interaction.client.user.avatarURL())
+				.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 				.setTitle(`Ranking tras ${race.Name}`)
 				.setURL(hist_msg.url)
 				.setTimestamp();
