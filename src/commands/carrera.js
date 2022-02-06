@@ -25,6 +25,9 @@ command.data = new SlashCommandBuilder()
 			.addStringOption(option =>
 				option.setName('nombre')
 					.setDescription('Nombre de la carrera asíncrona'))
+			.addBooleanOption(option =>
+				option.setName('ranked')
+					.setDescription('Determina si la carrera es puntuable.'))
 			.addStringOption(preset_option)
 			.addStringOption(option =>
 				option.setName('extra')

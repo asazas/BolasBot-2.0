@@ -21,68 +21,70 @@ async function cerrar_async(interaction, db, race) {
 	// Copia de resultados al historial, si los hay
 	const submit_channel = await interaction.guild.channels.fetch(`${race.SubmitChannel}`);
 	const results = await get_results_for_async(db, submit_channel.id);
-	if ((!results) || results.length < 2) {
-		return;
-	}
 
 	// Crear canal de historial si no existe
-	const global_var = await get_global_var(db);
-	let my_hist_channel = null;
-	if (global_var.AsyncHistoryChannel) {
-		my_hist_channel = await interaction.guild.channels.fetch(`${global_var.AsyncHistoryChannel}`);
-	}
-	if (!my_hist_channel) {
-		my_hist_channel = await interaction.guild.channels.create('async-historico', {
-			permissionOverwrites: [
-				{
-					id: interaction.guild.roles.everyone,
-					deny: [Permissions.FLAGS.SEND_MESSAGES],
-				},
-				{
-					id: interaction.guild.me,
-					allow: [Permissions.FLAGS.SEND_MESSAGES],
-				},
-			],
-		});
-		await set_async_history_channel(db, my_hist_channel.id);
-	}
+	if (results && results.length > 1) {
+		const global_var = await get_global_var(db);
+		let my_hist_channel = null;
+		if (global_var.AsyncHistoryChannel) {
+			my_hist_channel = await interaction.guild.channels.fetch(`${global_var.AsyncHistoryChannel}`);
+		}
+		if (!my_hist_channel) {
+			my_hist_channel = await interaction.guild.channels.create('async-historico', {
+				permissionOverwrites: [
+					{
+						id: interaction.guild.roles.everyone,
+						deny: [Permissions.FLAGS.SEND_MESSAGES],
+					},
+					{
+						id: interaction.guild.me,
+						allow: [Permissions.FLAGS.SEND_MESSAGES],
+					},
+				],
+			});
+			await set_async_history_channel(db, my_hist_channel.id);
+		}
 
-	const results_text = await get_async_results_text(db, submit_channel.id);
-	const data_embed = await get_async_data_embed(db, submit_channel.id);
-	const hist_msg = await my_hist_channel.send({ content: results_text, embeds: [data_embed] });
+		const results_text = await get_async_results_text(db, submit_channel.id);
+		const data_embed = await get_async_data_embed(db, submit_channel.id);
+		const hist_msg = await my_hist_channel.send({ content: results_text, embeds: [data_embed] });
 
-	// Actualización de puntuaciones
-	// Crear canal de puntuaciones si no existe
-	let my_score_channel = null;
-	if (global_var.PlayerScoreChannel) {
-		my_score_channel = await interaction.guild.channels.fetch(`${global_var.PlayerScoreChannel}`);
+		// Actualización de puntuaciones si la carrera es ranked
+		// Crear canal de puntuaciones si no existe
+		if (race.Ranked) {
+			let my_score_channel = null;
+			if (global_var.PlayerScoreChannel) {
+				my_score_channel = await interaction.guild.channels.fetch(`${global_var.PlayerScoreChannel}`);
+			}
+			if (!my_score_channel) {
+				my_score_channel = await interaction.guild.channels.create('ranking-jugadores', {
+					permissionOverwrites: [
+						{
+							id: interaction.guild.roles.everyone,
+							deny: [Permissions.FLAGS.SEND_MESSAGES],
+						},
+						{
+							id: interaction.guild.me,
+							allow: [Permissions.FLAGS.SEND_MESSAGES],
+						},
+					],
+				});
+				await set_player_score_channel(db, my_score_channel.id);
+			}
+			const score_embed = new MessageEmbed()
+				.setColor('#0099ff')
+				.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
+				.setTitle(`Ranking tras ${race.Name}`)
+				.setURL(hist_msg.url)
+				.setTimestamp();
+			await calculate_player_scores(db, interaction.channelId, true);
+			const score_text = await get_player_ranking_text(db);
+			await my_score_channel.send({ content: score_text, embeds: [score_embed] });
+		}
 	}
-	if (!my_score_channel) {
-		my_score_channel = await interaction.guild.channels.create('ranking-jugadores', {
-			permissionOverwrites: [
-				{
-					id: interaction.guild.roles.everyone,
-					deny: [Permissions.FLAGS.SEND_MESSAGES],
-				},
-				{
-					id: interaction.guild.me,
-					allow: [Permissions.FLAGS.SEND_MESSAGES],
-				},
-			],
-		});
-		await set_player_score_channel(db, my_score_channel.id);
-	}
-	const score_embed = new MessageEmbed()
-		.setColor('#0099ff')
-		.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
-		.setTitle(`Ranking tras ${race.Name}`)
-		.setURL(hist_msg.url)
-		.setTimestamp();
-	await calculate_player_scores(db, interaction.channelId, true);
-	const score_text = await get_player_ranking_text(db);
-	await my_score_channel.send({ content: score_text, embeds: [score_embed] });
 
 	// Eliminar roles y canales de la carrera asíncrona.
+	// DEPRECATED: en la próxima actualización todas las carreras tendrán RoleId
 	if (race.RoleId) {
 		const async_role = await interaction.guild.roles.fetch(`${race.RoleId}`);
 		await async_role.delete();
@@ -149,110 +151,70 @@ async function async_crear(interaction, db) {
 	let results_channel = null;
 	let spoilers_channel = null;
 
-	const blind = interaction.options.getBoolean('blind');
-
-	if (blind) {
-		async_category = await interaction.guild.channels.create(channel_name, {
-			type: 'GUILD_CATEGORY',
-		});
-		submit_channel = await interaction.guild.channels.create(`${channel_name}-submit`, {
-			parent: async_submit_category,
-		});
-		results_channel = await interaction.guild.channels.create(`${channel_name}-results`, {
-			parent: async_category,
-			permissionOverwrites: [
-				{
-					id: interaction.guild.roles.everyone,
-					deny: [Permissions.FLAGS.VIEW_CHANNEL, Permissions.FLAGS.SEND_MESSAGES],
-				},
-				{
-					id: interaction.guild.me,
-					allow: [Permissions.FLAGS.VIEW_CHANNEL, Permissions.FLAGS.SEND_MESSAGES],
-				},
-			],
-		});
-		spoilers_channel = await interaction.guild.channels.create(`${channel_name}-spoilers`, {
-			parent: async_category,
-			permissionOverwrites: [
-				{
-					id: interaction.guild.roles.everyone,
-					deny: [Permissions.FLAGS.VIEW_CHANNEL],
-				},
-				{
-					id: interaction.guild.me,
-					allow: [Permissions.FLAGS.VIEW_CHANNEL],
-				},
-			],
-		});
-	}
-
-	else {
-		async_role = await interaction.guild.roles.create({ name: channel_name });
-		async_category = await interaction.guild.channels.create(channel_name, {
-			type: 'GUILD_CATEGORY',
-		});
-		submit_channel = await interaction.guild.channels.create(`${channel_name}-submit`, {
-			parent: async_submit_category,
-		});
-		results_channel = await interaction.guild.channels.create(`${channel_name}-results`, {
-			parent: async_category,
-			permissionOverwrites: [
-				{
-					id: interaction.guild.roles.everyone,
-					deny: [Permissions.FLAGS.VIEW_CHANNEL, Permissions.FLAGS.SEND_MESSAGES],
-				},
-				{
-					id: interaction.guild.me,
-					allow: [Permissions.FLAGS.VIEW_CHANNEL, Permissions.FLAGS.SEND_MESSAGES],
-				},
-				{
-					id: async_role,
-					allow: [Permissions.FLAGS.VIEW_CHANNEL],
-				},
-			],
-		});
-		spoilers_channel = await interaction.guild.channels.create(`${channel_name}-spoilers`, {
-			parent: async_category,
-			permissionOverwrites: [
-				{
-					id: interaction.guild.roles.everyone,
-					deny: [Permissions.FLAGS.VIEW_CHANNEL],
-				},
-				{
-					id: interaction.guild.me,
-					allow: [Permissions.FLAGS.VIEW_CHANNEL],
-				},
-				{
-					id: async_role,
-					allow: [Permissions.FLAGS.VIEW_CHANNEL],
-				},
-			],
-		});
-	}
+	async_role = await interaction.guild.roles.create({ name: channel_name });
+	async_category = await interaction.guild.channels.create(channel_name, {
+		type: 'GUILD_CATEGORY',
+	});
+	submit_channel = await interaction.guild.channels.create(`${channel_name}-submit`, {
+		parent: async_submit_category,
+	});
+	results_channel = await interaction.guild.channels.create(`${channel_name}-results`, {
+		parent: async_category,
+		permissionOverwrites: [
+			{
+				id: interaction.guild.roles.everyone,
+				deny: [Permissions.FLAGS.VIEW_CHANNEL, Permissions.FLAGS.SEND_MESSAGES],
+			},
+			{
+				id: interaction.guild.me,
+				allow: [Permissions.FLAGS.VIEW_CHANNEL, Permissions.FLAGS.SEND_MESSAGES],
+			},
+			{
+				id: async_role,
+				allow: [Permissions.FLAGS.VIEW_CHANNEL],
+			},
+		],
+	});
+	spoilers_channel = await interaction.guild.channels.create(`${channel_name}-spoilers`, {
+		parent: async_category,
+		permissionOverwrites: [
+			{
+				id: interaction.guild.roles.everyone,
+				deny: [Permissions.FLAGS.VIEW_CHANNEL],
+			},
+			{
+				id: interaction.guild.me,
+				allow: [Permissions.FLAGS.VIEW_CHANNEL],
+			},
+			{
+				id: async_role,
+				allow: [Permissions.FLAGS.VIEW_CHANNEL],
+			},
+		],
+	});
 
 	const results_text = await get_async_results_text(db, submit_channel.id);
 	const results_msg = await results_channel.send(results_text);
 
-	// Registrar async en base de datos.
-	if (blind) {
-		await insert_async(db, name, creator.id, full_preset, seed_info ? seed_info['hash'] : null, seed_info ? seed_info['code'] : null,
-			seed_info ? seed_info['url'] : null, null, submit_channel.id, results_channel.id, results_msg.id, spoilers_channel.id);
-	}
-	else {
-		await insert_async(db, name, creator.id, full_preset, seed_info ? seed_info['hash'] : null, seed_info ? seed_info['code'] : null,
-			seed_info ? seed_info['url'] : null, async_role.id, submit_channel.id, results_channel.id, results_msg.id, spoilers_channel.id);
-	}
+	let ranked = interaction.options.getBoolean('ranked');
+	if (!ranked) ranked = false;
 
-	// Enviar seed al canal de submit.
-	const async_data = await get_async_data_embed(db, submit_channel.id);
-	let data_msg = null;
-	if (seed_info && seed_info['spoiler_attachment']) {
-		data_msg = await submit_channel.send({ embeds: [async_data], files: [seed_info['spoiler_attachment']] });
+	// Registrar async en base de datos.
+	await insert_async(db, name, creator.id, ranked, full_preset, seed_info ? seed_info['hash'] : null, seed_info ? seed_info['code'] : null,
+		seed_info ? seed_info['url'] : null, async_role.id, submit_channel.id, results_channel.id, results_msg.id, spoilers_channel.id);
+
+	// Enviar seed al canal de submit, si la carrera no es ranked.
+	if (!ranked) {
+		const async_data = await get_async_data_embed(db, submit_channel.id);
+		let data_msg = null;
+		if (seed_info && seed_info['spoiler_attachment']) {
+			data_msg = await submit_channel.send({ embeds: [async_data], files: [seed_info['spoiler_attachment']] });
+		}
+		else {
+			data_msg = await submit_channel.send({ embeds: [async_data] });
+		}
+		await data_msg.pin();
 	}
-	else {
-		data_msg = await submit_channel.send({ embeds: [async_data] });
-	}
-	await data_msg.pin();
 
 	// Enviar instrucciones al canal de submit.
 	const instructions = new MessageEmbed()
@@ -263,15 +225,9 @@ async function async_crear(interaction, db) {
 		Usad preferiblemente tiempo real, no in-game time.
 		Por favor, mantened este canal lo más limpio posible y SIN SPOILERS.`)
 		.setTimestamp();
-	if (blind) {
-		instructions.addField('Retransmisión de carrera asíncrona',
-			`Al cierre de esta carrera, se eligirán hasta un máximo de 4 jugadores para su retransmisión.
-			Para poder ser elegible, el VOD de la partida debe cumplir las siguientes condiciones:
-			- El temporizador debe tener el valor inicial de -2 minutos.
-			- El VOD debe terminar en la pantalla final de los créditos.
-			- El ALTTPR Community Tracker debe estar visible → https://alttprtracker.dunka.net/
-			- Únicamente el audio del juego debe estar presente.
-			- El VOD debe ser subido a YouTube como vídeo no listado.`);
+	if (ranked) {
+		instructions.addField('Carrera asíncrona puntuable vinculante',
+			'Para participar en esta carrera asíncrona debes introducir el comando `/jugar` en este canal. Al hacerlo tendrás acceso a los detalles de la partida. Si te apuntas a la carrera y no registras un resultado antes de su cierre, se considerará como un forfeit.');
 	}
 	await submit_channel.send({ embeds: [instructions] });
 

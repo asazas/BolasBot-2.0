@@ -1,5 +1,5 @@
 const { MessageEmbed } = require('discord.js');
-const { save_async_result } = require('../datamgmt/async_db_utils');
+const { save_async_result, get_player_result } = require('../datamgmt/async_db_utils');
 const { get_or_insert_player } = require('../datamgmt/db_utils');
 const { set_player_forfeit, set_player_done, set_player_undone } = require('../datamgmt/race_db_utils');
 const { get_async_results_text } = require('./async_util');
@@ -20,8 +20,15 @@ async function done_async(interaction, db, race) {
 		throw { 'message': 'Esta carrera no está abierta.' };
 	}
 
-	// Procesar tiempo y collection.
 	await interaction.deferReply({ ephemeral: true });
+	if (race.Ranked) {
+		const player_result = await get_player_result(db, race.SubmitChannel, author.id);
+		if (!player_result) {
+			throw { 'message': 'Debes apuntarte a esta carrera antes de poder registrar un resultado.' };
+		}
+	}
+
+	// Procesar tiempo y collection.
 	let collection = interaction.options.getInteger('collection');
 	if (!collection) {
 		collection = 0;
@@ -60,6 +67,7 @@ async function done_async(interaction, db, race) {
 	await results_message.edit(results_text);
 
 	// Dar rol de carrera, si procede.
+	// DEPRECATED: Todas las carreras tendrán RoleId
 	if (race.RoleId) {
 		const async_role = await interaction.guild.roles.fetch(`${race.RoleId}`);
 		await interaction.member.roles.add(async_role);

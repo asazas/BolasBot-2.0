@@ -40,36 +40,38 @@ async function cerrar_carrera(interaction, db, race) {
 	const data_embed = await get_race_data_embed(db, interaction.channelId);
 	const hist_msg = await my_hist_channel.send({ content: results_text, embeds: [data_embed] });
 
-	// Actualización de puntuaciones
+	// Actualización de puntuaciones si la carrera es ranked
 	// Crear canal de puntuaciones si no existe
-	let my_score_channel = null;
-	if (global_var.PlayerScoreChannel) {
-		my_score_channel = await interaction.guild.channels.fetch(`${global_var.PlayerScoreChannel}`);
+	if (race.Ranked) {
+		let my_score_channel = null;
+		if (global_var.PlayerScoreChannel) {
+			my_score_channel = await interaction.guild.channels.fetch(`${global_var.PlayerScoreChannel}`);
+		}
+		if (!my_score_channel) {
+			my_score_channel = await interaction.guild.channels.create('ranking-jugadores', {
+				permissionOverwrites: [
+					{
+						id: interaction.guild.roles.everyone,
+						deny: [Permissions.FLAGS.SEND_MESSAGES],
+					},
+					{
+						id: interaction.guild.me,
+						allow: [Permissions.FLAGS.SEND_MESSAGES],
+					},
+				],
+			});
+			await set_player_score_channel(db, my_score_channel.id);
+		}
+		const score_embed = new MessageEmbed()
+			.setColor('#0099ff')
+			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
+			.setTitle(`Ranking tras ${race.Name}`)
+			.setURL(hist_msg.url)
+			.setTimestamp();
+		await calculate_player_scores(db, interaction.channelId, false);
+		const score_text = await get_player_ranking_text(db);
+		await my_score_channel.send({ content: score_text, embeds: [score_embed] });
 	}
-	if (!my_score_channel) {
-		my_score_channel = await interaction.guild.channels.create('ranking-jugadores', {
-			permissionOverwrites: [
-				{
-					id: interaction.guild.roles.everyone,
-					deny: [Permissions.FLAGS.SEND_MESSAGES],
-				},
-				{
-					id: interaction.guild.me,
-					allow: [Permissions.FLAGS.SEND_MESSAGES],
-				},
-			],
-		});
-		await set_player_score_channel(db, my_score_channel.id);
-	}
-	const score_embed = new MessageEmbed()
-		.setColor('#0099ff')
-		.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
-		.setTitle(`Ranking tras ${race.Name}`)
-		.setURL(hist_msg.url)
-		.setTimestamp();
-	await calculate_player_scores(db, interaction.channelId, false);
-	const score_text = await get_player_ranking_text(db);
-	await my_score_channel.send({ content: score_text, embeds: [score_embed] });
 }
 
 // Invocado con /carrera crear. Crea una carrera síncrona.
@@ -104,7 +106,9 @@ async function carrera_crear(interaction, db) {
 		autoArchiveDuration: 1440,
 	});
 
-	await insert_race(db, name, creator.id, full_preset, seed_info ? seed_info['hash'] : null, seed_info ? seed_info['code'] : null,
+	const ranked = interaction.options.getBoolean('ranked');
+
+	await insert_race(db, name, creator.id, ranked, full_preset, seed_info ? seed_info['hash'] : null, seed_info ? seed_info['code'] : null,
 		seed_info ? seed_info['url'] : null, race_channel.id);
 
 	const async_data = await get_race_data_embed(db, race_channel.id);

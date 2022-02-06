@@ -1,6 +1,6 @@
 const { Op } = require('sequelize');
 
-async function insert_async(sequelize, name, creator, preset, seed_hash, seed_code, seed_url,
+async function insert_async(sequelize, name, creator, ranked, preset, seed_hash, seed_code, seed_url,
 	role_id, submit_channel, results_channel, results_message, spoilers_channel) {
 	const async_races = sequelize.models.AsyncRaces;
 	try {
@@ -9,6 +9,7 @@ async function insert_async(sequelize, name, creator, preset, seed_hash, seed_co
 				Name: name,
 				Creator: creator,
 				StartDate: Math.floor(new Date().getTime() / 1000),
+				Ranked: ranked,
 				Preset: preset,
 				SeedHash: seed_hash,
 				SeedCode: seed_code,
@@ -178,5 +179,37 @@ async function get_results_for_async(sequelize, submit_channel) {
 	}
 }
 
+async function get_player_result(sequelize, submit_channel, player) {
+	const async_results = sequelize.models.AsyncResults;
+	try {
+		return await sequelize.transaction(async (t) => {
+			return await async_results.findOne({
+				include: [
+					{
+						model: sequelize.models.AsyncRaces,
+						as: 'race',
+						required: true,
+						where: {
+							SubmitChannel: submit_channel,
+						},
+					},
+					{
+						model: sequelize.models.Players,
+						as: 'player',
+						required: true,
+						where: {
+							DiscordId: player,
+						},
+					},
+				],
+				transaction: t,
+			});
+		});
+	}
+	catch (error) {
+		console.log(error['message']);
+	}
+}
+
 module.exports = { insert_async, get_active_async_races, search_async_by_name, get_async_by_submit,
-	update_async_status, save_async_result, get_results_for_async };
+	update_async_status, save_async_result, get_results_for_async, get_player_result };

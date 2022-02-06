@@ -110,6 +110,11 @@ async function get_data_models(server) {
 		EndDate: {
 			type: DataTypes.INTEGER,
 		},
+		Ranked: {
+			type: DataTypes.BOOLEAN,
+			allowNull: false,
+			defaultValue: false,
+		},
 		// 0: abierta, 1: en curso, 2: terminada
 		Status: {
 			type: DataTypes.INTEGER,
@@ -194,6 +199,11 @@ async function get_data_models(server) {
 		EndDate: {
 			type: DataTypes.INTEGER,
 		},
+		Ranked: {
+			type: DataTypes.BOOLEAN,
+			allowNull: false,
+			defaultValue: false,
+		},
 		// 0: abierta, 1: cerrada, 2: purgada
 		Status: {
 			type: DataTypes.INTEGER,
@@ -218,6 +228,7 @@ async function get_data_models(server) {
 		},
 		RoleId: {
 			type: DataTypes.TEXT,
+			// allowNull: false,
 		},
 		SubmitChannel: {
 			type: DataTypes.TEXT,

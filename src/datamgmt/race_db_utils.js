@@ -1,4 +1,4 @@
-async function insert_race(sequelize, name, creator, preset, seed_hash, seed_code, seed_url, race_channel) {
+async function insert_race(sequelize, name, creator, ranked, preset, seed_hash, seed_code, seed_url, race_channel) {
 	const races = sequelize.models.Races;
 	try {
 		return await sequelize.transaction(async (t) => {
@@ -6,6 +6,7 @@ async function insert_race(sequelize, name, creator, preset, seed_hash, seed_cod
 				Name: name,
 				Creator: creator,
 				CreationDate: Math.floor(new Date().getTime() / 1000),
+				Ranked: ranked,
 				Preset: preset,
 				SeedHash: seed_hash,
 				SeedCode: seed_code,

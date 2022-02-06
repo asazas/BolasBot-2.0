@@ -26,8 +26,8 @@ command.data = new SlashCommandBuilder()
 				option.setName('nombre')
 					.setDescription('Nombre de la carrera asíncrona'))
 			.addBooleanOption(option =>
-				option.setName('blind')
-					.setDescription('¿Deberían los participantes ver los resultados de la carrera al terminar?'))
+				option.setName('ranked')
+					.setDescription('Determina si la carrera es puntuable y vinculante.'))
 			.addStringOption(preset_option)
 			.addStringOption(option =>
 				option.setName('extra')
