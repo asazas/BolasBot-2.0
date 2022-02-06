@@ -108,6 +108,12 @@ async function async_crear(interaction, db) {
 		throw { 'message': 'Este usuario no puede crear carreras porque está vetado.' };
 	}
 
+	let ranked = interaction.options.getBoolean('ranked');
+	if (!ranked) ranked = false;
+	if (ranked && !interaction.memberPermissions.has(Permissions.FLAGS.MANAGE_CHANNELS)) {
+		throw { 'message': 'Solo un moderador puede crear carreras puntuables.' };
+	}
+
 	// Límite de carreras asíncronas: máximo 10 en el servidor
 	const asyncs = await get_active_async_races(db);
 	if (asyncs && asyncs.length >= 10) {
@@ -195,9 +201,6 @@ async function async_crear(interaction, db) {
 
 	const results_text = await get_async_results_text(db, submit_channel.id);
 	const results_msg = await results_channel.send(results_text);
-
-	let ranked = interaction.options.getBoolean('ranked');
-	if (!ranked) ranked = false;
 
 	// Registrar async en base de datos.
 	await insert_async(db, name, creator.id, ranked, full_preset, seed_info ? seed_info['hash'] : null, seed_info ? seed_info['code'] : null,

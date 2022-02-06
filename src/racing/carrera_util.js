@@ -88,6 +88,12 @@ async function carrera_crear(interaction, db) {
 		throw { 'message': 'Este usuario no puede crear carreras porque está vetado.' };
 	}
 
+	let ranked = interaction.options.getBoolean('ranked');
+	if (!ranked) ranked = false;
+	if (ranked && !interaction.memberPermissions.has(Permissions.FLAGS.MANAGE_CHANNELS)) {
+		throw { 'message': 'Solo un moderador puede crear carreras puntuables.' };
+	}
+
 	// Nombre de la carrera
 	let name = interaction.options.getString('nombre');
 	if (!name) {
@@ -105,8 +111,6 @@ async function carrera_crear(interaction, db) {
 		name: channel_name,
 		autoArchiveDuration: 1440,
 	});
-
-	const ranked = interaction.options.getBoolean('ranked');
 
 	await insert_race(db, name, creator.id, ranked, full_preset, seed_info ? seed_info['hash'] : null, seed_info ? seed_info['code'] : null,
 		seed_info ? seed_info['url'] : null, race_channel.id);
