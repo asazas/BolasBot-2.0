@@ -13,6 +13,90 @@ const random_words = ['Asazas', 'DiegoA', 'Vilxs', 'Diegolazo', 'Matkap', 'Kitsu
 	'Sus', 'Memes', 'México', 'Waifu', 'Gamer', 'VTuber', '5Head', 'Larpas', 'Magcargo'];
 
 
+async function cerrar_async(interaction, db, race) {
+
+	// Marcar async como purgada
+	await update_async_status(db, race.Id, 2);
+
+	// Copia de resultados al historial, si los hay
+	const submit_channel = await interaction.guild.channels.fetch(`${race.SubmitChannel}`);
+	const results = await get_results_for_async(db, submit_channel.id);
+	if ((!results) || results.length < 2) {
+		return;
+	}
+
+	// Crear canal de historial si no existe
+	const global_var = await get_global_var(db);
+	let my_hist_channel = null;
+	if (global_var.AsyncHistoryChannel) {
+		my_hist_channel = await interaction.guild.channels.fetch(`${global_var.AsyncHistoryChannel}`);
+	}
+	if (!my_hist_channel) {
+		my_hist_channel = await interaction.guild.channels.create('async-historico', {
+			permissionOverwrites: [
+				{
+					id: interaction.guild.roles.everyone,
+					deny: [Permissions.FLAGS.SEND_MESSAGES],
+				},
+				{
+					id: interaction.guild.me,
+					allow: [Permissions.FLAGS.SEND_MESSAGES],
+				},
+			],
+		});
+		await set_async_history_channel(db, my_hist_channel.id);
+	}
+
+	const results_text = await get_async_results_text(db, submit_channel.id);
+	const data_embed = await get_async_data_embed(db, submit_channel.id);
+	const hist_msg = await my_hist_channel.send({ content: results_text, embeds: [data_embed] });
+
+	// Actualización de puntuaciones
+	// Crear canal de puntuaciones si no existe
+	let my_score_channel = null;
+	if (global_var.PlayerScoreChannel) {
+		my_score_channel = await interaction.guild.channels.fetch(`${global_var.PlayerScoreChannel}`);
+	}
+	if (!my_score_channel) {
+		my_score_channel = await interaction.guild.channels.create('ranking-jugadores', {
+			permissionOverwrites: [
+				{
+					id: interaction.guild.roles.everyone,
+					deny: [Permissions.FLAGS.SEND_MESSAGES],
+				},
+				{
+					id: interaction.guild.me,
+					allow: [Permissions.FLAGS.SEND_MESSAGES],
+				},
+			],
+		});
+		await set_player_score_channel(db, my_score_channel.id);
+	}
+	const score_embed = new MessageEmbed()
+		.setColor('#0099ff')
+		.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
+		.setTitle(`Ranking tras ${race.Name}`)
+		.setURL(hist_msg.url)
+		.setTimestamp();
+	await calculate_player_scores(db, interaction.channelId, true);
+	const score_text = await get_player_ranking_text(db);
+	await my_score_channel.send({ content: score_text, embeds: [score_embed] });
+
+	// Eliminar roles y canales de la carrera asíncrona.
+	if (race.RoleId) {
+		const async_role = await interaction.guild.roles.fetch(`${race.RoleId}`);
+		await async_role.delete();
+	}
+	await submit_channel.delete();
+	const results_channel = await interaction.guild.channels.fetch(`${race.ResultsChannel}`);
+	const category = results_channel.parent;
+	await results_channel.delete();
+	const spoilers_channel = await interaction.guild.channels.fetch(`${race.SpoilersChannel}`);
+	await spoilers_channel.delete();
+	await category.delete();
+}
+
+// Invocado con /async crear. Crea una nueva carrera asíncrona.
 async function async_crear(interaction, db) {
 	await interaction.deferReply();
 
@@ -35,7 +119,7 @@ async function async_crear(interaction, db) {
 	}
 	const channel_name = name.substring(0, 20);
 
-
+	// Tomar categoría de async-submit, crear si no existe.
 	const global_var = await get_global_var(db);
 	let async_submit_category = null;
 	if (global_var.AsyncSubmitCategory) {
@@ -149,6 +233,7 @@ async function async_crear(interaction, db) {
 	const results_text = await get_async_results_text(db, submit_channel.id);
 	const results_msg = await results_channel.send(results_text);
 
+	// Registrar async en base de datos.
 	if (blind) {
 		await insert_async(db, name, creator.id, full_preset, seed_info ? seed_info['hash'] : null, seed_info ? seed_info['code'] : null,
 			seed_info ? seed_info['url'] : null, null, submit_channel.id, results_channel.id, results_msg.id, spoilers_channel.id);
@@ -158,6 +243,7 @@ async function async_crear(interaction, db) {
 			seed_info ? seed_info['url'] : null, async_role.id, submit_channel.id, results_channel.id, results_msg.id, spoilers_channel.id);
 	}
 
+	// Enviar seed al canal de submit.
 	const async_data = await get_async_data_embed(db, submit_channel.id);
 	let data_msg = null;
 	if (seed_info && seed_info['spoiler_attachment']) {
@@ -168,6 +254,7 @@ async function async_crear(interaction, db) {
 	}
 	await data_msg.pin();
 
+	// Enviar instrucciones al canal de submit.
 	const instructions = new MessageEmbed()
 		.setColor('#0099ff')
 		.setTitle(`Envío de resultados: ${name}`)
@@ -188,6 +275,7 @@ async function async_crear(interaction, db) {
 	}
 	await submit_channel.send({ embeds: [instructions] });
 
+	// Responder al comando
 	const text_ans = new MessageEmbed()
 		.setColor('#0099ff')
 		.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
@@ -196,6 +284,7 @@ async function async_crear(interaction, db) {
 	await interaction.editReply({ embeds: [text_ans] });
 }
 
+// Invocado con /async cerrar. Deja de aceptar nuevos resultados en la carrera asíncrona.
 async function async_cerrar(interaction, db) {
 	const race = await get_async_by_submit(db, interaction.channelId);
 	if (!race) {
@@ -222,6 +311,7 @@ async function async_cerrar(interaction, db) {
 	}
 }
 
+// Invocado con /async reabrir. Vuelve a aceptar resultados en la carrera asíncrona.
 async function async_reabrir(interaction, db) {
 	const race = await get_async_by_submit(db, interaction.channelId);
 	if (!race) {
@@ -248,6 +338,7 @@ async function async_reabrir(interaction, db) {
 	}
 }
 
+// Invocado con /async purgar. Cierra definitivamente una carrera asíncrona, eliminando sus canales.
 async function async_purgar(interaction, db) {
 	const race = await get_async_by_submit(db, interaction.channelId);
 	if (!race) {
@@ -258,92 +349,21 @@ async function async_purgar(interaction, db) {
 		throw { 'message': 'Solo el creador de la carrera o un moderador pueden ejecutar este comando.' };
 	}
 
-	if (race.Status == 1) {
-		const ans_embed = new MessageEmbed()
-			.setColor('#0099ff')
-			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
-			.setDescription('Purgando...')
-			.setTimestamp();
-		await interaction.reply({ embeds: [ans_embed] });
-
-		const creator = interaction.user;
-		await get_or_insert_player(db, creator.id, creator.username, creator.discriminator, `${creator}`);
-		await update_async_status(db, race.Id, 2);
-
-		// Copia de resultados al historial, si los hay
-		const submit_channel = await interaction.guild.channels.fetch(`${race.SubmitChannel}`);
-		const results = await get_results_for_async(db, submit_channel.id);
-		if (results && results.length > 0) {
-			const global_var = await get_global_var(db);
-			let my_hist_channel = null;
-			if (global_var.AsyncHistoryChannel) {
-				my_hist_channel = await interaction.guild.channels.fetch(`${global_var.AsyncHistoryChannel}`);
-			}
-			if (!my_hist_channel) {
-				my_hist_channel = await interaction.guild.channels.create('async-historico', {
-					permissionOverwrites: [
-						{
-							id: interaction.guild.roles.everyone,
-							deny: [Permissions.FLAGS.SEND_MESSAGES],
-						},
-						{
-							id: interaction.guild.me,
-							allow: [Permissions.FLAGS.SEND_MESSAGES],
-						},
-					],
-				});
-				await set_async_history_channel(db, my_hist_channel.id);
-			}
-
-			const results_text = await get_async_results_text(db, submit_channel.id);
-			const data_embed = await get_async_data_embed(db, submit_channel.id);
-			const hist_msg = await my_hist_channel.send({ content: results_text, embeds: [data_embed] });
-
-			let my_score_channel = null;
-			if (global_var.PlayerScoreChannel) {
-				my_score_channel = await interaction.guild.channels.fetch(`${global_var.PlayerScoreChannel}`);
-			}
-			if (!my_score_channel) {
-				my_score_channel = await interaction.guild.channels.create('ranking-jugadores', {
-					permissionOverwrites: [
-						{
-							id: interaction.guild.roles.everyone,
-							deny: [Permissions.FLAGS.SEND_MESSAGES],
-						},
-						{
-							id: interaction.guild.me,
-							allow: [Permissions.FLAGS.SEND_MESSAGES],
-						},
-					],
-				});
-				await set_player_score_channel(db, my_score_channel.id);
-			}
-			const score_embed = new MessageEmbed()
-				.setColor('#0099ff')
-				.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
-				.setTitle(`Ranking tras ${race.Name}`)
-				.setURL(hist_msg.url)
-				.setTimestamp();
-			await calculate_player_scores(db, interaction.channelId, true);
-			const score_text = await get_player_ranking_text(db);
-			await my_score_channel.send({ content: score_text, embeds: [score_embed] });
-		}
-
-		if (race.RoleId) {
-			const async_role = await interaction.guild.roles.fetch(`${race.RoleId}`);
-			await async_role.delete();
-		}
-		await submit_channel.delete();
-		const results_channel = await interaction.guild.channels.fetch(`${race.ResultsChannel}`);
-		const category = results_channel.parent;
-		await results_channel.delete();
-		const spoilers_channel = await interaction.guild.channels.fetch(`${race.SpoilersChannel}`);
-		await spoilers_channel.delete();
-		await category.delete();
-	}
-	else {
+	if (race.Status != 1) {
 		throw { 'message': 'La carrera debe cerrarse antes de ser purgada.' };
 	}
+
+	const ans_embed = new MessageEmbed()
+		.setColor('#0099ff')
+		.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
+		.setDescription('Purgando...')
+		.setTimestamp();
+	await interaction.reply({ embeds: [ans_embed] });
+
+	const creator = interaction.user;
+	await get_or_insert_player(db, creator.id, creator.username, creator.discriminator, `${creator}`);
+
+	cerrar_async(interaction, db, race);
 }
 
 module.exports = { random_words, async_crear, async_cerrar, async_reabrir, async_purgar, get_async_results_text };
