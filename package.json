@@ -11,7 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "@discordjs/builders": "^0.12.0",
-    "@discordjs/rest": "^0.3.0-dev.1644106030.d8184f9",
+    "@discordjs/rest": "^0.3.0-dev.1644408653.fe11ff5",
     "@twurple/api": "^5.0.17",
     "@twurple/auth": "^5.0.17",
     "@twurple/eventsub": "^5.0.17",
@@ -22,7 +22,7 @@
     "gaxios": "^4.3.2",
     "glob": "^7.2.0",
     "luxon": "^2.3.0",
-    "sequelize": "^6.15.0",
+    "sequelize": "^6.16.1",
     "slugid": "^3.0.0",
     "sqlite3": "^5.0.2",
     "tmp": "^0.2.1"
