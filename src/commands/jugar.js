@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { get_async_by_submit, save_async_result } = require('../datamgmt/async_db_utils');
+const { get_async_by_submit, save_async_result, get_player_result } = require('../datamgmt/async_db_utils');
 const { get_or_insert_player } = require('../datamgmt/db_utils');
 const { get_async_data_embed } = require('../racing/race_results_util');
 const { seed_info_embed } = require('../seedgen/info_embeds');
@@ -32,13 +32,21 @@ module.exports = {
 			throw { 'message': 'Esta carrera no está abierta.' };
 		}
 
-		await save_async_result(db, race.Id, author.id, 359999, 0);
+		const player_result = await get_player_result(db, race.SubmitChannel, author.id);
+		if (!player_result) {
+			await save_async_result(db, race.Id, author.id, 359999, 0);
+		}
 
 		const async_data = await get_async_data_embed(db, race.SubmitChannel);
 		const seed = await retrieve_from_url(race.SeedUrl, interaction);
-		const info_embed = seed_info_embed(seed, interaction);
-		if (info_embed[1]) {
-			await interaction.editReply({ embeds: [async_data], files: [info_embed[1]], ephemeral: true });
+		if (seed) {
+			const info_embed = seed_info_embed(seed, interaction);
+			if (info_embed[1]) {
+				await interaction.editReply({ embeds: [async_data], files: [info_embed[1]], ephemeral: true });
+			}
+			else {
+				await interaction.editReply({ embeds: [async_data], ephemeral: true });
+			}
 		}
 		else {
 			await interaction.editReply({ embeds: [async_data], ephemeral: true });
