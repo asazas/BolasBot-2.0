@@ -51,7 +51,6 @@ module.exports = {
 		else {
 			await interaction.editReply({ embeds: [async_data], ephemeral: true });
 		}
-		await interaction.channel.send(`${author} se une a la carrera.`);
 		return;
 	},
 };
