@@ -29,6 +29,9 @@ async function get_data_models(server) {
 		StreamAlertsRole: {
 			type: DataTypes.TEXT,
 		},
+		ReactionRolesChannel: {
+			type: DataTypes.TEXT,
+		},
 	});
 
 	const players = sequelize.define('Players', {
@@ -280,6 +283,51 @@ async function get_data_models(server) {
 	});
 	async_results.belongsTo(async_races, { as: 'race', foreignKey: 'Race', onDelete: 'SET NULL' });
 	async_results.belongsTo(players, { as: 'player', foreignKey: 'Player', onDelete: 'SET NULL' });
+
+	const reaction_role_categories = sequelize.define('ReactionRoleCategories', {
+		Name: {
+			type: DataTypes.TEXT,
+			primaryKey: true,
+		},
+		Message: {
+			type: DataTypes.TEXT,
+			allowNull: false,
+		},
+	});
+
+	const reaction_roles = sequelize.define('ReactionRoles', {
+		Id: {
+			type: DataTypes.INTEGER,
+			primaryKey: true,
+			autoIncrement: true,
+		},
+		RoleName: {
+			type: DataTypes.TEXT,
+			unique: true,
+		},
+		RoleId: {
+			type: DataTypes.TEXT,
+			allowNull: false,
+		},
+		Description: {
+			type: DataTypes.TEXT,
+			allowNull: false,
+		},
+		EmojiId: {
+			type: DataTypes.TEXT,
+			allowNull: false,
+			unique: true,
+		},
+		EmojiName: {
+			type: DataTypes.TEXT,
+			allowNull: false,
+			unique: true,
+		},
+		Category: {
+			type: DataTypes.TEXT,
+		},
+	});
+	reaction_roles.belongsTo(reaction_role_categories, { as: 'category', foreignKey: 'Category', onDelete: 'CASCADE' });
 
 	// SYNC PARA DEBUG
 	// await sequelize.sync({ force: true });

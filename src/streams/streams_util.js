@@ -90,7 +90,7 @@ async function announce_live_streams(guild, guild_streams, db, twitch_info) {
 				}
 				const ans_embed = new MessageEmbed()
 					.setColor('#0099ff')
-					.setAuthor(guild.me.user.username, guild.me.user.avatarURL())
+					.setAuthor({ name: guild.me.user.username, iconURL: guild.me.user.avatarURL() })
 					.setTitle(title)
 					.setURL(`https://www.twitch.tv/${twitch_info[channel_name].userName}`)
 					.setDescription(`${twitch_info[channel_name].title}`)
