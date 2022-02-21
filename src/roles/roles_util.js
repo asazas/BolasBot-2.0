@@ -5,7 +5,7 @@ const { set_reaction_roles_channel, get_role_category, create_reaction_role_cate
 const unicode_emoji_regex = /^\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff]$/;
 const discord_custom_emoji_regex = /^(?:<a?)?:\w+:(?:(\d{18})>)?$/;
 
-async function resolver_id_emoji(interaction, nombre_emoji) {
+async function resolver_id_emoji(guild, nombre_emoji) {
 	let id_emoji = null;
 	if (unicode_emoji_regex.test(nombre_emoji)) {
 		id_emoji = nombre_emoji;
@@ -13,7 +13,7 @@ async function resolver_id_emoji(interaction, nombre_emoji) {
 	else {
 		const emoji_regex_res = discord_custom_emoji_regex.exec(nombre_emoji);
 		if (emoji_regex_res) {
-			const emoji_obj = await interaction.guild.emojis.fetch(emoji_regex_res[1]);
+			const emoji_obj = await guild.emojis.fetch(emoji_regex_res[1]);
 			if (emoji_obj && !emoji_obj.managed) {
 				id_emoji = emoji_regex_res[1];
 			}
@@ -140,7 +140,7 @@ async function crear_rol(interaction, db) {
 	await interaction.deferReply();
 
 	const nombre_emoji = interaction.options.getString('emoji');
-	const emoji = await resolver_id_emoji(interaction, nombre_emoji);
+	const emoji = await resolver_id_emoji(interaction.guild, nombre_emoji);
 	if (!emoji) {
 		throw { 'message': 'No puedo usar este emoji.' };
 	}
@@ -186,8 +186,7 @@ async function eliminar_rol(interaction, db) {
 	const cat_msg = await roles_channel.messages.fetch(`${rol.category.Message}`);
 	await actualizar_mensaje_roles(cat_msg, roles_en_cat);
 
-	const id_emoji = resolver_id_emoji(interaction, rol.Emoji);
-	const reactions = cat_msg.reactions.resolve(id_emoji);
+	const reactions = cat_msg.reactions.resolve(rol.EmojiId);
 	if (reactions) {
 		await reactions.remove();
 	}
@@ -201,14 +200,22 @@ async function eliminar_rol(interaction, db) {
 }
 
 async function asignar_reaction_role(db, guild, user, emoji) {
-	const rol = await get_role_by_emoji_id(db, emoji.id);
+	let emoji_id = emoji.id;
+	if (!emoji_id) {
+		emoji_id = emoji.name;
+	}
+	const rol = await get_role_by_emoji_id(db, emoji_id);
 	const rol_obj = await guild.roles.fetch(`${rol.RoleId}`);
 	const member = await guild.members.fetch(user.id);
 	await member.roles.add(rol_obj);
 }
 
 async function quitar_reaction_role(db, guild, user, emoji) {
-	const rol = await get_role_by_emoji_id(db, emoji.id);
+	let emoji_id = emoji.id;
+	if (!emoji_id) {
+		emoji_id = emoji.name;
+	}
+	const rol = await get_role_by_emoji_id(db, emoji_id);
 	const rol_obj = await guild.roles.fetch(`${rol.RoleId}`);
 	const member = await guild.members.fetch(user.id);
 	await member.roles.remove(rol_obj);

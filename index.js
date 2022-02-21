@@ -108,12 +108,6 @@ discord_client.on('messageReactionAdd', async (reaction, user) => {
 		return;
 	}
 
-	// Eliminar reacciones que no se corresponden con un rol
-	if (!reaction.me) {
-		await reaction.remove();
-		return;
-	}
-
 	if (reaction.partial) {
 		try {
 			await reaction.fetch();
@@ -122,6 +116,12 @@ discord_client.on('messageReactionAdd', async (reaction, user) => {
 			console.error('Something went wrong when fetching the message:', error);
 			return;
 		}
+	}
+
+	// Eliminar reacciones que no se corresponden con un rol
+	if (reaction.count < 2) {
+		await reaction.remove();
+		return;
 	}
 
 	await asignar_reaction_role(db[reaction.message.guildId], reaction.message.guild, user, reaction.emoji);
