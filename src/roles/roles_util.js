@@ -5,7 +5,7 @@ const { set_reaction_roles_channel, get_role_category, create_reaction_role_cate
 const unicode_emoji_regex = /^\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff]$/;
 const discord_custom_emoji_regex = /^(?:<a?)?:\w+:(?:(\d{18})>)?$/;
 
-function resolver_id_emoji(interaction, nombre_emoji) {
+async function resolver_id_emoji(interaction, nombre_emoji) {
 	let id_emoji = null;
 	if (unicode_emoji_regex.test(nombre_emoji)) {
 		id_emoji = nombre_emoji;
@@ -13,8 +13,8 @@ function resolver_id_emoji(interaction, nombre_emoji) {
 	else {
 		const emoji_regex_res = discord_custom_emoji_regex.exec(nombre_emoji);
 		if (emoji_regex_res) {
-			const emoji_obj = interaction.client.emojis.resolve(emoji_regex_res[1]);
-			if (emoji_obj) {
+			const emoji_obj = await interaction.guild.emojis.fetch(emoji_regex_res[1]);
+			if (emoji_obj && !emoji_obj.managed) {
 				id_emoji = emoji_regex_res[1];
 			}
 		}
@@ -140,7 +140,7 @@ async function crear_rol(interaction, db) {
 	await interaction.deferReply();
 
 	const nombre_emoji = interaction.options.getString('emoji');
-	const emoji = resolver_id_emoji(interaction, nombre_emoji);
+	const emoji = await resolver_id_emoji(interaction, nombre_emoji);
 	if (!emoji) {
 		throw { 'message': 'No puedo usar este emoji.' };
 	}
