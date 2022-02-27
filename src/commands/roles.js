@@ -22,7 +22,7 @@ command.data = new SlashCommandBuilder()
 					.setDescription('Crear un nuevo rol.')
 					.addStringOption(option =>
 						option.setName('nombre')
-							.setDescription('Nombre del rol')
+							.setDescription('Nombre del rol. Si no existe en el servidor, lo crea.')
 							.setRequired(true))
 					.addStringOption(option =>
 						option.setName('emoji')

@@ -28,7 +28,7 @@ async function actualizar_mensaje_roles(cat_msg, roles_en_cat) {
 		if (desc) {
 			desc += '\n\n';
 		}
-		desc += `${rol.EmojiName}: ${rol.Description}`;
+		desc += `${rol.EmojiName} : ${rol.Description}`;
 	}
 	const embed = cat_msg.embeds[0];
 	embed.setDescription(desc);
@@ -137,18 +137,27 @@ async function crear_rol(interaction, db) {
 		throw { 'message': 'Ya existe un rol con este nombre.' };
 	}
 
-	await interaction.deferReply();
-
 	const nombre_emoji = interaction.options.getString('emoji');
 	const emoji = await resolver_id_emoji(interaction.guild, nombre_emoji);
 	if (!emoji) {
 		throw { 'message': 'No puedo usar este emoji.' };
 	}
+	if (await get_role_by_emoji_id(db, emoji)) {
+		throw { 'message': 'Ya existe un rol con este emoji.' };
+	}
+
+	await interaction.deferReply();
 
 	const descripcion = interaction.options.getString('descripcion');
 
-	const nuevo_rol = await interaction.guild.roles.create({ name: nombre_rol });
-	await create_reaction_role(db, descripcion, emoji, nombre_emoji, nombre_rol.toLowerCase(), nuevo_rol.id, categoria.Name);
+	const busca_rol = (await interaction.guild.roles.fetch()).find(role => role.name.toLowerCase() == nombre_rol.toLowerCase());
+	if (busca_rol) {
+		await create_reaction_role(db, descripcion, emoji, nombre_emoji, nombre_rol.toLowerCase(), busca_rol.id, categoria.Name);
+	}
+	else {
+		const nuevo_rol = await interaction.guild.roles.create({ name: nombre_rol });
+		await create_reaction_role(db, descripcion, emoji, nombre_emoji, nombre_rol.toLowerCase(), nuevo_rol.id, categoria.Name);
+	}
 
 	const global_var = await get_global_var(db);
 	const roles_channel = await interaction.guild.channels.fetch(`${global_var.ReactionRolesChannel}`);
@@ -221,5 +230,7 @@ async function quitar_reaction_role(db, guild, user, emoji) {
 	await member.roles.remove(rol_obj);
 }
 
-module.exports = { crear_categoria_roles, eliminar_categoria_roles, crear_rol, eliminar_rol,
-	asignar_reaction_role, quitar_reaction_role };
+module.exports = {
+	crear_categoria_roles, eliminar_categoria_roles, crear_rol, eliminar_rol,
+	asignar_reaction_role, quitar_reaction_role,
+};
