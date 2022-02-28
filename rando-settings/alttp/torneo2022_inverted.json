@@ -1,11 +1,11 @@
 {
   "randomizer": "alttp",
-  "goal_name": "open",
+  "goal_name": "torneo2022_inverted",
   "customizer": false,
-  "description": "La secuencia inicial de escape está completada por defecto, por lo que se puede comenzar la partida desde casa de Link o desde el santuario. Link empieza sin armas ni otros ítems.",
+  "description": "Inverted.",
   "settings": {
-    "name": "open",
-    "notes": "Open",
+    "name": "torneo2022_inverted",
+    "notes": "Torneo 2022 - Inverted",
     "allow_quickswap": true,
     "goal": "ganon",
     "item": {
@@ -13,7 +13,7 @@
       "functionality": "normal"
     },
     "lang": "es",
-    "mode": "open",
+    "mode": "inverted",
     "hints": "off",
     "weapons": "randomized",
     "crystals": {

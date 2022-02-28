@@ -24,7 +24,8 @@
       "boss_shuffle": "random",
       "enemy_damage": "default",
       "enemy_health": "default",
-      "enemy_shuffle": "shuffled"
+      "enemy_shuffle": "shuffled",
+      "pot_shuffle": "off"
     },
     "glitches": "none",
     "spoilers": false,

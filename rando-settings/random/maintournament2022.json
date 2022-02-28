@@ -1,0 +1,27 @@
+{
+    "randomizer": "random",
+    "name": "maintournament2022",
+    "description": "Modo escogido al azar entre los permitidos en el torneo principal ALTTPR 2022.",
+    "presets": [
+        {
+            "preset": "torneo2022_ambrosia",
+            "chance": 1
+        },
+        {
+            "preset": "torneo2022_hard",
+            "chance": 1
+        },
+        {
+            "preset": "torneo2022_inverted",
+            "chance": 1
+        },
+        {
+            "preset": "torneo2022_keysanity",
+            "chance": 1
+        },
+        {
+            "preset": "torneo2022_mcboss",
+            "chance": 1
+        }
+    ]
+}

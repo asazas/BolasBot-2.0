@@ -31,7 +31,8 @@
       "boss_shuffle": "none",
       "enemy_shuffle": "none",
       "enemy_damage": "default",
-      "enemy_health": "default"
+      "enemy_health": "default",
+      "pot_shuffle": "off"
     },
     "l": {},
     "eq": [

@@ -1,11 +1,11 @@
 {
   "randomizer": "alttp",
-  "goal_name": "ambrosia",
-  "customizer": true,
-  "description": "Igual que el modo Standard, pero comenzando con la espada de nivel 1, y el tío revela la localización de las botas al inicio. Además, los drops de los jefes de las mazmorras no serán nunca ítems de mazmorra (mapas, brújulas, o llaves pequeñas o grandes.)",
+  "goal_name": "torneo2022_mcboss",
+  "customizer": false,
+  "description": "Boss shuffle + Map/Compass shuffle.",
   "settings": {
-    "name": "ambrosia",
-    "notes": "Ambrosia",
+    "name": "torneo2022_mcboss",
+    "notes": "Torneo 2022 - Map/Compass Bossmizer",
     "allow_quickswap": true,
     "goal": "ganon",
     "item": {
@@ -13,15 +13,15 @@
       "pool": "normal"
     },
     "lang": "es",
-    "mode": "standard",
+    "mode": "open",
     "hints": "off",
-    "weapons": "assured",
+    "weapons": "randomized",
     "crystals": {
       "ganon": "7",
       "tower": "7"
     },
     "enemizer": {
-      "boss_shuffle": "none",
+      "boss_shuffle": "full",
       "enemy_damage": "default",
       "enemy_health": "default",
       "enemy_shuffle": "none",
@@ -32,7 +32,7 @@
     "entrances": "none",
     "tournament": true,
     "accessibility": "items",
-    "dungeon_items": "standard",
+    "dungeon_items": "mc",
     "item_placement": "advanced",
     "l": {},
     "eq": [
@@ -312,7 +312,7 @@
       "prize.crossWorld": true,
       "prize.shuffleCrystals": true,
       "prize.shufflePendants": true,
-      "region.bossNormalLocation": false,
+      "region.bossNormalLocation": true,
       "region.wildBigKeys": false,
       "region.wildCompasses": false,
       "region.wildKeys": false,
@@ -321,11 +321,12 @@
       "rom.freeItemMenu": false,
       "rom.freeItemText": false,
       "rom.genericKeys": false,
+      "rom.logicMode": "NoGlitches",
       "rom.mapOnPickup": false,
       "rom.rupeeBow": false,
       "rom.timerMode": "off",
       "rom.timerStart": "",
-      "spoil.BootsLocation": true
+      "spoil.BootsLocation": false
     }
   }
 }

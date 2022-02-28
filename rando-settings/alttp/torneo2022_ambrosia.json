@@ -1,16 +1,16 @@
 {
   "randomizer": "alttp",
-  "goal_name": "ambrosia",
+  "goal_name": "torneo2022_ambrosia",
   "customizer": true,
-  "description": "Igual que el modo Standard, pero comenzando con la espada de nivel 1, y el tío revela la localización de las botas al inicio. Además, los drops de los jefes de las mazmorras no serán nunca ítems de mazmorra (mapas, brújulas, o llaves pequeñas o grandes.)",
+  "description": "Ambrosia con hard item pool.",
   "settings": {
-    "name": "ambrosia",
-    "notes": "Ambrosia",
+    "name": "torneo2022_ambrosia",
+    "notes": "Torneo 2022 - Ambrosia",
     "allow_quickswap": true,
     "goal": "ganon",
     "item": {
       "functionality": "normal",
-      "pool": "normal"
+      "pool": "hard"
     },
     "lang": "es",
     "mode": "standard",
