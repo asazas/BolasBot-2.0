@@ -63,6 +63,24 @@ async function get_async_data_embed(db, submit_channel) {
 	return data_embed;
 }
 
+async function get_reduced_async_data_embed(db, submit_channel) {
+	const my_async = await get_async_by_submit(db, submit_channel);
+
+	const data_embed = new MessageEmbed()
+		.setColor('#0099ff')
+		.setTitle(`Carrera asíncrona: ${my_async.Name}`)
+		.addField('Creador', my_async.creator.Name)
+		.addField('Fecha de inicio', `<t:${my_async.StartDate}>`)
+		.setTimestamp();
+	if (my_async.EndDate) {
+		data_embed.addField('Fecha de cierre', `<t:${my_async.EndDate}>`);
+	}
+	if (my_async.Preset) {
+		data_embed.addField('Descripción', my_async.Preset);
+	}
+	return data_embed;
+}
+
 async function get_race_data_embed(db, race_channel) {
 	const my_race = await get_race_by_channel(db, race_channel);
 
@@ -207,5 +225,5 @@ async function calculate_player_scores(db, race_channel, async) {
 }
 
 
-module.exports = { get_async_results_text, get_async_data_embed, get_race_data_embed, get_race_results_text, calcular_tiempo,
-	get_player_ranking_text, calculate_player_scores };
+module.exports = { get_async_results_text, get_async_data_embed, get_reduced_async_data_embed, get_race_data_embed,
+	get_race_results_text, calcular_tiempo, get_player_ranking_text, calculate_player_scores };

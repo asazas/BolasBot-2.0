@@ -2,7 +2,7 @@ const { Permissions, MessageEmbed } = require('discord.js');
 const { get_results_for_async, get_async_by_submit, get_active_async_races, insert_async, update_async_status } = require('../datamgmt/async_db_utils');
 
 const { get_or_insert_player, get_global_var, set_async_history_channel, set_player_score_channel, set_async_submit_category } = require('../datamgmt/db_utils');
-const { get_async_results_text, get_async_data_embed, calculate_player_scores, get_player_ranking_text } = require('./race_results_util');
+const { get_async_results_text, get_async_data_embed, calculate_player_scores, get_player_ranking_text, get_reduced_async_data_embed } = require('./race_results_util');
 const { seed_in_create_race } = require('./race_seed_util');
 
 
@@ -216,6 +216,11 @@ async function async_crear(interaction, db) {
 		else {
 			data_msg = await submit_channel.send({ embeds: [async_data] });
 		}
+		await data_msg.pin();
+	}
+	else {
+		const reduced_async_data = await get_reduced_async_data_embed(db, submit_channel.id);
+		const data_msg = await submit_channel.send({ embeds: [reduced_async_data] });
 		await data_msg.pin();
 	}
 
