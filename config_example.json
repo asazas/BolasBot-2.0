@@ -1,6 +1,7 @@
 {
     "discordClientId": "DISCORD_CLIENT_ID",
     "discordGuildId": "DISCORD_GUILD_ID",
+    "discordEmojiGuildId": "DISCORD_EMOJI_GUILD_ID",
     "discordToken": "DISCORD_BOT_TOKEN",
     "twitchClientId": "TWITCH_CLIENT_ID",
     "twitchClientSecret": "TWITCH_CLIENT_SECRET"

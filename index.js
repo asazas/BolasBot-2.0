@@ -4,11 +4,12 @@ const { Client, Collection, Intents } = require('discord.js');
 const { ClientCredentialsAuthProvider } = require('@twurple/auth');
 const { ApiClient } = require('@twurple/api');
 const { CronJob } = require('cron');
-const { discordToken, twitchClientId, twitchClientSecret } = require('./config.json');
+const { discordEmojiGuildId, discordToken, twitchClientId, twitchClientSecret } = require('./config.json');
 const { get_data_models } = require('./src/datamgmt/setup');
 const { announce_live_streams, streams_data, get_twitch_streams_info } = require('./src/streams/streams_util');
 const { get_global_var } = require('./src/datamgmt/db_utils');
 const { asignar_reaction_role, quitar_reaction_role } = require('./src/roles/roles_util');
+const { initialize_code_emojis } = require('./src/seedgen/seedgen_util');
 
 // Create a new Discord client instance
 const discord_client = new Client({
@@ -41,6 +42,9 @@ discord_client.once('ready', async () => {
 		db[guild_id] = await get_data_models(guild_id);
 		role_channels[guild_id] = (await get_global_var(db[guild_id])).ReactionRolesChannel;
 	}
+
+	// populate seed code emojis (if available)
+	await initialize_code_emojis(discord_client, discordEmojiGuildId);
 
 	// schedule stream alerts
 	const job = new CronJob('0 */12 * * * *', async function() {

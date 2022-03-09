@@ -7,6 +7,22 @@ const code_map = { 0: 'Bow', 1: 'Boomerang', 2: 'Hookshot', 3: 'Bombs',
 	25: 'Moon Pearl', 26: 'Shield', 27: 'Tunic', 28: 'Heart',
 	29: 'Map', 30: 'Compass', 31: 'Big Key' };
 
+const code_map_emojis = {};
+
+async function initialize_code_emojis(client, guild_id) {
+	const emoji_guild = await client.guilds.fetch(guild_id);
+	if (!emoji_guild) {
+		return;
+	}
+	const emojis = await emoji_guild.emojis.fetch();
+	for (const key in code_map) {
+		const my_emoji = emojis.find(emoji => emoji.name == code_map[key].replaceAll(' ', ''));
+		if (my_emoji && !my_emoji.managed) {
+			code_map_emojis[key] = `${my_emoji}`;
+		}
+	}
+}
+
 function search_in_patch(patch, offset, length) {
 	for (let i = 0; i < patch.length - 1; i++) {
 		const next_pos = parseInt(Object.getOwnPropertyNames(patch[i + 1])[0]);
@@ -21,10 +37,17 @@ function search_in_patch(patch, offset, length) {
 
 function get_seed_code(seed) {
 	const code = search_in_patch(seed.data.patch, 1573397, 5);
+	if (Object.keys(code_map_emojis).length == Object.keys(code_map).length) {
+		for (let i = 0; i < code.length; i++) {
+			code[i] = code_map_emojis[code[i]];
+		}
+		return code.join(' ');
+	}
+
 	for (let i = 0; i < code.length; i++) {
 		code[i] = code_map[code[i]];
 	}
-	return code;
+	return code.join(' | ');
 }
 
-module.exports = { get_seed_code, search_in_patch };
+module.exports = { initialize_code_emojis, get_seed_code, search_in_patch };

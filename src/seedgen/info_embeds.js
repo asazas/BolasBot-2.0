@@ -53,7 +53,7 @@ function sm_info_embed(seed, interaction, preset = '') {
 }
 
 function alttpr_info_embed(seed, interaction, preset = '') {
-	const code = get_seed_code(seed).join(' | ');
+	const code = get_seed_code(seed);
 	const url = `https://alttpr.com/h/${seed.data.hash}`;
 	let embed;
 
@@ -161,7 +161,7 @@ function seed_raw_data(seed, interaction, preset = '') {
 	}
 
 	else {
-		output['code'] = get_seed_code(seed).join(' | ');
+		output['code'] = get_seed_code(seed);
 		output['url'] = `https://alttpr.com/h/${seed.data.hash}`;
 		output['hash'] = seed.data.hash;
 
