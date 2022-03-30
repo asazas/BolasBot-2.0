@@ -160,29 +160,6 @@ async function async_crear(interaction, db) {
 	async_role = await interaction.guild.roles.create({ name: channel_name });
 	async_category = await interaction.guild.channels.create(channel_name, {
 		type: 'GUILD_CATEGORY',
-	});
-	submit_channel = await interaction.guild.channels.create(`${channel_name}-submit`, {
-		parent: async_submit_category,
-	});
-	results_channel = await interaction.guild.channels.create(`${channel_name}-results`, {
-		parent: async_category,
-		permissionOverwrites: [
-			{
-				id: interaction.guild.roles.everyone,
-				deny: [Permissions.FLAGS.VIEW_CHANNEL, Permissions.FLAGS.SEND_MESSAGES],
-			},
-			{
-				id: interaction.guild.me,
-				allow: [Permissions.FLAGS.VIEW_CHANNEL, Permissions.FLAGS.SEND_MESSAGES],
-			},
-			{
-				id: async_role,
-				allow: [Permissions.FLAGS.VIEW_CHANNEL],
-			},
-		],
-	});
-	spoilers_channel = await interaction.guild.channels.create(`${channel_name}-spoilers`, {
-		parent: async_category,
 		permissionOverwrites: [
 			{
 				id: interaction.guild.roles.everyone,
@@ -197,6 +174,15 @@ async function async_crear(interaction, db) {
 				allow: [Permissions.FLAGS.VIEW_CHANNEL],
 			},
 		],
+	});
+	submit_channel = await interaction.guild.channels.create(`${channel_name}-submit`, {
+		parent: async_submit_category,
+	});
+	results_channel = await interaction.guild.channels.create(`${channel_name}-results`, {
+		parent: async_category,
+	});
+	spoilers_channel = await interaction.guild.channels.create(`${channel_name}-spoilers`, {
+		parent: async_category,
 	});
 
 	const results_text = await get_async_results_text(db, submit_channel.id);
