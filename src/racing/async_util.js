@@ -180,6 +180,20 @@ async function async_crear(interaction, db) {
 	});
 	results_channel = await interaction.guild.channels.create(`${channel_name}-results`, {
 		parent: async_category,
+		permissionOverwrites: [
+			{
+				id: interaction.guild.roles.everyone,
+				deny: [Permissions.FLAGS.VIEW_CHANNEL, Permissions.FLAGS.SEND_MESSAGES],
+			},
+			{
+				id: interaction.guild.me,
+				allow: [Permissions.FLAGS.VIEW_CHANNEL, Permissions.FLAGS.SEND_MESSAGES],
+			},
+			{
+				id: async_role,
+				allow: [Permissions.FLAGS.VIEW_CHANNEL],
+			},
+		],
 	});
 	spoilers_channel = await interaction.guild.channels.create(`${channel_name}-spoilers`, {
 		parent: async_category,
