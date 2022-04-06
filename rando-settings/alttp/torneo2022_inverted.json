@@ -1,7 +1,7 @@
 {
   "randomizer": "alttp",
   "goal_name": "torneo2022_inverted",
-  "customizer": false,
+  "customizer": true,
   "description": "Inverted keysanity con flauta inicial.",
   "settings": {
     "name": "torneo2022_inverted",
