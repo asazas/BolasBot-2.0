@@ -12,7 +12,7 @@ preset_option.setName('preset')
 for (const file of preset_files) {
 	const filename = path.basename(file, '.json');
 	const dirname = path.basename(path.dirname(file)).toUpperCase();
-	preset_option.addChoice(`${dirname} - ${filename}`, filename);
+	preset_option.addChoices({ name: `${dirname} - ${filename}`, value: filename });
 }
 
 const command = {};
@@ -65,7 +65,7 @@ command.data = new SlashCommandBuilder()
 					.setDescription('Cancelar la carrera.')));
 
 
-command.execute = async function(interaction, db) {
+command.execute = async function (interaction, db) {
 	if (!interaction.inGuild()) {
 		throw { 'message': 'Este comando no puede ser usado en mensajes directos.' };
 	}

@@ -15,16 +15,16 @@ module.exports = {
 		.addStringOption(option =>
 			option.setName('zona_horaria')
 				.setDescription('Zona horaria. Por defecto: EST/EDT')
-				.addChoice('Nueva York (EST/EDT)', 'America/New_York')
-				.addChoice('Madrid (CET/CEST)', 'Europe/Madrid')
-				.addChoice('Lisboa (WET/WEST)', 'Europe/Lisbon')
-				.addChoice('Chihuahua (MST/MDT)', 'America/Chihuahua')
-				.addChoice('Ciudad de México (CST/CDT)', 'America/Mexico_City')
-				.addChoice('Tijuana (PST/PDT)', 'America/Tijuana')
-				.addChoice('Bogotá (EST)', 'America/Bogota')
-				.addChoice('Santiago de Chile (CLT/CLST)', 'America/Santiago')
-				.addChoice('Buenos Aires (ART)', 'America/Argentina/Buenos_Aires')
-				.addChoice('Tokyo (JST)', 'Asia/Tokyo')),
+				.addChoices({ name: 'Nueva York (EST/EDT)', value: 'America/New_York' },
+					{ name: 'Madrid (CET/CEST)', value: 'Europe/Madrid' },
+					{ name: 'Lisboa (WET/WEST)', value: 'Europe/Lisbon' },
+					{ name: 'Chihuahua (MST/MDT)', value: 'America/Chihuahua' },
+					{ name: 'Ciudad de México (CST/CDT)', value: 'America/Mexico_City' },
+					{ name: 'Tijuana (PST/PDT)', value: 'America/Tijuana' },
+					{ name: 'Bogotá (EST)', value: 'America/Bogota' },
+					{ name: 'Santiago de Chile (CLT/CLST)', value: 'America/Santiago' },
+					{ name: 'Buenos Aires (ART)', value: 'America/Argentina/Buenos_Aires' },
+					{ name: 'Tokyo (JST)', value: 'Asia/Tokyo' })),
 
 	async execute(interaction) {
 		let fecha = interaction.options.getString('fecha');

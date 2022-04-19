@@ -13,7 +13,7 @@ plantillas.setName('juego')
 
 for (const file of template_files) {
 	const filename = path.basename(file, '.yaml');
-	plantillas.addChoice(filename, filename);
+	plantillas.addChoices({ name: filename, value: filename });
 }
 
 const command = {};
@@ -39,7 +39,7 @@ command.data = new SlashCommandBuilder()
 			.setDescription('Obtener plantilla de ajustes para un juego de Archipelago Multiworld.')
 			.addStringOption(plantillas));
 
-command.execute = async function(interaction, db) {
+command.execute = async function (interaction, db) {
 
 	if (interaction.options.getSubcommand() == 'yaml_channel') {
 		if (!interaction.inGuild()) {

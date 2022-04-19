@@ -57,8 +57,8 @@ preset_option_help.setName('preset')
 for (const file of preset_files) {
 	const filename = path.basename(file, '.json');
 	const dirname = path.basename(path.dirname(file)).toUpperCase();
-	preset_option.addChoice(`${dirname} - ${filename}`, filename);
-	preset_option_help.addChoice(`${dirname} - ${filename}`, filename);
+	preset_option.addChoices({ name: `${dirname} - ${filename}`, value: filename });
+	preset_option_help.addChoices({ name: `${dirname} - ${filename}`, value: filename });
 }
 
 const sm_preset_files = glob.sync('rando-settings/sm*/*.json');
@@ -69,7 +69,7 @@ preset_multi.setName('preset')
 for (const file of sm_preset_files) {
 	const filename = path.basename(file, '.json');
 	const dirname = path.basename(path.dirname(file)).toUpperCase();
-	preset_multi.addChoice(`${dirname} - ${filename}`, filename);
+	preset_multi.addChoices({ name: `${dirname} - ${filename}`, value: filename });
 }
 
 const command = {};
@@ -140,7 +140,7 @@ command.data = new SlashCommandBuilder()
 					.setDescription('Ayuda de opciones extra')));
 
 
-command.execute = async function(interaction) {
+command.execute = async function (interaction) {
 	if (interaction.options.getSubcommand() == 'crear') {
 		await seed_crear(interaction);
 		return;
