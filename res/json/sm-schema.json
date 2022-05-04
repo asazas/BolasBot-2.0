@@ -1,7 +1,7 @@
 {
     "id": "sm",
     "name": "Super Metroid Item Randomizer",
-    "version": "3.0",
+    "version": "3.1",
     "options": [
         {
             "key": "logic",

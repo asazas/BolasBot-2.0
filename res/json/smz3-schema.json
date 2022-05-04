@@ -1,7 +1,7 @@
 {
     "id": "smz3",
     "name": "Super Metroid & A Link to the Past Combo Randomizer",
-    "version": "11.2",
+    "version": "11.3",
     "options": [
         {
             "key": "smlogic",
@@ -18,9 +18,59 @@
             "description": "Goal",
             "type": "dropdown",
             "values": {
-                "defeatboth": "Defeat Ganon and Mother Brain"
+                "defeatboth": "Defeat Ganon and Mother Brain",
+                "fastganondefeatmotherbrain": "Fast Ganon and Defeat Mother Brain",
+                "alldungeonsdefeatmotherbrain": "All Dungeons and Defeat Mother Brain"
             },
             "default": "defeatboth"
+        },
+        {
+            "key": "opentower",
+            "description": "Open Ganon's Tower",
+            "type": "dropdown",
+            "values": {
+                "nocrystals": "No Crystals",
+                "onecrystal": "One Crystal",
+                "twocrystals": "Two Crystals",
+                "threecrystals": "Three Crystals",
+                "fourcrystals": "Four Crystals",
+                "fivecrystals": "Five Crystals",
+                "sixcrystals": "Six Crystals",
+                "sevencrystals": "Seven Crystals",
+                "random": "Random"
+            },
+            "default": "sevencrystals"
+        },
+        {
+            "key": "ganonvulnerable",
+            "description": "Ganon Vulnerable",
+            "type": "dropdown",
+            "values": {
+                "nocrystals": "No Crystals",
+                "onecrystal": "One Crystal",
+                "twocrystals": "Two Crystals",
+                "threecrystals": "Three Crystals",
+                "fourcrystals": "Four Crystals",
+                "fivecrystals": "Five Crystals",
+                "sixcrystals": "Six Crystals",
+                "sevencrystals": "Seven Crystals",
+                "random": "Random"
+            },
+            "default": "sevencrystals"
+        },
+        {
+            "key": "opentourian",
+            "description": "Open Tourian",
+            "type": "dropdown",
+            "values": {
+                "nobosses": "No Bosses",
+                "oneboss": "One Boss",
+                "twobosses": "Two Bosses",
+                "threebosses": "Three Bosses",
+                "fourbosses": "Four Bosses",
+                "random": "Random"
+            },
+            "default": "fourbosses"
         },
         {
             "key": "swordlocation",

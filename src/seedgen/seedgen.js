@@ -123,6 +123,9 @@ async function generate_smz3(preset_data, extra, jugadores = 1, nombres = '') {
 		if (extra_params.includes('spoiler')) {
 			preset_data['settings']['race'] = 'false';
 		}
+		if (extra_params.includes('ad')) {
+			preset_data['settings']['goal'] = 'alldungeonsdefeatmotherbrain';
+		}
 		if (extra_params.includes('hard')) {
 			preset_data['settings']['smlogic'] = 'hard';
 		}
@@ -147,15 +150,19 @@ async function generate_varia(preset_data, extra) {
 
 	let settings_preset, skills_preset;
 	try {
-		settings_preset = await gaxios.request({ url: 'https://randommetroidsolver.pythonanywhere.com/randoPresetWebService',
-			method: 'POST', data: settings, retry: true });
+		settings_preset = await gaxios.request({
+			url: 'https://randommetroidsolver.pythonanywhere.com/randoPresetWebService',
+			method: 'POST', data: settings, retry: true
+		});
 	}
 	catch (error) {
 		throw { 'message': 'El preset de ajustes indicado no existe.' };
 	}
 	try {
-		skills_preset = await gaxios.request({ url: 'https://randommetroidsolver.pythonanywhere.com/presetWebService',
-			method: 'POST', data: skills, retry: true });
+		skills_preset = await gaxios.request({
+			url: 'https://randommetroidsolver.pythonanywhere.com/presetWebService',
+			method: 'POST', data: skills, retry: true
+		});
 	}
 	catch (error) {
 		throw { 'message': 'El preset de habilidades indicado no existe.' };
@@ -172,8 +179,10 @@ async function generate_varia(preset_data, extra) {
 		}
 	}
 
-	return await gaxios.request({ url: 'https://randommetroidsolver.pythonanywhere.com/randomizerWebService',
-		method: 'POST', data: my_preset, retry: true });
+	return await gaxios.request({
+		url: 'https://randommetroidsolver.pythonanywhere.com/randomizerWebService',
+		method: 'POST', data: my_preset, retry: true
+	});
 }
 
 async function generate_random(preset_data, extra, recursion = 0) {
@@ -207,18 +216,18 @@ async function generate_from_preset(preset, extra, jugadores = 1, nombres = '', 
 	if (preset_file_loc) {
 		const preset_data = JSON.parse(fs.readFileSync(preset_file_loc));
 		switch (preset_data['randomizer']) {
-		case 'alttp':
-			return [full_preset, await generate_alttpr(preset_data, extra)];
-		case 'mystery':
-			return [full_preset, await generate_alttpr(mystery_settings(preset_data), extra)];
-		case 'sm':
-			return [full_preset, await generate_sm(preset_data, extra, jugadores, nombres)];
-		case 'smz3':
-			return [full_preset, await generate_smz3(preset_data, extra, jugadores, nombres)];
-		case 'varia':
-			return [full_preset, await generate_varia(preset_data, extra)];
-		case 'random':
-			return await generate_random(preset_data, extra, recursion);
+			case 'alttp':
+				return [full_preset, await generate_alttpr(preset_data, extra)];
+			case 'mystery':
+				return [full_preset, await generate_alttpr(mystery_settings(preset_data), extra)];
+			case 'sm':
+				return [full_preset, await generate_sm(preset_data, extra, jugadores, nombres)];
+			case 'smz3':
+				return [full_preset, await generate_smz3(preset_data, extra, jugadores, nombres)];
+			case 'varia':
+				return [full_preset, await generate_varia(preset_data, extra)];
+			case 'random':
+				return await generate_random(preset_data, extra, recursion);
 		}
 	}
 }

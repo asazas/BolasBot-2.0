@@ -5,6 +5,9 @@
   "settings": {
     "smlogic": "normal",
     "goal": "defeatboth",
+    "opentower": "sevencrystals",
+    "ganonvulnerable": "sevencrystals",
+    "opentourian": "fourbosses",
     "swordlocation": "randomized",
     "morphlocation": "randomized",
     "keyshuffle": "none",
