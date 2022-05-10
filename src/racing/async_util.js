@@ -1,4 +1,5 @@
-const { Permissions, MessageEmbed } = require('discord.js');
+const { Permissions, MessageEmbed, CommandInteraction } = require('discord.js');
+const { Sequelize, Model } = require('sequelize');
 const { get_results_for_async, get_async_by_submit, get_active_async_races, insert_async, update_async_status } = require('../datamgmt/async_db_utils');
 
 const { get_or_insert_player, get_global_var, set_async_history_channel, set_player_score_channel, set_async_submit_category } = require('../datamgmt/db_utils');
@@ -6,13 +7,25 @@ const { get_async_results_text, get_async_data_embed, calculate_player_scores, g
 const { seed_in_create_race } = require('./race_seed_util');
 
 
+/**
+ * Lista de palabras para generar nombres aleatorios de carreras.
+ */
 const random_words = ['Asazas', 'DiegoA', 'Vilxs', 'Diegolazo', 'Matkap', 'Kitsune', 'Eolina', 'Kaede',
 	'Kodama', 'Akuma', 'Cougars', 'Fantasma', 'Marco', 'Jim', 'Gio', 'Midget',
 
-	'Campeón', 'Scrub', 'Noob',	'Casual', 'Fernando', 'Almeida', 'Genio', 'Fenómeno', 'Lento', 'Trampas',
+	'Campeón', 'Scrub', 'Noob', 'Casual', 'Fernando', 'Almeida', 'Genio', 'Fenómeno', 'Lento', 'Trampas',
 	'Sus', 'Memes', 'México', 'Waifu', 'Gamer', 'VTuber', '5Head', 'Larpas', 'Magcargo'];
 
 
+/**
+ * @summary Llamado en async_purgar una vez se ha verificado que la carrera asíncrona puede archivarse.
+ * 
+ * @description Cierra una carrera asíncrona: actualiza historial, ranking y elimina roles y canales asociados.
+ * 
+ * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
+ * @param {Sequelize}          db          Base de datos del servidor en el que se invocó el comando.
+ * @param {Model}              race        Entrada de base de datos (AsyncRaces) correspondiente a la carrera.
+ */
 async function cerrar_async(interaction, db, race) {
 
 	// Marcar async como purgada
@@ -84,7 +97,6 @@ async function cerrar_async(interaction, db, race) {
 	}
 
 	// Eliminar roles y canales de la carrera asíncrona.
-	// DEPRECATED: en la próxima actualización todas las carreras tendrán RoleId
 	if (race.RoleId) {
 		const async_role = await interaction.guild.roles.fetch(`${race.RoleId}`);
 		await async_role.delete();
@@ -98,7 +110,15 @@ async function cerrar_async(interaction, db, race) {
 	await category.delete();
 }
 
-// Invocado con /async crear. Crea una nueva carrera asíncrona.
+
+/**
+ * @summary Invocado con /async crear.
+ * 
+ * @description Crea una nueva carrera asíncrona.
+ * 
+ * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
+ * @param {Sequelize}          db          Base de datos del servidor en el que se invocó el comando.
+ */
 async function async_crear(interaction, db) {
 	await interaction.deferReply();
 
@@ -248,7 +268,15 @@ async function async_crear(interaction, db) {
 	await interaction.editReply({ embeds: [text_ans] });
 }
 
-// Invocado con /async cerrar. Deja de aceptar nuevos resultados en la carrera asíncrona.
+
+/**
+ * @summary Invocado con /async cerrar.
+ * 
+ * @description Deja de aceptar nuevos resultados en la carrera asíncrona.
+ * 
+ * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
+ * @param {Sequelize}          db          Base de datos del servidor en el que se invocó el comando.
+ */
 async function async_cerrar(interaction, db) {
 	const race = await get_async_by_submit(db, interaction.channelId);
 	if (!race) {
@@ -275,7 +303,15 @@ async function async_cerrar(interaction, db) {
 	}
 }
 
-// Invocado con /async reabrir. Vuelve a aceptar resultados en la carrera asíncrona.
+
+/**
+ * @summary Invocado con /async reabrir.
+ * 
+ * @description Vuelve a aceptar resultados en la carrera asíncrona.
+ * 
+ * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
+ * @param {Sequelize}          db          Base de datos del servidor en el que se invocó el comando.
+ */
 async function async_reabrir(interaction, db) {
 	const race = await get_async_by_submit(db, interaction.channelId);
 	if (!race) {
@@ -302,7 +338,15 @@ async function async_reabrir(interaction, db) {
 	}
 }
 
-// Invocado con /async purgar. Cierra definitivamente una carrera asíncrona, eliminando sus canales.
+
+/**
+ * @summary Invocado con /async purgar.
+ * 
+ * @description Cierra definitivamente una carrera asíncrona, eliminando sus canales.
+ * 
+ * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
+ * @param {Sequelize}          db          Base de datos del servidor en el que se invocó el comando.
+ */
 async function async_purgar(interaction, db) {
 	const race = await get_async_by_submit(db, interaction.channelId);
 	if (!race) {

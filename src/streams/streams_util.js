@@ -1,7 +1,18 @@
-const { Permissions, MessageEmbed } = require('discord.js');
+const { ApiClient } = require('@twurple/api');
+const { Permissions, MessageEmbed, CommandInteraction, Guild } = require('discord.js');
+const { Sequelize } = require('sequelize');
 const { get_or_insert_player, get_global_var } = require('../datamgmt/db_utils');
 const { register_stream, unregister_stream, set_stream_alerts_role, get_streams, update_stream_live, set_stream_alerts_channel } = require('../datamgmt/stream_db_utils');
 
+
+/**
+ * @summary Invocado con /streams alta.
+ * 
+ * @description Añade un stream de Twitch a la lista de alertas del servidor.
+ * 
+ * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
+ * @param {Sequelize}          db          Base de datos del servidor en el que se invocó el comando.
+ */
 async function stream_alta(interaction, db) {
 	const stream = interaction.options.getString('stream');
 	const owner = interaction.options.getUser('usuario');
@@ -20,6 +31,15 @@ async function stream_alta(interaction, db) {
 	await interaction.reply({ embeds: [ans_embed] });
 }
 
+
+/**
+ * @summary Invocado con /streams baja.
+ * 
+ * @description Elimina un stream de Twitch de la lista de alertas del servidor.
+ * 
+ * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
+ * @param {Sequelize}          db          Base de datos del servidor en el que se invocó el comando.
+ */
 async function stream_baja(interaction, db) {
 	const stream = interaction.options.getString('stream');
 	const deleted = await unregister_stream(db, stream);
@@ -34,6 +54,15 @@ async function stream_baja(interaction, db) {
 	await interaction.reply({ embeds: [ans_embed] });
 }
 
+
+/**
+ * @summary Invocado con /streams rol.
+ * 
+ * @description Establece un rol en el servidor al que notificar cuando haya alertas de stream.
+ * 
+ * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
+ * @param {Sequelize}          db          Base de datos del servidor en el que se invocó el comando.
+ */
 async function set_stream_role(interaction, db) {
 	const role = interaction.options.getRole('rol');
 	if (role) {
@@ -56,6 +85,17 @@ async function set_stream_role(interaction, db) {
 	}
 }
 
+
+/**
+ * @summary Llamado cada vez que se ejecuta la rutina para alertas de stream.
+ * 
+ * @description Consulta todos los streams que están siendo monitorizados en un servidor para alertas.
+ * 
+ * @param {Sequelize} db Base de datos del servidor en el que se realiza la consulta.
+ * 
+ * @returns Un objeto que contiene una entrada por stream monitorizado, especificando quién es el propietario 
+ * del stream y de si estaba en línea o no cuando la última consulta fue efectuada.
+ */
 async function streams_data(db) {
 	const streams = await get_streams(db);
 	const stream_list = {};
@@ -65,6 +105,19 @@ async function streams_data(db) {
 	return stream_list;
 }
 
+/**
+ * @summary Llamado cada vez que se ejecuta la rutina para alertas de stream.
+ * 
+ * @description Realiza una consulta a Twitch para comprobar el estado de todos los streams monitorizados. Para 
+ * optimizar la eficiencia de esta operación, se consultan los streams de todos los servidores en los que el bot 
+ * está presente de forma simultánea.
+ * 
+ * @param {string[]}  stream_list   Array que contiene los usuarios de Twitch a consultar.
+ * @param {ApiClient} twitch_client Cliente de Twitch de la librería Twurple.
+ * 
+ * @returns Objeto que contiene, para cada usuario consultado que está emitiendo, información sobre su stream. 
+ * Los usuarios que no estén emitiendo no figurarán en este objeto.
+ */
 async function get_twitch_streams_info(stream_list, twitch_client) {
 	const twitch_info = {};
 	const resp = twitch_client.streams.getStreamsPaginated({ userName: stream_list });
@@ -74,6 +127,21 @@ async function get_twitch_streams_info(stream_list, twitch_client) {
 	return twitch_info;
 }
 
+
+/**
+ * @summary Llamado cada vez que se ejecuta la rutina para alertas de stream.
+ * 
+ * @description Envía mensajes en el canal de alertas de stream de un servidor notificando sobre streams 
+ * monitorizados que hayan empezado a emitir. Actualiza el estado de todos los streams monitorizados en base 
+ * de datos.
+ * 
+ * @param {Guild}     guild         Servidor en el que se mandarán las alertas.
+ * @param {Object}    guild_streams Información de streams monitorizados sacada de la base de datos del servidor. 
+ *                                  Se trata del objeto devuelto por el método streams_data().
+ * @param {Sequelize} db            Base de datos correspondiente al servidor sobre el que se está operando. 
+ * @param {Object}    twitch_info   Información de streams obtenida de la consulta a la API de Twitch. Se trata 
+ *                                  del objeto devuelto por el método get_twitch_streams_info().
+ */
 async function announce_live_streams(guild, guild_streams, db, twitch_info) {
 	const set_live = [];
 	const set_not_live = [];
@@ -154,5 +222,7 @@ async function announce_live_streams(guild, guild_streams, db, twitch_info) {
 	}
 }
 
-module.exports = { stream_alta, stream_baja, set_stream_role, streams_data,
-	get_twitch_streams_info, announce_live_streams };
+module.exports = {
+	stream_alta, stream_baja, set_stream_role, streams_data,
+	get_twitch_streams_info, announce_live_streams
+};

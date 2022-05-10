@@ -34,7 +34,10 @@ const twitch_api_client = new ApiClient({ authProvider: twitch_auth_provider });
 const db = {};
 const role_channels = {};
 
-// When the client is ready, run this code (only once)
+
+/**
+ * Código a ejecutar cuando el bot esté listo tras arrancarlo, solo una vez.
+ */
 discord_client.once('ready', async () => {
 
 	// initialize databases
@@ -73,6 +76,12 @@ discord_client.once('ready', async () => {
 	console.log(`Ready! Logged in as ${discord_client.user.tag}`);
 });
 
+
+/**
+ * Código de respuesta a interacciones.
+ * 
+ * Si la interacción es un comando, ejecutarlo.
+ */
 discord_client.on('interactionCreate', async interaction => {
 	if (!interaction.isCommand()) return;
 
@@ -101,7 +110,12 @@ discord_client.on('interactionCreate', async interaction => {
 	}
 });
 
-// Código para reaction roles
+
+/**
+ * Reacción a evento de añadir una reacción de un mensaje.
+ * 
+ * Si es un mensaje de un canal de roles, añadir el rol correspondiente al usuario.
+ */
 discord_client.on('messageReactionAdd', async (reaction, user) => {
 	// Ignorar reacciones del propio bot
 	if (user.id == discord_client.user.id) {
@@ -131,6 +145,12 @@ discord_client.on('messageReactionAdd', async (reaction, user) => {
 	await asignar_reaction_role(db[reaction.message.guildId], reaction.message.guild, user, reaction.emoji);
 });
 
+
+/**
+ * Reacción a evento de retirar una reacción de un mensaje.
+ * 
+ * Si es un mensaje de un canal de roles, retirar el rol correspondiente al usuario.
+ */
 discord_client.on('messageReactionRemove', async (reaction, user) => {
 	// Ignorar reacciones del propio bot
 	if (user.id == discord_client.user.id) {
