@@ -12,22 +12,22 @@
   "dependencies": {
     "@discordjs/builders": "^0.13.0",
     "@discordjs/rest": "^0.4.1",
-    "@twurple/api": "^5.1.0",
-    "@twurple/auth": "^5.1.0",
-    "@twurple/eventsub": "^5.1.0",
-    "axios": "^0.26.1",
-    "cron": "^1.8.2",
-    "discord-api-types": "^0.31.2",
+    "@twurple/api": "^5.1.6",
+    "@twurple/auth": "^5.1.6",
+    "@twurple/eventsub": "^5.1.6",
+    "axios": "^0.27.2",
+    "cron": "^2.0.0",
+    "discord-api-types": "^0.32.1",
     "discord.js": "^13.6.0",
     "gaxios": "^5.0.0",
     "glob": "^8.0.1",
-    "luxon": "^2.3.2",
+    "luxon": "^2.4.0",
     "sequelize": "^6.19.0",
     "slugid": "^3.0.0",
-    "sqlite3": "^5.0.4",
+    "sqlite3": "^5.0.8",
     "tmp": "^0.2.1"
   },
   "devDependencies": {
-    "eslint": "^8.13.0"
+    "eslint": "^8.15.0"
   }
 }
