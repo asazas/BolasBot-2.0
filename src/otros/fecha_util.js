@@ -12,9 +12,22 @@ const dias_semana = {
 	'domingo': 7,
 };
 
-const hora_americana_regex = /^(1[0-2]|0?[1-9])(:[0-5][0-9])?\s*(AM|PM)$/;
-const hora_europea_regex = /^(2[0-3]|[0-1]?[0-9]):([0-5][0-9])$/;
+const HORA_AMERICANA_REGEX = /^(1[0-2]|0?[1-9])(:[0-5][0-9])?\s*(AM|PM)$/;
+const HORA_EUROPEA_REGEX = /^(2[0-3]|[0-1]?[0-9]):([0-5][0-9])$/;
 
+
+/**
+ * @summary Función auxiliar para el comando /fecha.
+ * 
+ * @description Devuelve un objeto DateTime de la librería Luxon que representa el inicio del día dado por el 
+ * parámetro "fecha".
+ * 
+ * @param {string} fecha    Fecha en formato dd/mm/aaaa. También puede ser "hoy", "mañana" o un día de la semana.
+ * @param {string} timezone Zona horaria a la que corresponde la fecha dada.
+ * 
+ * @returns {DateTime} Objeto DateTime de la librería Luxon que representa el inicio del día dado por el 
+ * parámetro "fecha".
+ */
 function validar_fecha(fecha, timezone) {
 	const fecha_obj = DateTime.fromFormat(fecha, 'D', { locale: 'es', zone: timezone });
 	if (fecha_obj.isValid) {
@@ -40,6 +53,20 @@ function validar_fecha(fecha, timezone) {
 	}
 }
 
+
+/**
+ * @summary Función auxiliar para el comando /fecha.
+ * 
+ * @description Actualiza un objeto DateTime de la librería Luxon para incluir la hora del día dada por el 
+ * parámetro "hora".
+ * 
+ * @param {DateTime} fecha_val Objeto DateTime de la librería Luxon representando el inicio de un día dado.
+ * @param {string}   hora      Hora con la que actualizar el objeto DateTime dado.
+ * @param {string}   timezone  Zona horaria a la que corresponden la fecha y hora dadas.
+ * 
+ * @returns {DateTime} Objeto DateTime de la librería Luxon representando la fecha y hora dadas por la invocación 
+ * del comando /fecha.
+ */
 function validar_hora(fecha_val, hora, timezone) {
 	let horas = null, minutos = null;
 	if (hora === 'AHORA') {
@@ -48,7 +75,7 @@ function validar_hora(fecha_val, hora, timezone) {
 		minutos = ahora.minute;
 		return fecha_val.set({ hour: horas, minute: minutos });
 	}
-	const hora_americana = hora_americana_regex.exec(hora);
+	const hora_americana = HORA_AMERICANA_REGEX.exec(hora);
 	if (hora_americana) {
 		horas = parseInt(hora_americana[1]);
 		if (hora_americana[3] === 'AM' && horas === 12) horas = 0;
@@ -56,7 +83,7 @@ function validar_hora(fecha_val, hora, timezone) {
 		minutos = hora_americana[2] ? parseInt(hora_americana[2].substring(1)) : 0;
 		return fecha_val.set({ hour: horas, minute: minutos });
 	}
-	const hora_europea = hora_europea_regex.exec(hora);
+	const hora_europea = HORA_EUROPEA_REGEX.exec(hora);
 	if (hora_europea) {
 		horas = parseInt(hora_europea[1]);
 		minutos = parseInt(hora_europea[2]);
@@ -65,6 +92,19 @@ function validar_hora(fecha_val, hora, timezone) {
 	throw { 'message': 'La hora indicada no es válida.' };
 }
 
+
+/**
+ * @summary Invocado por el comando /fecha.
+ * 
+ * @description Procesa una fecha, hora y zona horaria para generar un objeto DateTime de la librería Luxon.
+ * 
+ * @param {string} fecha    Fecha en formato dd/mm/aaaa. También puede ser "hoy", "mañana" o un día de la semana.
+ * @param {string} hora     Hora en formato hh:mm, europeo (24 horas) o americano (12 horas am/pm). También puede 
+ *                          ser "ahora".
+ * @param {string} timezone Zona horaria a la que corresponden la fecha y hora dadas.
+ * 
+ * @returns {DateTime} Objeto DateTime de la librería Luxon que representa la fecha y hora dadas.
+ */
 function procesar_fecha(fecha, hora, timezone) {
 	const fecha_val = validar_fecha(fecha, timezone);
 	const fecha_con_hora = validar_hora(fecha_val, hora, timezone);

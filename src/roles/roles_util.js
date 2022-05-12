@@ -1,17 +1,29 @@
-const { Permissions, MessageEmbed } = require('discord.js');
+const { Permissions, MessageEmbed, Guild, CommandInteraction, User, ReactionEmoji, Message } = require('discord.js');
+const { Sequelize } = require('sequelize');
 const { get_global_var } = require('../datamgmt/db_utils');
 const { set_reaction_roles_channel, get_role_category, create_reaction_role_category, get_roles_for_category, delete_reaction_role_category, get_all_role_categories, get_role_by_name, create_reaction_role, delete_reaction_role, get_role_by_emoji_id } = require('../datamgmt/role_db_utils');
 
-const unicode_emoji_regex = /^\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff]$/;
-const discord_custom_emoji_regex = /^(?:<a?)?:\w+:(?:(\d{18})>)?$/;
+const UNICODE_EMOJI_REGEX = /^\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff]$/;
+const DISCORD_CUSTOM_EMOJI_REGEX = /^(?:<a?)?:\w+:(?:(\d{18})>)?$/;
 
+
+/**
+ * @summary Función auxiliar para obtener el ID de un emoji.
+ * 
+ * @description Computa el ID de un emoji (unicode o propio de servidor) a partir de su representación textual.
+ * 
+ * @param {Guild}  guild        Servidor en el que buscar el emoji.
+ * @param {string} nombre_emoji Representación textual del emoji.
+ * 
+ * @returns {?string} ID del emoji. Puede ser null si es un emoji de servidor que no se encuentra.
+ */
 async function resolver_id_emoji(guild, nombre_emoji) {
 	let id_emoji = null;
-	if (unicode_emoji_regex.test(nombre_emoji)) {
+	if (UNICODE_EMOJI_REGEX.test(nombre_emoji)) {
 		id_emoji = nombre_emoji;
 	}
 	else {
-		const emoji_regex_res = discord_custom_emoji_regex.exec(nombre_emoji);
+		const emoji_regex_res = DISCORD_CUSTOM_EMOJI_REGEX.exec(nombre_emoji);
 		if (emoji_regex_res) {
 			const emoji_obj = await guild.emojis.fetch(emoji_regex_res[1]);
 			if (emoji_obj && !emoji_obj.managed) {
@@ -22,6 +34,16 @@ async function resolver_id_emoji(guild, nombre_emoji) {
 	return id_emoji;
 }
 
+
+/**
+ * @summary Llamado cuando se crea o se elimina un rol reaccionable.
+ * 
+ * @description Actualiza la el mensaje de una categoría de roles reaccionables para registrar la creación o 
+ * eliminación de un rol.
+ * 
+ * @param {Message} cat_msg      Mensaje de categoría de roles a actualizar.
+ * @param {Model[]} roles_en_cat Nueva lista de roles existentes en la categoría.
+ */
 async function actualizar_mensaje_roles(cat_msg, roles_en_cat) {
 	let desc = '';
 	for (const rol of roles_en_cat) {
@@ -35,6 +57,15 @@ async function actualizar_mensaje_roles(cat_msg, roles_en_cat) {
 	await cat_msg.edit({ embeds: [embed] });
 }
 
+
+/**
+ * @summary Invocado por /roles crear categoria.
+ * 
+ * @description Crea una nueva categoría para roles reaccionables.
+ * 
+ * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
+ * @param {Sequelize}          db          Base de datos del servidor en el que se invocó el comando.
+ */
 async function crear_categoria_roles(interaction, db) {
 	const todas_cats = await get_all_role_categories(db);
 	if (todas_cats && todas_cats.length > 10) {
@@ -90,6 +121,15 @@ async function crear_categoria_roles(interaction, db) {
 	await interaction.editReply({ embeds: [ans_embed] });
 }
 
+
+/**
+ * @summary Invocado por /roles eliminar categoria.
+ * 
+ * @description Elimina una categoría para roles reaccionables.
+ * 
+ * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
+ * @param {Sequelize}          db          Base de datos del servidor en el que se invocó el comando.
+ */
 async function eliminar_categoria_roles(interaction, db) {
 	const nombre_cat = interaction.options.getString('nombre');
 	const categoria = await get_role_category(db, nombre_cat.toLowerCase());
@@ -120,6 +160,15 @@ async function eliminar_categoria_roles(interaction, db) {
 	await interaction.editReply({ embeds: [ans_embed] });
 }
 
+
+/**
+ * @summary Invocado por /roles crear rol.
+ * 
+ * @description Crea un nuevo rol reaccionable dentro de una categoría existente.
+ * 
+ * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
+ * @param {Sequelize}          db          Base de datos del servidor en el que se invocó el comando.
+ */
 async function crear_rol(interaction, db) {
 	const nombre_cat = interaction.options.getString('categoria');
 	const categoria = await get_role_category(db, nombre_cat.toLowerCase());
@@ -175,6 +224,15 @@ async function crear_rol(interaction, db) {
 	await interaction.editReply({ embeds: [ans_embed] });
 }
 
+
+/**
+ * @summary Invocado por /roles eliminar rol.
+ * 
+ * @description Elimina un rol reaccionable.
+ * 
+ * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
+ * @param {Sequelize}          db          Base de datos del servidor en el que se invocó el comando.
+ */
 async function eliminar_rol(interaction, db) {
 	const nombre_rol = interaction.options.getString('nombre');
 	const rol = await get_role_by_name(db, nombre_rol.toLowerCase());
@@ -208,6 +266,17 @@ async function eliminar_rol(interaction, db) {
 	await interaction.editReply({ embeds: [ans_embed] });
 }
 
+
+/**
+ * @summary Invocado al detectar que se añade una reacción a un mensaje de roles reaccionables.
+ * 
+ * @description Asigna el rol correspondiente al usuario que añadió la reacción.
+ * 
+ * @param {Sequelize}     db    Base de datos del servidor en el que se registró la reacción.
+ * @param {Guild}         guild Servidor en el que se registró la reacción.
+ * @param {User}          user  Usuario que añadió la reacción.
+ * @param {ReactionEmoji} emoji Emoji asociado a la reacción.
+ */
 async function asignar_reaction_role(db, guild, user, emoji) {
 	let emoji_id = emoji.id;
 	if (!emoji_id) {
@@ -219,6 +288,17 @@ async function asignar_reaction_role(db, guild, user, emoji) {
 	await member.roles.add(rol_obj);
 }
 
+
+/**
+ * @summary Invocado al detectar que se elimina una reacción de un mensaje de roles reaccionables.
+ * 
+ * @description Retira el rol correspondiente al usuario que eliminó la reacción.
+ * 
+ * @param {Sequelize}     db    Base de datos del servidor en el que se eliminó la reacción.
+ * @param {Guild}         guild Servidor en el que se eliminó la reacción.
+ * @param {User}          user  Usuario que eliminó la reacción.
+ * @param {ReactionEmoji} emoji Emoji asociado a la reacción.
+ */
 async function quitar_reaction_role(db, guild, user, emoji) {
 	let emoji_id = emoji.id;
 	if (!emoji_id) {
