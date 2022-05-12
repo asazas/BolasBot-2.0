@@ -1,9 +1,22 @@
-const { MessageEmbed, MessageAttachment } = require('discord.js');
+const { MessageEmbed, MessageAttachment, CommandInteraction } = require('discord.js');
 const slugid = require('slugid');
 
 const { get_formatted_spoiler } = require('./spoiler');
 const { get_seed_code } = require('./seedgen_util');
 
+
+/**
+ * @summary Llamado cuando se solicita información de una seed de Super Metroid o SMZ3.
+ * 
+ * @description Genera un mensaje que contiene los detalles de la seed de Super Metroid o SMZ3 pasada como parámetro.
+ * 
+ * @param {object}             seed        Objeto que contiene los datos de la seed, tal cual lo devuelve la web
+ *                                         de SMZ3.
+ * @param {CommandInteraction} interaction Interacción correspondiente al comando inicialmente invocado.
+ * @param {string}             preset      Preset y opciones extra indicados en el comando inicialmente invocado.
+ * 
+ * @returns {MessageEmbed} Embed que contiene los datos disponibles de la seed: preset, URL, autor y hash.
+ */
 function sm_info_embed(seed, interaction, preset = '') {
 	let seed_guid = seed['data']['guid'];
 	seed_guid = `${seed_guid.substring(0, 8)}-${seed_guid.substring(8, 12)}-${seed_guid.substring(12, 16)}-${seed_guid.substring(16, 20)}-${seed_guid.substring(20, 32)}`;
@@ -52,6 +65,19 @@ function sm_info_embed(seed, interaction, preset = '') {
 	return embed;
 }
 
+
+/**
+ * @summary Llamado cuando se solicita información de una seed de ALTTPR.
+ * 
+ * @description Genera un mensaje que contiene los detalles de la seed de ALTTPR pasada como parámetro.
+ * 
+ * @param {object}             seed        Objeto que contiene los datos de la seed, tal cual lo devuelve la web
+ *                                         de ALTTPR.
+ * @param {CommandInteraction} interaction Interacción correspondiente al comando inicialmente invocado.
+ * @param {string}             preset      Preset y opciones extra indicados en el comando inicialmente invocado.
+ * 
+ * @returns {MessageEmbed} Embed que contiene los datos disponibles de la seed: preset, URL, autor y hash.
+ */
 function alttpr_info_embed(seed, interaction, preset = '') {
 	const code = get_seed_code(seed);
 	const url = `https://alttpr.com/h/${seed.data.hash}`;
@@ -82,6 +108,19 @@ function alttpr_info_embed(seed, interaction, preset = '') {
 	return embed;
 }
 
+
+/**
+ * @summary Llamado cuando se solicita información de una seed de Super Metroid VARIA.
+ * 
+ * @description Genera un mensaje que contiene los detalles de la seed de VARIA pasada como parámetro.
+ * 
+ * @param {object}             seed        Objeto que contiene los datos de la seed, tal cual lo devuelve la web
+ *                                         de VARIA.
+ * @param {CommandInteraction} interaction Interacción correspondiente al comando inicialmente invocado.
+ * @param {string}             preset      Preset y opciones extra indicados en el comando inicialmente invocado.
+ * 
+ * @returns {MessageEmbed} Embed que contiene los datos disponibles de la seed: preset, URL y autor.
+ */
 function varia_info_embed(seed, interaction, preset = '') {
 	const url = `https://randommetroidsolver.pythonanywhere.com/customizer/${seed.data.seedKey}`;
 
@@ -109,6 +148,22 @@ function varia_info_embed(seed, interaction, preset = '') {
 	return embed;
 }
 
+
+/**
+ * @summary Llamado en los comandos /seed crear, /seed info y /jugar.
+ * 
+ * @description Llama a la rutina correspondiente para generar un embed conteniendo la información de una seed 
+ * de ALTTPR, SM, SMZ3 o VARIA. Para ALTTPR, genera también el spoiler log si este está disponible.
+ * 
+ * @param {object}             seed        Objeto con los datos de la seed, tal y como lo devuelve la API del 
+ *                                         randomizer correspondiente.
+ * @param {CommandInteraction} interaction Interacción correspondiente al comando inicialmente invocado.
+ * @param {string}             preset      Preset de la seed generada y opciones extra, separadas por espacios.
+ * 
+ * @returns {any[]} Array con dos elementos: en la posición [0], el MessageEmbed con los datos de la seed pasada 
+ * como argumento; y en la posición [1], el archivo 'spoiler.json' como MessageAttachment para seeds de ALTTPR 
+ * que generen spoiler log (devuelve null en la posición [1] en cualquier otro caso.)
+ */
 function seed_info_embed(seed, interaction, preset = '') {
 	// super metroid varia randomizer
 	if (seed['data']['seedKey']) {
@@ -131,6 +186,21 @@ function seed_info_embed(seed, interaction, preset = '') {
 	}
 }
 
+
+/**
+ * @summary Llamado por el método seed_in_create_race(), usado a su vez en los comandos /carrera crear y 
+ * /async crear.
+ * 
+ * @description Devuelve los datos de la seed dada como atributos de un objeto.
+ * 
+ * @param {object}             seed        Objeto con los datos de la seed, tal y como lo devuelve la API del 
+ *                                         randomizer correspondiente.
+ * @param {CommandInteraction} interaction Interacción correspondiente al comando inicialmente invocado.
+ * @param {string}             preset      Preset de la seed generada y opciones extra, separadas por espacios.
+ * 
+ * @returns {object} Objeto con los datos de la seed. Puede contener los siguientes atributos: 'author', 'preset', 
+ * 'url', 'hash', 'code', 'spoiler' y 'spoiler_attachment'.
+ */
 function seed_raw_data(seed, interaction, preset = '') {
 	const output = {};
 	output['author'] = interaction.user.username;

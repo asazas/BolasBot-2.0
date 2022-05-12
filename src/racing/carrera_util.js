@@ -1,4 +1,5 @@
-const { MessageEmbed, Permissions } = require('discord.js');
+const { MessageEmbed, Permissions, CommandInteraction } = require('discord.js');
+const { Sequelize, Model } = require('sequelize');
 
 const { get_or_insert_player, get_global_var, set_race_history_channel, set_player_score_channel } = require('../datamgmt/db_utils');
 const { get_race_by_channel, insert_race, get_or_insert_race_player, delete_race_player_if_present, set_player_ready, set_race_started,
@@ -9,6 +10,17 @@ const { get_race_data_embed, get_race_results_text, calculate_player_scores, get
 const { seed_in_create_race } = require('./race_seed_util');
 
 
+/**
+ * @summary Llamado como parte de la rutina del comando /carrera forzar final y de /done y /forfeit (si es el 
+ * último jugador de la carrera el que lo invoca.)
+ * 
+ * @description Cierra una carrera: bloquea la ejecución de más comandos por parte de los jugadores, copia los 
+ * resultados al historial y actualiza las puntuaciones de los jugadores (si la carrera es puntuable.)
+ * 
+ * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
+ * @param {Sequelize}          db          Base de datos del servidor en el que se invocó el comando.
+ * @param {Model}              race        Carrera a cerrar, tal y como figura en base de datos.
+ */
 async function cerrar_carrera(interaction, db, race) {
 
 	await set_race_finished(db, interaction.channelId);
@@ -74,7 +86,16 @@ async function cerrar_carrera(interaction, db, race) {
 	}
 }
 
-// Invocado con /carrera crear. Crea una carrera síncrona.
+
+/**
+ * @summary Invocado por el comando /carrera crear.
+ * 
+ * @description Crea un hilo de Discord para gestionar una nueva carrera. Genera una seed para la carrera si es 
+ * necesario.
+ * 
+ * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
+ * @param {Sequelize}          db          Base de datos del servidor en el que se invocó el comando.
+ */
 async function carrera_crear(interaction, db) {
 	if (interaction.channel.isThread()) {
 		throw { 'message': 'Este comando no puede ser usado en hilos.' };
@@ -133,7 +154,15 @@ async function carrera_crear(interaction, db) {
 	await interaction.editReply({ embeds: [text_ans] });
 }
 
-// Invocado con /carrera entrar. Registra al jugador en la carrera.
+
+/**
+ * @summary Invocado por el comando /carrera entrar.
+ * 
+ * @description Registra al jugador que utilizó el comando en la carrera.
+ * 
+ * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
+ * @param {Sequelize}          db          Base de datos del servidor en el que se invocó el comando.
+ */
 async function carrera_entrar(interaction, db) {
 	const race = await get_race_by_channel(db, interaction.channelId);
 	if (!race) {
@@ -163,7 +192,15 @@ async function carrera_entrar(interaction, db) {
 	await interaction.reply({ embeds: [text_ans] });
 }
 
-// Invocado con /carrera salir. Retira al jugador de una carrera no empezada.
+
+/**
+ * @summary Invocado por el comando /carrera salir.
+ * 
+ * @description Retira al jugador que utilizó el comando de la carrera, siempre y cuando esta no haya empezado.
+ * 
+ * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
+ * @param {Sequelize}          db          Base de datos del servidor en el que se invocó el comando.
+ */
 async function carrera_salir(interaction, db) {
 	const race = await get_race_by_channel(db, interaction.channelId);
 	if (!race) {
@@ -192,7 +229,15 @@ async function carrera_salir(interaction, db) {
 	await interaction.reply({ embeds: [text_ans] });
 }
 
-// Invocado con /carrera listo. Declara al jugador como listo para iniciar la carrera.
+
+/**
+ * @summary Invocado por el comando /carrera listo.
+ * 
+ * @description Declara al jugador que utilizó el comando como listo para iniciar la carrera.
+ * 
+ * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
+ * @param {Sequelize}          db          Base de datos del servidor en el que se invocó el comando.
+ */
 async function carrera_listo(interaction, db) {
 	const race = await get_race_by_channel(db, interaction.channelId);
 	if (!race) {
@@ -262,7 +307,15 @@ async function carrera_no_listo(interaction, db) {
 	await interaction.reply({ embeds: [text_ans] });
 }
 
-// Invocado con /carrera forzar inicio. Considera a todos los jugadores como listos e inicia la carrera.
+
+/**
+ * @summary Invocado por el comando /carrera forzar inicio.
+ * 
+ * @description Considera todos los jugadores como listos e inicia inmediatamente la carrera.
+ * 
+ * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
+ * @param {Sequelize}          db          Base de datos del servidor en el que se invocó el comando.
+ */
 async function carrera_forzar_inicio(interaction, db) {
 	const race = await get_race_by_channel(db, interaction.channelId);
 	if (!race) {
@@ -298,7 +351,15 @@ async function carrera_forzar_inicio(interaction, db) {
 	}
 }
 
-// Invocado con /carrera forzar final. Finaliza una carrera en curso poniendo forfeit a los que no hayan acabado.
+
+/**
+ * @summary Invocado por el comando /carrera forzar final.
+ * 
+ * @description Finaliza una carrera en curso, asignando forfeits a los jugadores que no hayan terminado.
+ * 
+ * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
+ * @param {Sequelize}          db          Base de datos del servidor en el que se invocó el comando.
+ */
 async function carrera_forzar_final(interaction, db) {
 	const race = await get_race_by_channel(db, interaction.channelId);
 	if (!race) {
@@ -330,7 +391,15 @@ async function carrera_forzar_final(interaction, db) {
 	}
 }
 
-// Invocado con /carrera forzar cancelar. Anula la carrera.
+
+/**
+ * @summary Invocado por el comando /carrera forzar cancelar.
+ * 
+ * @description Anula una carrera que aún no ha empezado.
+ * 
+ * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
+ * @param {Sequelize}          db          Base de datos del servidor en el que se invocó el comando.
+ */
 async function carrera_forzar_cancelar(interaction, db) {
 	const race = await get_race_by_channel(db, interaction.channelId);
 	if (!race) {
@@ -358,5 +427,7 @@ async function carrera_forzar_cancelar(interaction, db) {
 	await interaction.channel.delete();
 }
 
-module.exports = { cerrar_carrera, carrera_crear, carrera_entrar, carrera_salir, carrera_listo, carrera_no_listo, carrera_forzar_inicio,
-	carrera_forzar_final, carrera_forzar_cancelar };
+module.exports = {
+	cerrar_carrera, carrera_crear, carrera_entrar, carrera_salir, carrera_listo, carrera_no_listo, carrera_forzar_inicio,
+	carrera_forzar_final, carrera_forzar_cancelar
+};

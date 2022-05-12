@@ -1,13 +1,23 @@
-const { MessageEmbed } = require('discord.js');
+const { MessageEmbed, CommandInteraction } = require('discord.js');
+const { Sequelize, Model } = require('sequelize');
 const { save_async_result, get_player_result } = require('../datamgmt/async_db_utils');
 const { get_or_insert_player } = require('../datamgmt/db_utils');
 const { set_player_forfeit, set_player_done, set_player_undone } = require('../datamgmt/race_db_utils');
-const { get_async_results_text } = require('./async_util');
 const { cerrar_carrera } = require('./carrera_util');
-const { calcular_tiempo } = require('./race_results_util');
+const { get_async_results_text, calcular_tiempo } = require('./race_results_util');
 
 
-// Comando /done en carreras asíncronas.
+/**
+ * @summary Invocado por el comando /done en carreras asíncronas.
+ * 
+ * @description Registra el resultado de un jugador en una carrera asíncrona. Da acceso al jugador a los canales 
+ * de resultados y spoilers.
+ * 
+ * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
+ * @param {Sequelize}          db          Base de datos del servidor en el que se invocó el comando.
+ * @param {Model}              race        Carrera asíncrona para la que se registra el resultado, tal y como 
+ *                                         figura en base de datos.
+ */
 async function done_async(interaction, db, race) {
 
 	const author = interaction.user;
@@ -66,8 +76,7 @@ async function done_async(interaction, db, race) {
 	const results_message = await results_channel.messages.fetch(`${race.ResultsMessage}`);
 	await results_message.edit(results_text);
 
-	// Dar rol de carrera, si procede.
-	// DEPRECATED: Todas las carreras tendrán RoleId
+	// Dar rol de carrera.
 	if (race.RoleId) {
 		const async_role = await interaction.guild.roles.fetch(`${race.RoleId}`);
 		await interaction.member.roles.add(async_role);
@@ -87,7 +96,19 @@ async function done_async(interaction, db, race) {
 	await interaction.channel.send(`${author} ha registrado un resultado.`);
 }
 
-// Comando /done en carreras síncronas.
+
+/**
+ * @summary Invocado por el comando /done en carreras síncronas.
+ * 
+ * @description Registra el resultado de un participante en una carrera síncrona. Si es el último participante 
+ * en terminar, cierra también la carrera.
+ * 
+ * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
+ * @param {Sequelize}          db          Base de datos del servidor en el que se invocó el comando.
+ * @param {Model}              race        Carrera para la que se registra el resultado, tal y como figura en 
+ *                                         base de datos.
+ * @param {boolean}            forfeit     Valor que indica si el resultado se trata de un abandono.
+ */
 async function done_race(interaction, db, race, forfeit = false) {
 
 	const author = interaction.user;
@@ -150,7 +171,18 @@ async function done_race(interaction, db, race, forfeit = false) {
 	}
 }
 
-// Comando /undone en carreras síncronas.
+
+/**
+ * @summary Invocado por el comando /undone.
+ * 
+ * @description Anula los efectos de un comando /done previo de un jugador en una carrera síncrona, permitiéndole 
+ * continuar la carrera.
+ * 
+ * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
+ * @param {Sequelize}          db          Base de datos del servidor en el que se invocó el comando.
+ * @param {Model}              race        Carrera para la que se anula el resultado, tal y como figura en base 
+ *                                         de datos.
+ */
 async function undone_race(interaction, db, race) {
 	await get_or_insert_player(db, interaction.user.id, interaction.user.username, interaction.user.discriminator, `${interaction.user}`);
 	const undone_code = await set_player_undone(db, race.Id, interaction.user.id);

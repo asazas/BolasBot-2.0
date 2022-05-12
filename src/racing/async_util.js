@@ -374,4 +374,4 @@ async function async_purgar(interaction, db) {
 	cerrar_async(interaction, db, race);
 }
 
-module.exports = { random_words, async_crear, async_cerrar, async_reabrir, async_purgar, get_async_results_text };
+module.exports = { random_words, async_crear, async_cerrar, async_reabrir, async_purgar };

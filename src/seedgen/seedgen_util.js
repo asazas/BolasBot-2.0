@@ -1,3 +1,5 @@
+const { Client } = require("discord.js");
+
 const code_map = { 0: 'Bow', 1: 'Boomerang', 2: 'Hookshot', 3: 'Bombs',
 	4: 'Mushroom', 5: 'Magic Powder', 6: 'Ice Rod', 7: 'Pendant',
 	8: 'Bombos', 9: 'Ether', 10: 'Quake', 11: 'Lamp',
@@ -9,6 +11,17 @@ const code_map = { 0: 'Bow', 1: 'Boomerang', 2: 'Hookshot', 3: 'Bombs',
 
 const code_map_emojis = {};
 
+
+/**
+ * @summary Se llama en la rutina de inicialización del bot para asociar emojis a cada posible componente de 
+ * un código (hash) de seed de ALTTPR.
+ * 
+ * @description Construye el mapa code_map_emojis, que asocia un emoji a cada uno de los elementos que pueden 
+ * aparecer en un código (hash) de ALTTPR.
+ * 
+ * @param {Client} client   Cliente de discord.js para interactuar con la API de Discord.
+ * @param {string} guild_id ID del servidor de Discord en el que buscar los emojis.
+ */
 async function initialize_code_emojis(client, guild_id) {
 	const emoji_guild = await client.guilds.fetch(guild_id);
 	if (!emoji_guild) {
@@ -23,6 +36,19 @@ async function initialize_code_emojis(client, guild_id) {
 	}
 }
 
+
+/**
+ * @summary Busca una sección del parche correspondiente a una seed de ALTTPR.
+ * 
+ * @description Dados unos valores de offset y longitud, obtiene la sección correspondiente del parche de una 
+ * seed de ALTTPR.
+ * 
+ * @param {object[]} patch  Parche de la seed de ALTTPR, tal y como lo devuelve la API.
+ * @param {number}   offset Valor inicial de la sección del parche buscada.
+ * @param {number}   length Longitud de la sección del parche buscada.
+ * 
+ * @returns {number[]}
+ */
 function search_in_patch(patch, offset, length) {
 	for (let i = 0; i < patch.length - 1; i++) {
 		const next_pos = parseInt(Object.getOwnPropertyNames(patch[i + 1])[0]);
@@ -35,6 +61,18 @@ function search_in_patch(patch, offset, length) {
 	return null;
 }
 
+
+/**
+ * @summary Calcula el código (hash) de una seed de ALTTPR.
+ * 
+ * @description Examina los datos del parche de la seed de ALTTPR dada y obtiene la cadena de cinco ítems que 
+ * conforma su código (hash.)
+ * 
+ * @param {object} seed Datos de la seed de ALTTPR, tal y como se obtienen desde la API.
+ * 
+ * @returns {string} Los cinco emojis de ítems (o sus nombres, si los emojis no están disponibles) que forman 
+ * parte del código de la seed.
+ */
 function get_seed_code(seed) {
 	const code = search_in_patch(seed.data.patch, 1573397, 5);
 	if (Object.keys(code_map_emojis).length == Object.keys(code_map).length) {

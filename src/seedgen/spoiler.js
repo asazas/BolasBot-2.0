@@ -58,6 +58,16 @@ const spritemap = {
 	227: 'Fairy',
 };
 
+
+/**
+ * @summary Llamado en la función get_seed_prizepacks().
+ * 
+ * @description Obtiene el tipo de drop de ALTTP correspondiente a un código.
+ * 
+ * @param {number} sprite Código del drop a buscar.
+ * 
+ * @returns {string} Nombre del drop correspondiente al código.
+ */
 function get_sprite_droppable(sprite) {
 	try {
 		return spritemap[sprite];
@@ -67,6 +77,15 @@ function get_sprite_droppable(sprite) {
 	}
 }
 
+
+/**
+ * @summary Llamado por get_formatter_spoiler().
+ * 
+ * @description Obtiene los drops correspondientes a árboles, cangrejos, stun y peces.
+ * 
+ * @param {object} data Campo 'data' del objeto seed que devuelve la API de ALTTPR.
+ * @returns {object} Objeto cuyas claves son los orígenes de los drops y cuyos valores son los drops en sí.
+ */
 function get_seed_prizepacks(data) {
 	const drops = {};
 	drops['PullTree'] = {};
@@ -94,6 +113,18 @@ function get_seed_prizepacks(data) {
 	return drops;
 }
 
+
+/**
+ * @summary Llamado al crear una seed de ALTTPR en la que los spoilers estén habilitados.
+ * 
+ * @description Procesa los datos de spoiler de la seed de ALTTPR dada y genera un objeto listo para ser 
+ * convertido a un archivo de salida en formato JSON.
+ * 
+ * @param {object} seed Objeto con los datos de la seed, tal y como devuelve la API de ALTTPR.
+ * 
+ * @returns {?object} Objeto con la información de spoiler de ALTTPR. Devuelve null si no se puede acceder al 
+ * spoiler log.
+ */
 function get_formatted_spoiler(seed) {
 	if (seed['data']['spoiler']['meta']['spoilers'] != 'on' && seed['data']['spoiler']['meta']['spoilers'] != 'generate') {
 		return null;

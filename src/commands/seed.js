@@ -4,8 +4,19 @@ const { SlashCommandBuilder, SlashCommandStringOption } = require('@discordjs/bu
 const { generate_from_preset, generate_varia_finetune, retrieve_from_url, preset_file } = require('../seedgen/seedgen');
 const { seed_info_embed, varia_info_embed } = require('../seedgen/info_embeds');
 const { preset_help, extra_help } = require('../seedgen/help');
+const { CommandInteraction } = require('discord.js');
 
 
+/**
+ * @summary Punto de entrada para /seed crear y /seed multi.
+ * 
+ * @description Crea una seed a partir de un preset y responde con sus datos.
+ * 
+ * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
+ * @param {number}             jugadores   Número de jugadores (solo relevante para /seed multi.)
+ * @param {string}             nombres     Nombres de los jugadores, separados por comas (solo relevante 
+ *                                         para /seed multi.)
+ */
 async function seed_crear(interaction, jugadores = 1, nombres = '') {
 	await interaction.deferReply();
 	const preset = interaction.options.getString('preset').toLowerCase();
@@ -25,6 +36,13 @@ async function seed_crear(interaction, jugadores = 1, nombres = '') {
 }
 
 
+/**
+ * @summary Punto de entrada para /seed info.
+ * 
+ * @description Obtiene la información de una seed a partir de su URL y responde con un embed.
+ * 
+ * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
+ */
 async function seed_info(interaction) {
 	const url = interaction.options.getString('url');
 	await interaction.deferReply();

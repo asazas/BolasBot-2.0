@@ -93,8 +93,8 @@ async function set_stream_role(interaction, db) {
  * 
  * @param {Sequelize} db Base de datos del servidor en el que se realiza la consulta.
  * 
- * @returns Un objeto que contiene una entrada por stream monitorizado, especificando quién es el propietario 
- * del stream y de si estaba en línea o no cuando la última consulta fue efectuada.
+ * @returns {object} Un objeto que contiene una entrada por stream monitorizado, especificando quién es el 
+ * propietario del stream y de si estaba en línea o no cuando la última consulta fue efectuada.
  */
 async function streams_data(db) {
 	const streams = await get_streams(db);
@@ -115,8 +115,8 @@ async function streams_data(db) {
  * @param {string[]}  stream_list   Array que contiene los usuarios de Twitch a consultar.
  * @param {ApiClient} twitch_client Cliente de Twitch de la librería Twurple.
  * 
- * @returns Objeto que contiene, para cada usuario consultado que está emitiendo, información sobre su stream. 
- * Los usuarios que no estén emitiendo no figurarán en este objeto.
+ * @returns {object} Objeto que contiene, para cada usuario consultado que está emitiendo, información sobre su 
+ * stream. Los usuarios que no estén emitiendo no figurarán en este objeto.
  */
 async function get_twitch_streams_info(stream_list, twitch_client) {
 	const twitch_info = {};
@@ -136,10 +136,10 @@ async function get_twitch_streams_info(stream_list, twitch_client) {
  * de datos.
  * 
  * @param {Guild}     guild         Servidor en el que se mandarán las alertas.
- * @param {Object}    guild_streams Información de streams monitorizados sacada de la base de datos del servidor. 
+ * @param {object}    guild_streams Información de streams monitorizados sacada de la base de datos del servidor. 
  *                                  Se trata del objeto devuelto por el método streams_data().
  * @param {Sequelize} db            Base de datos correspondiente al servidor sobre el que se está operando. 
- * @param {Object}    twitch_info   Información de streams obtenida de la consulta a la API de Twitch. Se trata 
+ * @param {object}    twitch_info   Información de streams obtenida de la consulta a la API de Twitch. Se trata 
  *                                  del objeto devuelto por el método get_twitch_streams_info().
  */
 async function announce_live_streams(guild, guild_streams, db, twitch_info) {

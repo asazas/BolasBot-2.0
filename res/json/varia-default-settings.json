@@ -4,6 +4,7 @@
     "preset": "regular",
     "raceMode": "off",
     "areaLayout": "off",
+    "doorsColorsRando": "off",
     "lightAreaRandomization": "off",
     "removeEscapeEnemies": "off",
     "layoutPatches": "on",
@@ -92,5 +93,6 @@
     "allowGreyDoors": "off",
     "minimizerQty": "45",
     "scavRandomized": "off",
+    "scavEscape": "off",
     "hud": "off"
 }
