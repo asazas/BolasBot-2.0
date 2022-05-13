@@ -1,15 +1,31 @@
 const fs = require('fs');
 const { finished } = require('stream/promises');
-const { MessageEmbed, MessageAttachment } = require('discord.js');
+const { MessageEmbed, MessageAttachment, CommandInteraction } = require('discord.js');
+const { Sequelize } = require('sequelize');
 const gaxios = require('gaxios');
 // problemas con multipart data en gaxios
-const axios = require('axios');
+const axios = require('axios').default;
 const FormData = require('form-data');
 const tmp = require('tmp');
 
 const { get_global_var } = require('../datamgmt/db_utils');
 const { random_words } = require('../racing/async_util');
 
+
+/**
+ * @summary Función auxiliar para la comunicación con la API de Archipelago.
+ * 
+ * @description Envía un .zip de ajustes de jugadores a Archipelado para la creación de una nueva partida de 
+ * multiworld.
+ * 
+ * @param {MessageAttachment} attachment Archivo comprimido .zip que incluye los ajustes de cada jugador.
+ * @param {boolean}           spoiler    Parámetro que decide si la partida se genera con acceso al log de 
+ *                                       spoiler (true) o no (false.)
+ * 
+ * @returns {object} Objeto que contiene la respuesta de la API de Archipelago Multiworld. Campos importantes: 
+ * status (201 = OK, cualquier otro = error), statusText, data.url (URL de la partida generada), data.text (para 
+ * obtener detalles acerca de un error, si este ocurre.)
+ */
 async function get_multiworld_game(attachment, spoiler) {
 	const zip_file = await gaxios.request({ url: attachment.url, responseType: 'stream', retry: true });
 
@@ -40,6 +56,17 @@ async function get_multiworld_game(attachment, spoiler) {
 	return response;
 }
 
+
+/**
+ * @summary Llamado por el comando /multiworld crear.
+ * 
+ * @description Crea una nueva partida de Archipelago Multiworld: busca un archivo comprimido .zip conteniendo 
+ * los ajustes de cada jugador entre los mensajes más recientes del canal de ajustes de multiworld, genera una 
+ * nueva partida usando la API de Archipelago, y crea un nuevo hilo en el servidor de Discord para la partida.
+ * 
+ * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
+ * @param {Sequelize}          db          Base de datos del servidor en el que se invocó el comando.
+ */
 async function crear_multiworld(interaction, db) {
 	const global_var = await get_global_var(db);
 	if (!global_var.MultiworldSettingsChannel) {
