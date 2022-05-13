@@ -12,8 +12,9 @@ const exec = util.promisify(require('child_process').exec);
  * @description Genera un embed con una imagen aleatoria de Fernando Almeida y una frase aleatoria generada 
  * por el comando de consola "fortune es", si este programa está instalado.
  * 
- * @returns {any[]} Un array con dos elementos: en la posición [0], un MessageEmbed con la imagen y frase 
- * aleatorias; y en la posición [1], la imagen aleatoria de Fernando Almeida como MessageAttachment.
+ * @returns {[MessageEmbed, MessageAttachment]} Un array con dos elementos: en la posición [0], un MessageEmbed 
+ * con la imagen y frase aleatorias; y en la posición [1], la imagen aleatoria de Fernando Almeida como 
+ * MessageAttachment.
  */
 async function get_fernando_embed() {
 	const image_name = `almeida${Math.floor(Math.random() * 10)}.png`;

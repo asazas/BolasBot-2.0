@@ -1,5 +1,16 @@
 const { Sequelize, DataTypes } = require('sequelize');
 
+
+/**
+ * @summary Llamado en la rutina de inicialización del bot, una vez por cada servidor en el que este se encuentre.
+ * 
+ * @description Inicializa la base de datos SQLite para cada uno de los servidores en los que está el bot: 
+ * incluye todas las definiciones de tablas y la creación del archivo de base de datos si este no existe.
+ * 
+ * @param {string} server ID del servidor para el que se inicializa la base de datos.
+ * 
+ * @returns {Sequelize} Objeto Sequelize correspondiente a la base de datos inicializada del servidor.
+ */
 async function get_data_models(server) {
 	const sequelize = new Sequelize({ dialect: 'sqlite', storage: `data/${server}.db`, define: { freezeTableName: true, timestamps: false } });
 
@@ -328,9 +339,6 @@ async function get_data_models(server) {
 		},
 	});
 	reaction_roles.belongsTo(reaction_role_categories, { as: 'category', foreignKey: 'Category', onDelete: 'CASCADE' });
-
-	// SYNC PARA DEBUG
-	// await sequelize.sync({ force: true });
 
 	await sequelize.sync();
 

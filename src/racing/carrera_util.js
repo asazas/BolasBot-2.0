@@ -278,7 +278,15 @@ async function carrera_listo(interaction, db) {
 	}
 }
 
-// Invocado con /carrera no_listo. Retira el estado de listo para empezar la carrera.
+
+/**
+ * @summary Invocado por el comando /carrera no_listo.
+ * 
+ * @description Retira el estado de listo para empezar la carrera al jugador que utilizó el comando.
+ * 
+ * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
+ * @param {Sequelize}          db          Base de datos del servidor en el que se invocó el comando.
+ */
 async function carrera_no_listo(interaction, db) {
 	const race = await get_race_by_channel(db, interaction.channelId);
 	if (!race) {

@@ -268,7 +268,9 @@ async function generate_varia(preset_data, extra) {
  *                             otro preset 'random'. La generación de seed falla si se superan los 3 niveles de 
  *                             recursión.
  * 
- * @returns {any[]} Array con el mismo formato que generate_from_preset().
+ * @returns {[string, object]} Un array con dos elementos: en la posición [0], un string que contiene el preset y 
+ * opciones extra especificadas en el comando; y en la posición [1], un objeto que contiene los datos de la seed 
+ * generada, tal y como lo devuelve la API del randomizer correspondiente.
  */
 async function generate_random(preset_data, extra, recursion = 0) {
 	if (recursion > 3) {
@@ -310,9 +312,9 @@ async function generate_random(preset_data, extra, recursion = 0) {
  * @param {number} recursion Niveles de recursión, solo relevante en presets de tipo 'random' para evitar un 
  *                           potencial bucle infinito en la generación de la seed.
  * 
- * @returns {any[]} Un array con dos elementos: en la posición [0], un string que contiene el preset y opciones 
- * extra especificadas en el comando; y en la posición [1], un objeto que contiene los datos de la seed generada, 
- * tal y como lo devuelve la API del randomizer correspondiente.
+ * @returns {[string, object]} Un array con dos elementos: en la posición [0], un string que contiene el preset y 
+ * opciones extra especificadas en el comando; y en la posición [1], un objeto que contiene los datos de la seed 
+ * generada, tal y como lo devuelve la API del randomizer correspondiente.
  */
 async function generate_from_preset(preset, extra, jugadores = 1, nombres = '', recursion = 0) {
 	const full_preset = extra ? preset + ' ' + extra : preset;

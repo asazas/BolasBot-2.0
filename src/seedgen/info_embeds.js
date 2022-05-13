@@ -160,9 +160,10 @@ function varia_info_embed(seed, interaction, preset = '') {
  * @param {CommandInteraction} interaction Interacción correspondiente al comando inicialmente invocado.
  * @param {string}             preset      Preset de la seed generada y opciones extra, separadas por espacios.
  * 
- * @returns {any[]} Array con dos elementos: en la posición [0], el MessageEmbed con los datos de la seed pasada 
- * como argumento; y en la posición [1], el archivo 'spoiler.json' como MessageAttachment para seeds de ALTTPR 
- * que generen spoiler log (devuelve null en la posición [1] en cualquier otro caso.)
+ * @returns {[MessageEmbed, ?MessageAttachment]} Array con dos elementos: en la posición [0], el MessageEmbed 
+ * con los datos de la seed pasada como argumento; y en la posición [1], el archivo 'spoiler.json' como 
+ * MessageAttachment para seeds de ALTTPR que generen spoiler log (devuelve null en la posición [1] en cualquier 
+ * otro caso.)
  */
 function seed_info_embed(seed, interaction, preset = '') {
 	// super metroid varia randomizer

@@ -1,3 +1,23 @@
+const { Sequelize, Model } = require("sequelize");
+
+
+/**
+ * @summary Llamado como parte de la rutina del comando /carrera crear.
+ * 
+ * @description Registra los datos de una nueva carrera síncrona en la base de datos del servidor.
+ * 
+ * @param {Sequelize} sequelize    Base de datos del servidor.
+ * @param {string}    name         Nombre de la carrera.
+ * @param {string}    creator      ID en Discord del creador de la carrera.
+ * @param {boolean}   ranked       Indica si la carrera es puntuable (true) o no (false.)
+ * @param {string}    preset       Nombre del preset de la seed para la carrera, incluyendo opciones extra.
+ * @param {string}    seed_hash    Hash de la seed para la carrera.
+ * @param {string}    seed_code    Código de la seed para la carrera.
+ * @param {string}    seed_url     URL de la seed para la carrera.
+ * @param {string}    race_channel ID del hilo de Discord creado para la carrera.
+ * 
+ * @returns {Model} Modelo correspondiente a la carrera creada.
+ */
 async function insert_race(sequelize, name, creator, ranked, preset, seed_hash, seed_code, seed_url, race_channel) {
 	const races = sequelize.models.Races;
 	try {
@@ -20,6 +40,17 @@ async function insert_race(sequelize, name, creator, ranked, preset, seed_hash, 
 	}
 }
 
+
+/**
+ * @summary Usado para diversas funcionalidades, cuando es necesario buscar los datos de una carrera en base de datos.
+ * 
+ * @description Busca una carrera síncrona en base de datos a partir del ID de su hilo de Discord.
+ * 
+ * @param {Sequelize} sequelize    Base de datos del servidor.
+ * @param {string}    race_channel ID del hilo de Discord correspondiente a la carrera.
+ * 
+ * @returns {?Model} Modelo correspondiente a la carrera buscada. Devuelve null si la carrera no existe.
+ */
 async function get_race_by_channel(sequelize, race_channel) {
 	const races = sequelize.models.Races;
 	try {
@@ -43,6 +74,19 @@ async function get_race_by_channel(sequelize, race_channel) {
 	}
 }
 
+
+/**
+ * @summary Llamado como parte de la rutina de /carrera entrar.
+ * 
+ * @description Registra en base de datos a un jugador como participante en una carrera síncrona.
+ * 
+ * @param {Sequelize} sequelize Base de datos del servidor.
+ * @param {number}    race      ID en base de datos de la carrera.
+ * @param {string}    player    ID en Discord del jugador que entra en la carrera.
+ * 
+ * @returns {number}  Devuelve 0 si la operación se completa con éxito, -1 si la operación falla porque la 
+ * carrera no está abierta, o -2 si el jugador ya había entrado en la carrera previamente.
+ */
 async function get_or_insert_race_player(sequelize, race, player) {
 	const race_results = sequelize.models.RaceResults;
 	const races = sequelize.models.Races;
@@ -73,6 +117,20 @@ async function get_or_insert_race_player(sequelize, race, player) {
 	}
 }
 
+
+/**
+ * @summary Llamado como parte de la rutina del comando /carrera salir.
+ * 
+ * @description Elimina a un jugador como participante de una carrera síncrona.
+ * 
+ * @param {Sequelize} sequelize Base de datos del servidor.
+ * @param {number}    race      ID en base de datos de la carrera.
+ * @param {string}    player    ID en Discord del jugador que entra en la carrera.
+ * 
+ * @returns {number} Devuelve 0 si la operación se completa con éxito, -1 si la operación falla porque el jugador 
+ * no está registrado en la carrera, -2 si la operación falla porque el jugador trata de salir mientras está 
+ * listo para comenzar, o -3 si la operación falla porque la carrera ya ha comenzado.
+ */
 async function delete_race_player_if_present(sequelize, race, player) {
 	const race_results = sequelize.models.RaceResults;
 	try {
@@ -106,6 +164,21 @@ async function delete_race_player_if_present(sequelize, race, player) {
 	}
 }
 
+
+/**
+ * @summary Llamado como parte de la rutina del comando /carrera listo.
+ * 
+ * @description Establece a un participante de una carrera síncrona como listo para comenzar.
+ * 
+ * @param {Sequelize} sequelize Base de datos del servidor.
+ * @param {number}    race      ID en base de datos de la carrera.
+ * @param {string}    player    ID en Discord del jugador que entra en la carrera.
+ * 
+ * @returns {object|number} Si la operación tiene éxito, devuelve un objeto con dos atributos: "all", el número 
+ * total de participantes en la carrera; y "ready", el número de jugadores que están listos para comenzar. Si la 
+ * operación falla, devuelve -1 si el jugador no está registrado en la carrera, -2 si el jugador ya se había 
+ * declarado previamente como listo para comenzar, o -3 si la carrera no está abierta.
+ */
 async function set_player_ready(sequelize, race, player) {
 	const race_results = sequelize.models.RaceResults;
 	try {
@@ -151,6 +224,18 @@ async function set_player_ready(sequelize, race, player) {
 	}
 }
 
+
+/**
+ * @summary Llamado como parte de la rutina de /carrera forzar inicio.
+ * 
+ * @description Establece a todos los jugadores de una carrera como listos para comenzar.
+ * 
+ * @param {Sequelize} sequelize Base de datos del servidor.
+ * @param {number}    race      ID en base de datos de la carrera.
+ * 
+ * @returns {number} Devuelve 0 si la operación se completa con éxito, -1 si la operación falla porque no hay al 
+ * menos dos jugadores apuntados a la carrera, o -2 si la operación falla porque la carrera no está abierta.
+ */
 async function set_all_ready_for_force_start(sequelize, race) {
 	const race_results = sequelize.models.RaceResults;
 	const races = sequelize.models.Races;
@@ -189,6 +274,20 @@ async function set_all_ready_for_force_start(sequelize, race) {
 	}
 }
 
+
+/**
+ * @summary Invocado como parte de la rutina del comando /carrera no_listo.
+ * 
+ * @description Retira el estado de listo para empezar la carrera a un jugador.
+ * 
+ * @param {Sequelize} sequelize Base de datos del servidor.
+ * @param {number}    race      ID en base de datos de la carrera.
+ * @param {string}    player    ID en Discord del jugador que entra en la carrera.
+ * 
+ * @returns {number} Devuelve 0 si la operación se completa con éxito, -1 si la operación falla porque el jugador 
+ * no está registrado en la carrera, -2 si la operación falla porque el jugador no está listo para comenzar, o -3 
+ * si la operación falla porque la carrera no está abierta.
+ */
 async function set_player_unready(sequelize, race, player) {
 	const race_results = sequelize.models.RaceResults;
 	try {
@@ -224,6 +323,17 @@ async function set_player_unready(sequelize, race, player) {
 	}
 }
 
+
+/**
+ * @summary Llamado cuando comienza una carrera síncrona.
+ * 
+ * @description Establece el estado de una carrera como "en curso". Actualiza su fecha de inicio.
+ * 
+ * @param {Sequelize} sequelize    Base de datos del servidor.
+ * @param {string}    race_channel ID del hilo de Discord correspondiente a la carrera.
+ * 
+ * @returns {Model} Modelo en base de datos correspondiente a la carrera actualizada.
+ */
 async function set_race_started(sequelize, race_channel) {
 	const races = sequelize.models.Races;
 	try {
@@ -245,6 +355,24 @@ async function set_race_started(sequelize, race_channel) {
 	}
 }
 
+
+/**
+ * @summary Invocado como parte de la rutina del comando /done usado en carreras síncronas.
+ * 
+ * @description Registra el tiempo de un jugador en una carrera síncrona y establece si estado como "terminado".
+ * 
+ * @param {Sequelize} sequelize Base de datos del servidor.
+ * @param {number}    race      ID en base de datos de la carrera.
+ * @param {string}    player    ID en Discord del jugador que entra en la carrera.
+ * 
+ * @returns {object|number} Si la operación tiene éxito, devuelve un objeto con los siguientes atributos: 
+ * "result", un modelo de base de datos RaceResults que representa el resultado del jugador; "position", 
+ * la posición en la carrera conseguida por el jugador; "done_count", el total de jugadores que han terminado 
+ * la carrera (incluyendo forfeits); y "player_count", el número total de participantes en la carrera. Si la 
+ * operación falla, devuelve -1 si el jugador no está registrado en la carrera, -2 si el jugador no está 
+ * participando en la carrera, -3 si la carrera aún está abierta, -4 si la carrera ya ha terminado, o -5 si 
+ * la carrera está en su cuenta atrás inicial.
+ */
 async function set_player_done(sequelize, race, player) {
 	const race_results = sequelize.models.RaceResults;
 	try {
@@ -301,6 +429,23 @@ async function set_player_done(sequelize, race, player) {
 	}
 }
 
+
+/**
+ * @summary Invocado como parte de la rutina del comando /forfeit en carreras síncronas.
+ * 
+ * @description Registra el abandono de un jugador en la carrera y establece su estado como "terminado".
+ * 
+ * @param {Sequelize} sequelize Base de datos del servidor.
+ * @param {number}    race      ID en base de datos de la carrera.
+ * @param {string}    player    ID en Discord del jugador que entra en la carrera.
+ * 
+ * @returns {object|number} Si la operación tiene éxito, devuelve un objeto con los siguientes atributos: 
+ * "result", un modelo de base de datos RaceResults que representa el resultado del jugador; "done_count", el 
+ * total de jugadores que han terminado la carrera (incluyendo forfeits); y "player_count", el número total de 
+ * participantes en la carrera. Si la operación falla, devuelve -1 si el jugador no está registrado en la 
+ * carrera, -2 si el jugador no está participando en la carrera, -3 si la carrera aún está abierta, o -4 si la 
+ * carrera ya ha terminado.
+ */
 async function set_player_forfeit(sequelize, race, player) {
 	const race_results = sequelize.models.RaceResults;
 	try {
@@ -350,6 +495,19 @@ async function set_player_forfeit(sequelize, race, player) {
 	}
 }
 
+
+/**
+ * @summary Llamado como parte de la rutina del comando /carrera forzar final.
+ * 
+ * @description Registra abandonos como resultado de todos los jugadores que todavía están participando en la 
+ * carrera.
+ * 
+ * @param {Sequelize} sequelize Base de datos del servidor.
+ * @param {number}    race      ID en base de datos de la carrera.
+ * 
+ * @returns {number} Devuelve 0 si la operación se completa con éxito, o -1 si la operación falla porque la 
+ * carrera no está en curso.
+ */
 async function set_all_forfeit_for_force_end(sequelize, race) {
 	const race_results = sequelize.models.RaceResults;
 	const races = sequelize.models.Races;
@@ -380,6 +538,17 @@ async function set_all_forfeit_for_force_end(sequelize, race) {
 	}
 }
 
+
+/**
+ * @summary Llamado al cerrar una carrera síncrona.
+ * 
+ * @description Establece una carrera como terminada, acualizando su fecha de final.
+ * 
+ * @param {Sequelize} sequelize    Base de datos del servidor.
+ * @param {string}    race_channel ID del hilo de Discord asociado a la carrera.
+ * 
+ * @returns {Model} Modelo de base de datos correspondiente a la carrera actualizada.
+ */
 async function set_race_finished(sequelize, race_channel) {
 	const races = sequelize.models.Races;
 	try {
@@ -401,6 +570,20 @@ async function set_race_finished(sequelize, race_channel) {
 	}
 }
 
+
+/**
+ * @summary Invocado como parte de la rutina del comando /undone.
+ * 
+ * @description Revierte el estado "terminado" de un jugador en la carrera, volviéndolo a marcar como "en curso".
+ * 
+ * @param {Sequelize} sequelize Base de datos del servidor.
+ * @param {number}    race      ID en base de datos de la carrera.
+ * @param {string}    player    ID en Discord del jugador que entra en la carrera. 
+ * 
+ * @returns {number} Devuelve 0 si la operación se completa con éxito. Si la operación falla, devuelve -1 si el 
+ * jugador no está apuntado en la carrera, -2 si el jugador no está participando en la carrera, -3 si la carrera 
+ * no está en curso, o -4 si el jugador no se había establecido como terminado.
+ */
 async function set_player_undone(sequelize, race, player) {
 	const race_results = sequelize.models.RaceResults;
 	try {
@@ -440,6 +623,18 @@ async function set_player_undone(sequelize, race, player) {
 	}
 }
 
+
+/**
+ * @summary Llamado al terminar una carrera síncrona para contruir la tabla de resultados y actualizar el 
+ * ranking de jugadores, en el caso de que la carrera fuese puntuable.
+ * 
+ * @description Obtiene los resultados de todos los jugadores en la carrera, en orden ascendiente de tiempos.
+ * 
+ * @param {Sequelize} sequelize    Base de datos del servidor.
+ * @param {string}    race_channel ID del hilo de Discord asociado a la carrera.
+ * 
+ * @returns {Model[]} Array ordenado que contiene los modelos correspondientes a los resultados de la carrera.
+ */
 async function get_results_for_race(sequelize, race_channel) {
 	const race_results = sequelize.models.RaceResults;
 	try {
@@ -473,6 +668,8 @@ async function get_results_for_race(sequelize, race_channel) {
 	}
 }
 
-module.exports = { insert_race, get_race_by_channel, get_or_insert_race_player,	delete_race_player_if_present,
+module.exports = {
+	insert_race, get_race_by_channel, get_or_insert_race_player, delete_race_player_if_present,
 	set_player_ready, set_all_ready_for_force_start, set_player_unready, set_race_started, set_player_done,
-	set_player_forfeit, set_all_forfeit_for_force_end, set_race_finished, set_player_undone, get_results_for_race };
+	set_player_forfeit, set_all_forfeit_for_force_end, set_race_finished, set_player_undone, get_results_for_race
+};
