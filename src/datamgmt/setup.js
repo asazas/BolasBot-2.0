@@ -340,6 +340,20 @@ async function get_data_models(server) {
 	});
 	reaction_roles.belongsTo(reaction_role_categories, { as: 'category', foreignKey: 'Category', onDelete: 'CASCADE' });
 
+	sequelize.define('Comandos', {
+		Name: {
+			type: DataTypes.TEXT,
+			primaryKey: true,
+		},
+		Text: {
+			type: DataTypes.TEXT,
+		},
+		CommandId: {
+			type: DataTypes.TEXT,
+			unique: true,
+		},
+	});
+
 	await sequelize.sync();
 
 	await sequelize.transaction(async (t) => {

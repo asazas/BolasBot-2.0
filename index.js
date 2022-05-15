@@ -10,6 +10,7 @@ const { announce_live_streams, streams_data, get_twitch_streams_info } = require
 const { get_global_var } = require('./src/datamgmt/db_utils');
 const { asignar_reaction_role, quitar_reaction_role } = require('./src/roles/roles_util');
 const { initialize_code_emojis } = require('./src/seedgen/seedgen_util');
+const { responder_comando_de_servidor } = require('./src/otros/comandos_util');
 
 // Create a new Discord client instance
 const discord_client = new Client({
@@ -87,7 +88,9 @@ discord_client.on('interactionCreate', async interaction => {
 
 	const command = discord_client.commands.get(interaction.commandName);
 
-	if (!command) return;
+	if (!command) {
+		return await responder_comando_de_servidor(interaction, db[interaction.guildId]);
+	}
 
 	try {
 		await command.execute(interaction, db[interaction.guildId]);
