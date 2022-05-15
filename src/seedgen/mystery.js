@@ -3,13 +3,13 @@ const fs = require('fs');
 
 /**
  * @summary Elige una opción a partir de una lista ponderada.
- * 
- * @description Recibiendo una lista de opciones con pesos asociados, este método escoge una de ellas, respetando 
+ *
+ * @description Recibiendo una lista de opciones con pesos asociados, este método escoge una de ellas, respetando
  * sus ponderaciones.
- * 
- * @param {object|string} options Un objeto cuyas claves son los nombres de las opciones y cuyos valores son los 
+ *
+ * @param {object|string} options Un objeto cuyas claves son los nombres de las opciones y cuyos valores son los
  * pesos asociados a cada una de ellas. También puede ser un string, en cuyo caso la función lo devuelve intacto.
- * 
+ *
  * @returns {?string} La opción elegida. Devuelve null si ocurre alguna anomalía inesperada (no debería.)
  */
 function weighted_choice(options) {
@@ -31,12 +31,12 @@ function weighted_choice(options) {
 
 /**
  * @summary Elección ponderada de un conjunto de sub-pesos.
- * 
- * @description Si el preset 'mystery' contiene conjuntos de sub-pesos, se elige uno al azar, teniendo en cuenta 
+ *
+ * @description Si el preset 'mystery' contiene conjuntos de sub-pesos, se elige uno al azar, teniendo en cuenta
  * la probabilidad asociada a cada uno de esos sub-pesos. Aplica los sub-pesos escogidos al preset.
- * 
+ *
  * @param {object} weights Contenido del archivo de preset 'mystery' dado.
- * 
+ *
  * @returns {object} Preset 'mystery' actualizado con la elección de uno de los conjuntos de sub-pesos.
  */
 function resolve_subweights(weights) {
@@ -51,12 +51,12 @@ function resolve_subweights(weights) {
 
 /**
  * @summary Elección ponderada de los ajustes básicos del preset 'mystery'.
- * 
- * @description Para cada uno de los ajustes básicos (no de customizer) del preset 'mystery', elegir al azar una 
+ *
+ * @description Para cada uno de los ajustes básicos (no de customizer) del preset 'mystery', elegir al azar una
  * de las opciones, atendiendo a sus pesos.
- * 
+ *
  * @param {object} weights Contenido del archivo de preset 'mystery' dado.
- * 
+ *
  * @returns {object} Archivo de preset de ALTTPR on las opciones básicas elegidas.
  */
 function roll_basic_settings(weights) {
@@ -86,77 +86,77 @@ function roll_basic_settings(weights) {
 
 /**
  * @summary Añade ítems al equipamiento inicial.
- * 
- * @description Añade uno o más ítems al conjunto de equipamiento inicial. La función se llama como resultado de 
+ *
+ * @description Añade uno o más ítems al conjunto de equipamiento inicial. La función se llama como resultado de
  * la elección de ajustes custom del preset 'mystery'.
- * 
- * @param {option} mystery_preset Salida de preset 'mystery', originalmente leído desde 'res/default-mystery.json', 
- *                                y modificado como resultado de la elección de opciones de customizer. Se 
+ *
+ * @param {option} mystery_preset Salida de preset 'mystery', originalmente leído desde 'res/default-mystery.json',
+ *                                y modificado como resultado de la elección de opciones de customizer. Se
  *                                modifica en esta función para añadir ítems al equipamiento inicial.
  * @param {string} item           Tipo de ítem a añadir al equipamiento inicial.
- * @param {number|boolean} value  Información extra sobre el ítem a añadir. Puede representar aspectos como el 
+ * @param {number|boolean} value  Información extra sobre el ítem a añadir. Puede representar aspectos como el
  *                                contenido de botellas, tipo de bumerán o número de rupias.
  */
 function update_custom_equipment(mystery_preset, item, value) {
 	if (item == 'Bottle1' || item == 'Bottle2' || item == 'Bottle3' || item == 'Bottle4') {
 		switch (value) {
-			case 1:
-				mystery_preset['settings']['eq'].push('Bottle');
-				break;
-			case 2:
-				mystery_preset['settings']['eq'].push('BottleWithRedPotion');
-				break;
-			case 3:
-				mystery_preset['settings']['eq'].push('BottleWithGreenPotion');
-				break;
-			case 4:
-				mystery_preset['settings']['eq'].push('BottleWithBluePotion');
-				break;
-			case 5:
-				mystery_preset['settings']['eq'].push('BottleWithBee');
-				break;
-			case 6:
-				mystery_preset['settings']['eq'].push('BottleWithGoldBee');
-				break;
-			case 7:
-				mystery_preset['settings']['eq'].push('BottleWithFairy');
-				break;
+		case 1:
+			mystery_preset['settings']['eq'].push('Bottle');
+			break;
+		case 2:
+			mystery_preset['settings']['eq'].push('BottleWithRedPotion');
+			break;
+		case 3:
+			mystery_preset['settings']['eq'].push('BottleWithGreenPotion');
+			break;
+		case 4:
+			mystery_preset['settings']['eq'].push('BottleWithBluePotion');
+			break;
+		case 5:
+			mystery_preset['settings']['eq'].push('BottleWithBee');
+			break;
+		case 6:
+			mystery_preset['settings']['eq'].push('BottleWithGoldBee');
+			break;
+		case 7:
+			mystery_preset['settings']['eq'].push('BottleWithFairy');
+			break;
 		}
 	}
 	else if (item == 'ProgressiveBow') {
 		switch (value) {
-			case 1:
-				mystery_preset['settings']['eq'].push('SilverArrowUpgrade');
-				break;
-			case 2:
-				mystery_preset['settings']['eq'].push('Bow');
-				break;
-			case 3:
-				mystery_preset['settings']['eq'].push('BowAndSilverArrows');
-				break;
+		case 1:
+			mystery_preset['settings']['eq'].push('SilverArrowUpgrade');
+			break;
+		case 2:
+			mystery_preset['settings']['eq'].push('Bow');
+			break;
+		case 3:
+			mystery_preset['settings']['eq'].push('BowAndSilverArrows');
+			break;
 		}
 	}
 	else if (item == 'Boomerang') {
 		switch (value) {
-			case 1:
-				mystery_preset['settings']['eq'].push('Boomerang');
-				break;
-			case 2:
-				mystery_preset['settings']['eq'].push('Boomerang');
-				break;
-			case 3:
-				mystery_preset['settings']['eq'].push('Boomerang', 'RedBoomerang');
-				break;
+		case 1:
+			mystery_preset['settings']['eq'].push('Boomerang');
+			break;
+		case 2:
+			mystery_preset['settings']['eq'].push('Boomerang');
+			break;
+		case 3:
+			mystery_preset['settings']['eq'].push('Boomerang', 'RedBoomerang');
+			break;
 		}
 	}
 	else if (item == 'Ocarina') {
 		switch (value) {
-			case 1:
-				mystery_preset['settings']['eq'].push('OcarinaInactive');
-				break;
-			case 2:
-				mystery_preset['settings']['eq'].push('OcarinaActive');
-				break;
+		case 1:
+			mystery_preset['settings']['eq'].push('OcarinaInactive');
+			break;
+		case 2:
+			mystery_preset['settings']['eq'].push('OcarinaActive');
+			break;
 		}
 	}
 	else if (item == 'Rupees') {
@@ -199,14 +199,14 @@ function update_custom_equipment(mystery_preset, item, value) {
 
 /**
  * @summary Actualiza el pool de ítems de acuerdo al equipamiento inicial.
- * 
- * @description Si el equipamiento inicial es diferente del normal como resultado de la elección de opciones 
- * 'mystery', esta función actualiza el pool de ítems para retirar aquellos objetos que estén en el equipamiento 
+ *
+ * @description Si el equipamiento inicial es diferente del normal como resultado de la elección de opciones
+ * 'mystery', esta función actualiza el pool de ítems para retirar aquellos objetos que estén en el equipamiento
  * inicial.
- * 
- * @param {object} mystery_preset Salida de preset 'mystery', originalmente leído desde 'res/default-mystery.json', 
- *                                y modificado como resultado de la elección de opciones de customizer. Se 
- *                                modifica en esta función para hacer que el pool de ítems sea coherente con el 
+ *
+ * @param {object} mystery_preset Salida de preset 'mystery', originalmente leído desde 'res/default-mystery.json',
+ *                                y modificado como resultado de la elección de opciones de customizer. Se
+ *                                modifica en esta función para hacer que el pool de ítems sea coherente con el
  *                                equipamiento inicial.
  */
 function update_item_pool(mystery_preset) {
@@ -233,15 +233,15 @@ function update_item_pool(mystery_preset) {
 
 /**
  * @summary Aplica opciones de Triforce Hunt.
- * 
- * @description Escoge y aplica a la salida del preset 'mystery' las opciones relativas a Triforce Hunt: número de 
+ *
+ * @description Escoge y aplica a la salida del preset 'mystery' las opciones relativas a Triforce Hunt: número de
  * piezas de trifuerza disponibles, y número de piezas de trifuerza necesarias para terminar.
- * 
- * @param {object} mystery_preset Salida de preset 'mystery', originalmente leído desde 'res/default-mystery.json', 
- *                                y modificado como resultado de la elección de opciones de customizer. Se 
+ *
+ * @param {object} mystery_preset Salida de preset 'mystery', originalmente leído desde 'res/default-mystery.json',
+ *                                y modificado como resultado de la elección de opciones de customizer. Se
  *                                modifica en esta función para añadir las opciones relativas a Triforce Hunt.
- * @param {object} weights        Archivo de preset 'mystery' con sub-pesos resueltos, correspondiente al preset 
- *                                con el que se solicitó la generación de la seed. 
+ * @param {object} weights        Archivo de preset 'mystery' con sub-pesos resueltos, correspondiente al preset
+ *                                con el que se solicitó la generación de la seed.
  */
 function triforce_hunt_settings(mystery_preset, weights) {
 	let min_difference, goal_pieces, pool_pieces;
@@ -294,17 +294,17 @@ function triforce_hunt_settings(mystery_preset, weights) {
 
 /**
  * @summary Aplica opciones de Timed OHKO.
- * 
- * @description Si está activo Timed OHKO, aplica las opciones correspondientes a este modo en la salida del 
+ *
+ * @description Si está activo Timed OHKO, aplica las opciones correspondientes a este modo en la salida del
  *              preset 'mystery'.
- * 
- * @param {object} mystery_preset Salida de preset 'mystery', originalmente leído desde 'res/default-mystery.json', 
- *                                y modificado como resultado de la elección de opciones de customizer. Se 
+ *
+ * @param {object} mystery_preset Salida de preset 'mystery', originalmente leído desde 'res/default-mystery.json',
+ *                                y modificado como resultado de la elección de opciones de customizer. Se
  *                                modifica en esta función para añadir las opciones relativas a Timed OHKO.
- * @param {object} options        Opciones básicas de ALTTPR escogidas en roll_basic_settings(). Pueden modificarse 
- *                                en esta función si el preset 'mystery' especifica algún ajuste forzado en caso 
+ * @param {object} options        Opciones básicas de ALTTPR escogidas en roll_basic_settings(). Pueden modificarse
+ *                                en esta función si el preset 'mystery' especifica algún ajuste forzado en caso
  *                                de activarse Timed OHKO.
- * @param {object} weights        Archivo de preset 'mystery' con sub-pesos resueltos, correspondiente al preset 
+ * @param {object} weights        Archivo de preset 'mystery' con sub-pesos resueltos, correspondiente al preset
  *                                con el que se solicitó la generación de la seed.
  */
 function timed_ohko_settings(mystery_preset, options, weights) {
@@ -347,16 +347,16 @@ function timed_ohko_settings(mystery_preset, options, weights) {
 
 /**
  * @summary Asegura que se cumplen determinadas restricciones tras elegir todos los ajustes.
- * 
- * @description Al final de la elección de todos los ajustes en el preset, esta función comprueba que no se hayan 
+ *
+ * @description Al final de la elección de todos los ajustes en el preset, esta función comprueba que no se hayan
  * elegido opciones que sean incompatibles entre sí, y realiza cambios si es necesario.
- * 
- * @param {object} mystery_preset Salida de preset 'mystery', originalmente leído desde 'res/default-mystery.json', 
- *                                y modificado como resultado de la elección de opciones de customizer. Se 
+ *
+ * @param {object} mystery_preset Salida de preset 'mystery', originalmente leído desde 'res/default-mystery.json',
+ *                                y modificado como resultado de la elección de opciones de customizer. Se
  *                                modifica en esta función si se detectan conjuntos de opciones incompatibles.
- * @param {object} options        Opciones básicas de ALTTPR escogidas en roll_basic_settings(). Pueden modificarse 
+ * @param {object} options        Opciones básicas de ALTTPR escogidas en roll_basic_settings(). Pueden modificarse
  *                                en esta función si se detectan conjuntos de opciones incompatibles.
- * @param {object} weights        Archivo de preset 'mystery' con sub-pesos resueltos, correspondiente al preset 
+ * @param {object} weights        Archivo de preset 'mystery' con sub-pesos resueltos, correspondiente al preset
  *                                con el que se solicitó la generación de la seed.
  */
 function customizer_coherence_checks(mystery_preset, options, weights) {
@@ -420,15 +420,15 @@ function customizer_coherence_checks(mystery_preset, options, weights) {
 
 /**
  * @summary Escoger y aplicar opciones de customizer.
- * 
- * @description Escoge de manera ponderada las opciones de customizer del preset 'mystery', incluyendo equipamiento 
+ *
+ * @description Escoge de manera ponderada las opciones de customizer del preset 'mystery', incluyendo equipamiento
  * inicial, pool de ítems disponibles y otras opciones custom.
- * 
- * @param {object} mystery_preset Plantilla para la salida de preset 'mystery', tal y como se lee desde 
- *                                'res/default-mystery.json'. Se modifica a lo largo de esta función como 
+ *
+ * @param {object} mystery_preset Plantilla para la salida de preset 'mystery', tal y como se lee desde
+ *                                'res/default-mystery.json'. Se modifica a lo largo de esta función como
  *                                resultado de la elección de opciones de customizer.
  * @param {object} options        Opciones básicas de ALTTPR escogidas en roll_basic_settings().
- * @param {object} weights        Archivo de preset 'mystery' con sub-pesos resueltos, correspondiente al preset 
+ * @param {object} weights        Archivo de preset 'mystery' con sub-pesos resueltos, correspondiente al preset
  *                                con el que se solicitó la generación de la seed.
  */
 function roll_customizer_settings(mystery_preset, options, weights) {
@@ -446,24 +446,24 @@ function roll_customizer_settings(mystery_preset, options, weights) {
 		for (const option in weights['customizer']['custom']) {
 			const choice = weighted_choice(weights['customizer']['custom'][option]);
 			switch (choice) {
-				case 'true':
-					if (mystery_preset['settings']['custom'][option] === false) {
-						mystery_preset['settings']['custom'][option] = true;
-						mystery_preset['customizer'] = true;
-					}
-					break;
-				case 'false':
-					if (mystery_preset['settings']['custom'][option] === true) {
-						mystery_preset['settings']['custom'][option] = false;
-						mystery_preset['customizer'] = true;
-					}
-					break;
-				default:
-					if (mystery_preset['settings']['custom'][option] !== choice) {
-						mystery_preset['settings']['custom'][option] = choice;
-						mystery_preset['customizer'] = true;
-					}
-					break;
+			case 'true':
+				if (mystery_preset['settings']['custom'][option] === false) {
+					mystery_preset['settings']['custom'][option] = true;
+					mystery_preset['customizer'] = true;
+				}
+				break;
+			case 'false':
+				if (mystery_preset['settings']['custom'][option] === true) {
+					mystery_preset['settings']['custom'][option] = false;
+					mystery_preset['customizer'] = true;
+				}
+				break;
+			default:
+				if (mystery_preset['settings']['custom'][option] !== choice) {
+					mystery_preset['settings']['custom'][option] = choice;
+					mystery_preset['customizer'] = true;
+				}
+				break;
 			}
 		}
 	}
@@ -489,13 +489,13 @@ function roll_customizer_settings(mystery_preset, options, weights) {
 
 /**
  * @summary Aplica reglas personalizadas del preset 'mystery'.
- * 
- * @description Si el preset 'mystery' especifica reglas personalizadas, comprobar si se cumplen las condiciones 
+ *
+ * @description Si el preset 'mystery' especifica reglas personalizadas, comprobar si se cumplen las condiciones
  * para su aplicación, y si es el caso, actualizar las opciones básicas del preset de acuerdo a las reglas.
- * 
- * @param {object} options Opciones básicas de ALTTPR escogidas en roll_basic_settings(). Pueden modificarse en 
+ *
+ * @param {object} options Opciones básicas de ALTTPR escogidas en roll_basic_settings(). Pueden modificarse en
  *                         esta función como resultado de la aplicación de reglas personalizadas.
- * @param {object} weights Archivo de preset 'mystery' con sub-pesos resueltos, correspondiente al preset con el 
+ * @param {object} weights Archivo de preset 'mystery' con sub-pesos resueltos, correspondiente al preset con el
  *                         que se solicitó la generación de la seed.
  */
 function apply_mystery_rules(options, weights) {
@@ -527,11 +527,11 @@ function apply_mystery_rules(options, weights) {
 
 /**
  * @summary Aplica los ajustes básicos a la salida del preset 'mystery'.
- * 
+ *
  * @description Copia los ajustes básicos escogidos en roll_basic_settings() a la salida del preset 'mystery'.
- * 
- * @param {object} mystery_preset Salida de preset 'mystery', originalmente leído desde 'res/default-mystery.json', 
- *                                y modificado como resultado de la elección de opciones de customizer. Se 
+ *
+ * @param {object} mystery_preset Salida de preset 'mystery', originalmente leído desde 'res/default-mystery.json',
+ *                                y modificado como resultado de la elección de opciones de customizer. Se
  *                                modifica en esta función para aplicar los ajustes básicos.
  * @param {object} options        Opciones básicas de ALTTPR escogidas en roll_basic_settings().
  */
@@ -560,12 +560,12 @@ function apply_basic_settings(mystery_preset, options) {
 
 /**
  * @summary Punto de entrada para generar un preset de ALTTPR a partir de un preset 'mystery'.
- * 
- * @description Procesa un archivo de preset 'mystery' para generar un archivo de preset que pueda ser leído por la 
+ *
+ * @description Procesa un archivo de preset 'mystery' para generar un archivo de preset que pueda ser leído por la
  * API de ALTTPR. Evalúa y escoge opciones a partir de los pesos especificados en el preset 'mystery'.
- * 
+ *
  * @param {object} weights Contenido del archivo de preset 'mystery', con los pesos correspondientes a cada ajuste.
- * 
+ *
  * @returns {object} Preset de ALTTPR construido a partir del procesado del preset 'mystery'.
  */
 function mystery_settings(weights) {

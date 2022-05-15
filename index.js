@@ -79,7 +79,7 @@ discord_client.once('ready', async () => {
 
 /**
  * Código de respuesta a interacciones.
- * 
+ *
  * Si la interacción es un comando, ejecutarlo.
  */
 discord_client.on('interactionCreate', async interaction => {
@@ -113,7 +113,7 @@ discord_client.on('interactionCreate', async interaction => {
 
 /**
  * Reacción a evento de añadir una reacción de un mensaje.
- * 
+ *
  * Si es un mensaje de un canal de roles, añadir el rol correspondiente al usuario.
  */
 discord_client.on('messageReactionAdd', async (reaction, user) => {
@@ -148,7 +148,7 @@ discord_client.on('messageReactionAdd', async (reaction, user) => {
 
 /**
  * Reacción a evento de retirar una reacción de un mensaje.
- * 
+ *
  * Si es un mensaje de un canal de roles, retirar el rol correspondiente al usuario.
  */
 discord_client.on('messageReactionRemove', async (reaction, user) => {

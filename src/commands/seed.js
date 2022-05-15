@@ -9,12 +9,12 @@ const { CommandInteraction } = require('discord.js');
 
 /**
  * @summary Punto de entrada para /seed crear y /seed multi.
- * 
+ *
  * @description Crea una seed a partir de un preset y responde con sus datos.
- * 
+ *
  * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
  * @param {number}             jugadores   Número de jugadores (solo relevante para /seed multi.)
- * @param {string}             nombres     Nombres de los jugadores, separados por comas (solo relevante 
+ * @param {string}             nombres     Nombres de los jugadores, separados por comas (solo relevante
  *                                         para /seed multi.)
  */
 async function seed_crear(interaction, jugadores = 1, nombres = '') {
@@ -38,9 +38,9 @@ async function seed_crear(interaction, jugadores = 1, nombres = '') {
 
 /**
  * @summary Punto de entrada para /seed info.
- * 
+ *
  * @description Obtiene la información de una seed a partir de su URL y responde con un embed.
- * 
+ *
  * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
  */
 async function seed_info(interaction) {
@@ -158,7 +158,7 @@ command.data = new SlashCommandBuilder()
 					.setDescription('Ayuda de opciones extra')));
 
 
-command.execute = async function (interaction) {
+command.execute = async function(interaction) {
 	if (interaction.options.getSubcommand() == 'crear') {
 		await seed_crear(interaction);
 		return;

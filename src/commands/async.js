@@ -49,7 +49,7 @@ command.data = new SlashCommandBuilder()
 			.setDescription('Purgar la carrera asíncrona'));
 
 
-command.execute = async function (interaction, db) {
+command.execute = async function(interaction, db) {
 	if (!interaction.inGuild()) {
 		throw { 'message': 'Este comando no puede ser usado en mensajes directos.' };
 	}

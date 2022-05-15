@@ -9,12 +9,12 @@ const DISCORD_CUSTOM_EMOJI_REGEX = /^(?:<a?)?:\w+:(?:(\d{18})>)?$/;
 
 /**
  * @summary Función auxiliar para obtener el ID de un emoji.
- * 
+ *
  * @description Computa el ID de un emoji (unicode o propio de servidor) a partir de su representación textual.
- * 
+ *
  * @param {Guild}  guild        Servidor en el que buscar el emoji.
  * @param {string} nombre_emoji Representación textual del emoji.
- * 
+ *
  * @returns {?string} ID del emoji. Puede ser null si es un emoji de servidor que no se encuentra.
  */
 async function resolver_id_emoji(guild, nombre_emoji) {
@@ -37,10 +37,10 @@ async function resolver_id_emoji(guild, nombre_emoji) {
 
 /**
  * @summary Llamado cuando se crea o se elimina un rol reaccionable.
- * 
- * @description Actualiza la el mensaje de una categoría de roles reaccionables para registrar la creación o 
+ *
+ * @description Actualiza la el mensaje de una categoría de roles reaccionables para registrar la creación o
  * eliminación de un rol.
- * 
+ *
  * @param {Message} cat_msg      Mensaje de categoría de roles a actualizar.
  * @param {Model[]} roles_en_cat Nueva lista de roles existentes en la categoría.
  */
@@ -60,9 +60,9 @@ async function actualizar_mensaje_roles(cat_msg, roles_en_cat) {
 
 /**
  * @summary Invocado por /roles crear categoria.
- * 
+ *
  * @description Crea una nueva categoría para roles reaccionables.
- * 
+ *
  * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
  * @param {Sequelize}          db          Base de datos del servidor en el que se invocó el comando.
  */
@@ -124,9 +124,9 @@ async function crear_categoria_roles(interaction, db) {
 
 /**
  * @summary Invocado por /roles eliminar categoria.
- * 
+ *
  * @description Elimina una categoría para roles reaccionables.
- * 
+ *
  * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
  * @param {Sequelize}          db          Base de datos del servidor en el que se invocó el comando.
  */
@@ -163,9 +163,9 @@ async function eliminar_categoria_roles(interaction, db) {
 
 /**
  * @summary Invocado por /roles crear rol.
- * 
+ *
  * @description Crea un nuevo rol reaccionable dentro de una categoría existente.
- * 
+ *
  * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
  * @param {Sequelize}          db          Base de datos del servidor en el que se invocó el comando.
  */
@@ -227,9 +227,9 @@ async function crear_rol(interaction, db) {
 
 /**
  * @summary Invocado por /roles eliminar rol.
- * 
+ *
  * @description Elimina un rol reaccionable.
- * 
+ *
  * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
  * @param {Sequelize}          db          Base de datos del servidor en el que se invocó el comando.
  */
@@ -269,9 +269,9 @@ async function eliminar_rol(interaction, db) {
 
 /**
  * @summary Invocado al detectar que se añade una reacción a un mensaje de roles reaccionables.
- * 
+ *
  * @description Asigna el rol correspondiente al usuario que añadió la reacción.
- * 
+ *
  * @param {Sequelize}     db    Base de datos del servidor en el que se registró la reacción.
  * @param {Guild}         guild Servidor en el que se registró la reacción.
  * @param {User}          user  Usuario que añadió la reacción.
@@ -291,9 +291,9 @@ async function asignar_reaction_role(db, guild, user, emoji) {
 
 /**
  * @summary Invocado al detectar que se elimina una reacción de un mensaje de roles reaccionables.
- * 
+ *
  * @description Retira el rol correspondiente al usuario que eliminó la reacción.
- * 
+ *
  * @param {Sequelize}     db    Base de datos del servidor en el que se eliminó la reacción.
  * @param {Guild}         guild Servidor en el que se eliminó la reacción.
  * @param {User}          user  Usuario que eliminó la reacción.

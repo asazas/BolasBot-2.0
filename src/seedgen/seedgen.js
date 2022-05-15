@@ -8,11 +8,11 @@ const { mystery_settings } = require('./mystery');
 
 /**
  * @summary Buscar un archivo de preset.
- * 
+ *
  * @description A partir del nombre de un preset, devuelve la ruta al archivo de preset correspondiente.
- * 
+ *
  * @param {string} preset Nombre del preset a buscar.
- *  
+ *
  * @returns {?string} Ruta al archivo de preset buscado. Devuelve null si el preset no existe.
  */
 function preset_file(preset) {
@@ -28,11 +28,11 @@ function preset_file(preset) {
 
 /**
  * @summary Añadir opciones de customizer por defecto.
- * 
+ *
  * @description Añade a un preset de ALTTPR las opciones de customizer con sus valores por defecto.
- * 
+ *
  * @param {object} preset_data Contenidos del archivo de preset de ALTTPR.
- * 
+ *
  * @returns {object} Archivo de preset con las opciones de customizer añadidas.
  */
 function add_default_customizer(preset_data) {
@@ -46,12 +46,12 @@ function add_default_customizer(preset_data) {
 
 /**
  * @summary Genera una seed de ALTTPR.
- * 
+ *
  * @description Hace una solicitud a la API de ALTTPR para generar una seed a partir de los datos de preset especificados.
- * 
+ *
  * @param {object} preset_data Contenido del archivo correspondiente al preset especificado.
  * @param {string} extra       Lista de opciones extra, separadas por espacios.
- * 
+ *
  * @returns {object} Objeto con los datos de la seed generada, tal y como lo devuelve la API de ALTTPR.
  */
 async function generate_alttpr(preset_data, extra) {
@@ -99,15 +99,15 @@ async function generate_alttpr(preset_data, extra) {
 
 /**
  * @summary Generación de una seed de SM.
- * 
+ *
  * @summary Hace una solicitud a la API de SM para generar una seed a partir de los datos de preset especificados.
- * 
+ *
  * @param {object} preset_data Contenido del archivo correspondiente al preset especificado.
  * @param {string} extra       Lista de opciones extra, separadas por espacios.
  * @param {number} jugadores   Número de jugadores (solo relevante para multiworld.)
  * @param {string} nombres     Lista de nombres de jugadores, separados por comas (solo relevante para multiworld.)
- * 
- * @returns {object} Objeto con los datos de la seed generada, tal y como lo devuelve la API de SM. 
+ *
+ * @returns {object} Objeto con los datos de la seed generada, tal y como lo devuelve la API de SM.
  */
 async function generate_sm(preset_data, extra, jugadores = 1, nombres = '') {
 	if (jugadores > 1) {
@@ -146,15 +146,15 @@ async function generate_sm(preset_data, extra, jugadores = 1, nombres = '') {
 
 /**
  * @summary Generación de una seed de SMZ3.
- * 
+ *
  * @summary Hace una solicitud a la API de SMZ3 para generar una seed a partir de los datos de preset especificados.
- * 
+ *
  * @param {object} preset_data Contenido del archivo correspondiente al preset especificado.
  * @param {string} extra       Lista de opciones extra, separadas por espacios.
  * @param {number} jugadores   Número de jugadores (solo relevante para multiworld.)
  * @param {string} nombres     Lista de nombres de jugadores, separados por comas (solo relevante para multiworld.)
- * 
- * @returns {object} Objeto con los datos de la seed generada, tal y como lo devuelve la API de SMZ3. 
+ *
+ * @returns {object} Objeto con los datos de la seed generada, tal y como lo devuelve la API de SMZ3.
  */
 async function generate_smz3(preset_data, extra, jugadores = 1, nombres = '') {
 	if (jugadores > 1) {
@@ -196,14 +196,14 @@ async function generate_smz3(preset_data, extra, jugadores = 1, nombres = '') {
 
 /**
  * @summary Generación de una seed de SM VARIA randomizer, desde /seed crear o /seed varia.
- * 
- * @description Hace una solicitud a la API de SM VARIA randomizer para generar una seed a partir de los presets 
+ *
+ * @description Hace una solicitud a la API de SM VARIA randomizer para generar una seed a partir de los presets
  *              de ajustes y de habilidades especificados.
- * 
- * @param {object} preset_data Contenido del archivo de preset 'varia' especificado, o pasado por 
+ *
+ * @param {object} preset_data Contenido del archivo de preset 'varia' especificado, o pasado por
  *                             generate_varia_finetune().
  * @param {string} extra       Parámetros extra especificados en el comando, separados por espacios.
- * 
+ *
  * @returns {object} Objeto con los datos de la seed generada, tal y como devuelve la web de SM VARIA randomizer.
  */
 async function generate_varia(preset_data, extra) {
@@ -221,7 +221,7 @@ async function generate_varia(preset_data, extra) {
 	try {
 		settings_preset = await gaxios.request({
 			url: 'https://randommetroidsolver.pythonanywhere.com/randoPresetWebService',
-			method: 'POST', data: settings, retry: true
+			method: 'POST', data: settings, retry: true,
 		});
 	}
 	catch (error) {
@@ -230,7 +230,7 @@ async function generate_varia(preset_data, extra) {
 	try {
 		skills_preset = await gaxios.request({
 			url: 'https://randommetroidsolver.pythonanywhere.com/presetWebService',
-			method: 'POST', data: skills, retry: true
+			method: 'POST', data: skills, retry: true,
 		});
 	}
 	catch (error) {
@@ -250,26 +250,26 @@ async function generate_varia(preset_data, extra) {
 
 	return await gaxios.request({
 		url: 'https://randommetroidsolver.pythonanywhere.com/randomizerWebService',
-		method: 'POST', data: my_preset, retry: true
+		method: 'POST', data: my_preset, retry: true,
 	});
 }
 
 
 /**
  * @summary Creación de seeds a partir de presets de tipo 'random'.
- * 
- * @description Escoge un preset al azar (teniendo en cuenta pesos) de entre los especificados en el archivo de 
+ *
+ * @description Escoge un preset al azar (teniendo en cuenta pesos) de entre los especificados en el archivo de
  * preset 'random' dado, y vuelve a llamar a generate_from_preset() usando el preset elegido.
- * 
+ *
  * @param {object} preset_data Contenido del archivo de preset 'random' deseado.
- * @param {string} extra       Opciones extra, separadas por espacio. Se aplicarán siempre, sea cual sea el 
+ * @param {string} extra       Opciones extra, separadas por espacio. Se aplicarán siempre, sea cual sea el
  *                             preset elegido.
- * @param {number} recursion   Número de niveles de recursión, que aumenta si dentro del preset 'random' se elige 
- *                             otro preset 'random'. La generación de seed falla si se superan los 3 niveles de 
+ * @param {number} recursion   Número de niveles de recursión, que aumenta si dentro del preset 'random' se elige
+ *                             otro preset 'random'. La generación de seed falla si se superan los 3 niveles de
  *                             recursión.
- * 
- * @returns {[string, object]} Un array con dos elementos: en la posición [0], un string que contiene el preset y 
- * opciones extra especificadas en el comando; y en la posición [1], un objeto que contiene los datos de la seed 
+ *
+ * @returns {[string, object]} Un array con dos elementos: en la posición [0], un string que contiene el preset y
+ * opciones extra especificadas en el comando; y en la posición [1], un objeto que contiene los datos de la seed
  * generada, tal y como lo devuelve la API del randomizer correspondiente.
  */
 async function generate_random(preset_data, extra, recursion = 0) {
@@ -299,21 +299,21 @@ async function generate_random(preset_data, extra, recursion = 0) {
 
 
 /**
- * @summary Inicio de la generación de una seed mediante preset, llamado en /seed crear, /seed multi, 
+ * @summary Inicio de la generación de una seed mediante preset, llamado en /seed crear, /seed multi,
  * /async crear y /carrera crear.
- * 
- * @description Comprueba que existe el archivo del preset invocado y llama a la rutina de generación 
+ *
+ * @description Comprueba que existe el archivo del preset invocado y llama a la rutina de generación
  * correspondiente, dependiendo del tipo de seed solicitado.
- * 
+ *
  * @param {string} preset    Nombre del preset solicitado.
  * @param {string} extra     Lista de opciones extra, separadas por espacios.
  * @param {number} jugadores Número de jugadores (solo relevante en /seed multi.)
  * @param {string} nombres   Lista de nombres de jugadores, separados por comas (solo relevante en /seed multi.)
- * @param {number} recursion Niveles de recursión, solo relevante en presets de tipo 'random' para evitar un 
+ * @param {number} recursion Niveles de recursión, solo relevante en presets de tipo 'random' para evitar un
  *                           potencial bucle infinito en la generación de la seed.
- * 
- * @returns {[string, object]} Un array con dos elementos: en la posición [0], un string que contiene el preset y 
- * opciones extra especificadas en el comando; y en la posición [1], un objeto que contiene los datos de la seed 
+ *
+ * @returns {[string, object]} Un array con dos elementos: en la posición [0], un string que contiene el preset y
+ * opciones extra especificadas en el comando; y en la posición [1], un objeto que contiene los datos de la seed
  * generada, tal y como lo devuelve la API del randomizer correspondiente.
  */
 async function generate_from_preset(preset, extra, jugadores = 1, nombres = '', recursion = 0) {
@@ -322,18 +322,18 @@ async function generate_from_preset(preset, extra, jugadores = 1, nombres = '', 
 	if (preset_file_loc) {
 		const preset_data = JSON.parse(fs.readFileSync(preset_file_loc));
 		switch (preset_data['randomizer']) {
-			case 'alttp':
-				return [full_preset, await generate_alttpr(preset_data, extra)];
-			case 'mystery':
-				return [full_preset, await generate_alttpr(mystery_settings(preset_data), extra)];
-			case 'sm':
-				return [full_preset, await generate_sm(preset_data, extra, jugadores, nombres)];
-			case 'smz3':
-				return [full_preset, await generate_smz3(preset_data, extra, jugadores, nombres)];
-			case 'varia':
-				return [full_preset, await generate_varia(preset_data, extra)];
-			case 'random':
-				return await generate_random(preset_data, extra, recursion);
+		case 'alttp':
+			return [full_preset, await generate_alttpr(preset_data, extra)];
+		case 'mystery':
+			return [full_preset, await generate_alttpr(mystery_settings(preset_data), extra)];
+		case 'sm':
+			return [full_preset, await generate_sm(preset_data, extra, jugadores, nombres)];
+		case 'smz3':
+			return [full_preset, await generate_smz3(preset_data, extra, jugadores, nombres)];
+		case 'varia':
+			return [full_preset, await generate_varia(preset_data, extra)];
+		case 'random':
+			return await generate_random(preset_data, extra, recursion);
 		}
 	}
 }
@@ -341,13 +341,13 @@ async function generate_from_preset(preset, extra, jugadores = 1, nombres = '', 
 
 /**
  * @summary Invocado por /seed varia.
- * 
+ *
  * @description Genera una seed de SM VARIA randomizer a partir de los presets de settings y skills especificados.
- * 
+ *
  * @param {string} settings Preset de ajustes de SM VARIA randomizer.
  * @param {string} skills   Preset de habilidades de SM VARIA randomizer.
  * @param {string} extra    Opciones extra especificadas en el comando.
- * 
+ *
  * @returns {object} Objeto con los datos de la seed generada, tal y como devuelve la web de SM VARIA randomizer.
  */
 async function generate_varia_finetune(settings, skills, extra) {
@@ -363,15 +363,15 @@ const SMZ3_URL_REGEX = /^https:\/\/(sm\.)?samus\.link\/seed\/[A-Za-z0-9_-]{8}[Q-
 
 
 /**
- * @summary Datos de la seed a partir de su URL, llamado en /seed info, /jugar (en carreras asíncronas puntuables), 
+ * @summary Datos de la seed a partir de su URL, llamado en /seed info, /jugar (en carreras asíncronas puntuables),
  * y /async crear y /carrera crear (si se especifica una URL de seed al crear la carrera o async.)
- * 
- * @description Envía una solicitud a la API de ALTTPR o SMZ3 para obtener los datos de la seed correspondiente a 
+ *
+ * @description Envía una solicitud a la API de ALTTPR o SMZ3 para obtener los datos de la seed correspondiente a
  * la URL dada.
- * 
+ *
  * @param {string} url URL correspondiente a la seed de la que obtener información.
- * 
- * @returns {?object} Objeto con la información de la seed, tal cual devuelve la API consultada. Puede devolver 
+ *
+ * @returns {?object} Objeto con la información de la seed, tal cual devuelve la API consultada. Puede devolver
  * null si la URL dada no es de una seed de ALTTP, SM o SMZ3.
  */
 async function retrieve_from_url(url) {

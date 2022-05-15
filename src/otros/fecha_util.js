@@ -18,14 +18,14 @@ const HORA_EUROPEA_REGEX = /^(2[0-3]|[0-1]?[0-9]):([0-5][0-9])$/;
 
 /**
  * @summary Función auxiliar para el comando /fecha.
- * 
- * @description Devuelve un objeto DateTime de la librería Luxon que representa el inicio del día dado por el 
+ *
+ * @description Devuelve un objeto DateTime de la librería Luxon que representa el inicio del día dado por el
  * parámetro "fecha".
- * 
+ *
  * @param {string} fecha    Fecha en formato dd/mm/aaaa. También puede ser "hoy", "mañana" o un día de la semana.
  * @param {string} timezone Zona horaria a la que corresponde la fecha dada.
- * 
- * @returns {DateTime} Objeto DateTime de la librería Luxon que representa el inicio del día dado por el 
+ *
+ * @returns {DateTime} Objeto DateTime de la librería Luxon que representa el inicio del día dado por el
  * parámetro "fecha".
  */
 function validar_fecha(fecha, timezone) {
@@ -56,15 +56,15 @@ function validar_fecha(fecha, timezone) {
 
 /**
  * @summary Función auxiliar para el comando /fecha.
- * 
- * @description Actualiza un objeto DateTime de la librería Luxon para incluir la hora del día dada por el 
+ *
+ * @description Actualiza un objeto DateTime de la librería Luxon para incluir la hora del día dada por el
  * parámetro "hora".
- * 
+ *
  * @param {DateTime} fecha_val Objeto DateTime de la librería Luxon representando el inicio de un día dado.
  * @param {string}   hora      Hora con la que actualizar el objeto DateTime dado.
  * @param {string}   timezone  Zona horaria a la que corresponden la fecha y hora dadas.
- * 
- * @returns {DateTime} Objeto DateTime de la librería Luxon representando la fecha y hora dadas por la invocación 
+ *
+ * @returns {DateTime} Objeto DateTime de la librería Luxon representando la fecha y hora dadas por la invocación
  * del comando /fecha.
  */
 function validar_hora(fecha_val, hora, timezone) {
@@ -95,14 +95,14 @@ function validar_hora(fecha_val, hora, timezone) {
 
 /**
  * @summary Invocado por el comando /fecha.
- * 
+ *
  * @description Procesa una fecha, hora y zona horaria para generar un objeto DateTime de la librería Luxon.
- * 
+ *
  * @param {string} fecha    Fecha en formato dd/mm/aaaa. También puede ser "hoy", "mañana" o un día de la semana.
- * @param {string} hora     Hora en formato hh:mm, europeo (24 horas) o americano (12 horas am/pm). También puede 
+ * @param {string} hora     Hora en formato hh:mm, europeo (24 horas) o americano (12 horas am/pm). También puede
  *                          ser "ahora".
  * @param {string} timezone Zona horaria a la que corresponden la fecha y hora dadas.
- * 
+ *
  * @returns {DateTime} Objeto DateTime de la librería Luxon que representa la fecha y hora dadas.
  */
 function procesar_fecha(fecha, hora, timezone) {

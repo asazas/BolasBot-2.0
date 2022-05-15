@@ -19,9 +19,9 @@ const random_words = ['Asazas', 'DiegoA', 'Vilxs', 'Diegolazo', 'Matkap', 'Kitsu
 
 /**
  * @summary Llamado en async_purgar una vez se ha verificado que la carrera asíncrona puede archivarse.
- * 
+ *
  * @description Cierra una carrera asíncrona: actualiza historial, ranking y elimina roles y canales asociados.
- * 
+ *
  * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
  * @param {Sequelize}          db          Base de datos del servidor en el que se invocó el comando.
  * @param {Model}              race        Entrada de base de datos (AsyncRaces) correspondiente a la carrera.
@@ -113,9 +113,9 @@ async function cerrar_async(interaction, db, race) {
 
 /**
  * @summary Invocado con /async crear.
- * 
+ *
  * @description Crea una nueva carrera asíncrona.
- * 
+ *
  * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
  * @param {Sequelize}          db          Base de datos del servidor en el que se invocó el comando.
  */
@@ -271,9 +271,9 @@ async function async_crear(interaction, db) {
 
 /**
  * @summary Invocado con /async cerrar.
- * 
+ *
  * @description Deja de aceptar nuevos resultados en la carrera asíncrona.
- * 
+ *
  * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
  * @param {Sequelize}          db          Base de datos del servidor en el que se invocó el comando.
  */
@@ -306,9 +306,9 @@ async function async_cerrar(interaction, db) {
 
 /**
  * @summary Invocado con /async reabrir.
- * 
+ *
  * @description Vuelve a aceptar resultados en la carrera asíncrona.
- * 
+ *
  * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
  * @param {Sequelize}          db          Base de datos del servidor en el que se invocó el comando.
  */
@@ -341,9 +341,9 @@ async function async_reabrir(interaction, db) {
 
 /**
  * @summary Invocado con /async purgar.
- * 
+ *
  * @description Cierra definitivamente una carrera asíncrona, eliminando sus canales.
- * 
+ *
  * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
  * @param {Sequelize}          db          Base de datos del servidor en el que se invocó el comando.
  */

@@ -1,11 +1,11 @@
-const { ThreadChannel, CommandInteraction } = require("discord.js");
+const { ThreadChannel, CommandInteraction } = require('discord.js');
 
 
 /**
  * @summary Invocado cuando comienza una carrera síncrona.
- * 
+ *
  * @description Ejecuta una cuenta atrás en el hilo correspondiente a la carrera síncrona que empieza.
- * 
+ *
  * @param {ThreadChannel} canal  Canal de la carrera.
  * @param {number}        tiempo Valor desde el que iniciar la cuenta atrás.
  */
@@ -33,9 +33,9 @@ async function countdown_en_canal(canal, tiempo) {
 
 /**
  * @summary Invocado por el comando /countdown.
- * 
+ *
  * @description Ejecuta una cuenta atrás en el canal donde se invocó el comando /countdown.
- * 
+ *
  * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
  * @param {number}             tiempo      Valor desde el que iniciar la cuenta atrás.
  */

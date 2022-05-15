@@ -3,9 +3,9 @@ const { Op, Sequelize } = require('sequelize');
 
 /**
  * @summary Llamado como parte de la rutina del comando /async crear.
- * 
+ *
  * @description Registra los datos de una nueva carrera asíncrona en la base de datos del servidor.
- * 
+ *
  * @param {Sequelize} sequelize        Base de datos del servidor.
  * @param {string}    name             Nombre de la carrera asíncrona.
  * @param {string}    creator          ID en Discord del creador de la carrera asíncrona.
@@ -19,7 +19,7 @@ const { Op, Sequelize } = require('sequelize');
  * @param {string}    results_channel  ID del canal de Discord para mostrar los resultados de la carrera.
  * @param {string}    results_message  ID del mensaje en Discord que contiene los resultados de la carrera.
  * @param {string}    spoilers_channel ID del canal de Discord para discusión de spoilers post-carrera.
- * 
+ *
  * @returns {Model} Modelo correspondiente a la nueva carrera asíncrona.
  */
 async function insert_async(sequelize, name, creator, ranked, preset, seed_hash, seed_code, seed_url,
@@ -52,11 +52,11 @@ async function insert_async(sequelize, name, creator, ranked, preset, seed_hash,
 
 /**
  * @summary Llamado como parte de la rutina de /async crear.
- * 
+ *
  * @description Busca todas las carreras asíncronas activas (no purgadas) en el servidor.
- * 
+ *
  * @param {Sequelize} sequelize Base de datos del servidor.
- * 
+ *
  * @returns {Model[]} Array que contiene los modelos asociados a las carreras asíncronas activas.
  */
 async function get_active_async_races(sequelize) {
@@ -81,12 +81,12 @@ async function get_active_async_races(sequelize) {
 
 /**
  * @summary Actualmente esta función no se utiliza en ningún sitio.
- * 
+ *
  * @description Busca carreras asíncronas por nombre.
- * 
+ *
  * @param {Sequelize} sequelize Base de datos del servidor.
  * @param {string}    name      Nombre de la/s carrera/s asíncrona/s a buscar.
- * 
+ *
  * @returns {Model[]} Array que contiene las carreras asíncronas cuyo nombre es igual al buscado.
  */
 async function search_async_by_name(sequelize, name) {
@@ -111,13 +111,13 @@ async function search_async_by_name(sequelize, name) {
 
 /**
  * @summary Llamado en múltiples operaciones en las que se necesitan obtener los datos de una carrera asíncrona.
- * 
- * @description Busca en el servidor los datos de una carrera asíncrona a partir del ID de su canal de envío de 
+ *
+ * @description Busca en el servidor los datos de una carrera asíncrona a partir del ID de su canal de envío de
  * resultados.
- * 
+ *
  * @param {Sequelize} sequelize      Base de datos del servidor.
  * @param {string}    submit_channel ID del canal de envío de resultados de la carrera asíncrona.
- * 
+ *
  * @returns {?Model} Modelo correspondiente a la carrera asíncrona buscada.
  */
 async function get_async_by_submit(sequelize, submit_channel) {
@@ -146,13 +146,13 @@ async function get_async_by_submit(sequelize, submit_channel) {
 
 /**
  * @summary Llamado como parte de las rutinas de /async cerrar, /async reabrir y /async purgar.
- * 
+ *
  * @description Actualiza el estado de una carrera asíncrona.
- * 
+ *
  * @param {Sequelize} sequelize Base de datos del servidor.
  * @param {number}    id        ID en base de datos de la carrera asíncrona a actualizar.
  * @param {number}    status    Nuevo estado de la carrera asíncrona (0: abierta, 1: cerrada, 2: purgada.)
- * 
+ *
  * @returns {[number]} Array con un elemento: el número de filas afectadas por la operación.
  */
 async function update_async_status(sequelize, id, status) {
@@ -197,16 +197,16 @@ async function update_async_status(sequelize, id, status) {
 
 /**
  * @summary Invocado en las rutinas de los comandos /jugar y /done (cuando se usa en carreras asíncronas.)
- * 
+ *
  * @description Registra o actualiza el resultado enviado por un jugador en una carrera asíncrona.
- * 
+ *
  * @param {Sequelize} sequelize       Base de datos del servidor.
  * @param {number}    race            ID en base de datos de la carrera para la que se guarda el resultado.
  * @param {string}    player          ID en Discord del jugador que registra el resultado.
  * @param {number}    time            Tiempo registrado por el jugador, en segundos.
  * @param {number}    collection_rate Tasa de colección de ítems registrada por el jugador.
- * 
- * @returns {[Model, null]} Array cuyo primer elemento es el modelo correspondiente al resultado de carrera 
+ *
+ * @returns {[Model, null]} Array cuyo primer elemento es el modelo correspondiente al resultado de carrera
  * asíncrona registrado o actualizado.
  */
 async function save_async_result(sequelize, race, player, time, collection_rate) {
@@ -231,16 +231,16 @@ async function save_async_result(sequelize, race, player, time, collection_rate)
 
 
 /**
- * @summary Llamado cuando se envían los resultados de una carrera asíncrona como mensaje en Discord y cuando se 
+ * @summary Llamado cuando se envían los resultados de una carrera asíncrona como mensaje en Discord y cuando se
  * actualizan las puntuaciones de los jugadores.
- * 
- * @description Obtiene todos los resultados enviados por los jugadores a una carrera asíncrona determinada, en 
+ *
+ * @description Obtiene todos los resultados enviados por los jugadores a una carrera asíncrona determinada, en
  * orden ascendiente de tiempo.
- * 
+ *
  * @param {Sequelize} sequelize      Base de datos del servidor.
- * @param {string}    submit_channel ID del canal de Discord para envío de resultados de la carrera asíncrona a 
+ * @param {string}    submit_channel ID del canal de Discord para envío de resultados de la carrera asíncrona a
  *                                   buscar.
- * 
+ *
  * @returns {Model[]} Array que contiene los modelos de los resultados para la carrera asíncrona buscada.
  */
 async function get_results_for_async(sequelize, submit_channel) {
@@ -277,15 +277,15 @@ async function get_results_for_async(sequelize, submit_channel) {
 
 
 /**
- * @summary Llamado en carreras asíncronas puntuables para confirmar que un jugador ha usado el comando /jugar 
+ * @summary Llamado en carreras asíncronas puntuables para confirmar que un jugador ha usado el comando /jugar
  * antes de registrar un resultado.
- * 
+ *
  * @description Busca el resultado de un jugador específico en una carrera asíncrona.
- * 
+ *
  * @param {Sequelize} sequelize      Base de datos del servidor.
  * @param {string}    submit_channel ID del canal de Discord para envío de resultados de la carrera asíncrona.
  * @param {string}    player         ID en Discord del jugador a buscar.
- * 
+ *
  * @returns {?Model} Modelo correspondiente al resultado buscado. Si este no existe, devuelve null.
  */
 async function get_player_result(sequelize, submit_channel, player) {
@@ -322,5 +322,5 @@ async function get_player_result(sequelize, submit_channel, player) {
 
 module.exports = {
 	insert_async, get_active_async_races, search_async_by_name, get_async_by_submit,
-	update_async_status, save_async_result, get_results_for_async, get_player_result
+	update_async_status, save_async_result, get_results_for_async, get_player_result,
 };

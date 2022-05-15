@@ -39,7 +39,7 @@ command.data = new SlashCommandBuilder()
 			.setDescription('Obtener plantilla de ajustes para un juego de Archipelago Multiworld.')
 			.addStringOption(plantillas));
 
-command.execute = async function (interaction, db) {
+command.execute = async function(interaction, db) {
 
 	if (interaction.options.getSubcommand() == 'yaml_channel') {
 		if (!interaction.inGuild()) {

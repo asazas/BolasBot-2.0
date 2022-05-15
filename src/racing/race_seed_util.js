@@ -5,14 +5,14 @@ const { retrieve_from_url, generate_from_preset } = require('../seedgen/seedgen'
 
 /**
  * @summary Llamado en /async crear y /carrera crear.
- * 
- * @description Genera una seed a partir de un preset, o la recupera a partir de una URL, para su uso en una 
+ *
+ * @description Genera una seed a partir de un preset, o la recupera a partir de una URL, para su uso en una
  * carrera síncrona o asíncrona.
- * 
+ *
  * @param {CommandInteraction} interaction Interacción correspondiente al comando inicialmente invocado.
- * 
- * @returns {object} Un objeto con tres atributos: la seed (tal y como devuelve la API del randomizer 
- * correspondiente), el preset con opciones extra, y la información de la seed (tal y como devuelve la función 
+ *
+ * @returns {object} Un objeto con tres atributos: la seed (tal y como devuelve la API del randomizer
+ * correspondiente), el preset con opciones extra, y la información de la seed (tal y como devuelve la función
  * seed_raw_data().)
  */
 async function seed_in_create_race(interaction) {

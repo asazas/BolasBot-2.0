@@ -7,9 +7,9 @@ const { register_stream, unregister_stream, set_stream_alerts_role, get_streams,
 
 /**
  * @summary Invocado con /streams alta.
- * 
+ *
  * @description Añade un stream de Twitch a la lista de alertas del servidor.
- * 
+ *
  * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
  * @param {Sequelize}          db          Base de datos del servidor en el que se invocó el comando.
  */
@@ -34,9 +34,9 @@ async function stream_alta(interaction, db) {
 
 /**
  * @summary Invocado con /streams baja.
- * 
+ *
  * @description Elimina un stream de Twitch de la lista de alertas del servidor.
- * 
+ *
  * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
  * @param {Sequelize}          db          Base de datos del servidor en el que se invocó el comando.
  */
@@ -57,9 +57,9 @@ async function stream_baja(interaction, db) {
 
 /**
  * @summary Invocado con /streams rol.
- * 
+ *
  * @description Establece un rol en el servidor al que notificar cuando haya alertas de stream.
- * 
+ *
  * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
  * @param {Sequelize}          db          Base de datos del servidor en el que se invocó el comando.
  */
@@ -88,12 +88,12 @@ async function set_stream_role(interaction, db) {
 
 /**
  * @summary Llamado cada vez que se ejecuta la rutina para alertas de stream.
- * 
+ *
  * @description Consulta todos los streams que están siendo monitorizados en un servidor para alertas.
- * 
+ *
  * @param {Sequelize} db Base de datos del servidor en el que se realiza la consulta.
- * 
- * @returns {object} Un objeto que contiene una entrada por stream monitorizado, especificando quién es el 
+ *
+ * @returns {object} Un objeto que contiene una entrada por stream monitorizado, especificando quién es el
  * propietario del stream y de si estaba en línea o no cuando la última consulta fue efectuada.
  */
 async function streams_data(db) {
@@ -107,15 +107,15 @@ async function streams_data(db) {
 
 /**
  * @summary Llamado cada vez que se ejecuta la rutina para alertas de stream.
- * 
- * @description Realiza una consulta a Twitch para comprobar el estado de todos los streams monitorizados. Para 
- * optimizar la eficiencia de esta operación, se consultan los streams de todos los servidores en los que el bot 
+ *
+ * @description Realiza una consulta a Twitch para comprobar el estado de todos los streams monitorizados. Para
+ * optimizar la eficiencia de esta operación, se consultan los streams de todos los servidores en los que el bot
  * está presente de forma simultánea.
- * 
+ *
  * @param {string[]}  stream_list   Array que contiene los usuarios de Twitch a consultar.
  * @param {ApiClient} twitch_client Cliente de Twitch de la librería Twurple.
- * 
- * @returns {object} Objeto que contiene, para cada usuario consultado que está emitiendo, información sobre su 
+ *
+ * @returns {object} Objeto que contiene, para cada usuario consultado que está emitiendo, información sobre su
  * stream. Los usuarios que no estén emitiendo no figurarán en este objeto.
  */
 async function get_twitch_streams_info(stream_list, twitch_client) {
@@ -130,16 +130,16 @@ async function get_twitch_streams_info(stream_list, twitch_client) {
 
 /**
  * @summary Llamado cada vez que se ejecuta la rutina para alertas de stream.
- * 
- * @description Envía mensajes en el canal de alertas de stream de un servidor notificando sobre streams 
- * monitorizados que hayan empezado a emitir. Actualiza el estado de todos los streams monitorizados en base 
+ *
+ * @description Envía mensajes en el canal de alertas de stream de un servidor notificando sobre streams
+ * monitorizados que hayan empezado a emitir. Actualiza el estado de todos los streams monitorizados en base
  * de datos.
- * 
+ *
  * @param {Guild}     guild         Servidor en el que se mandarán las alertas.
- * @param {object}    guild_streams Información de streams monitorizados sacada de la base de datos del servidor. 
+ * @param {object}    guild_streams Información de streams monitorizados sacada de la base de datos del servidor.
  *                                  Se trata del objeto devuelto por el método streams_data().
- * @param {Sequelize} db            Base de datos correspondiente al servidor sobre el que se está operando. 
- * @param {object}    twitch_info   Información de streams obtenida de la consulta a la API de Twitch. Se trata 
+ * @param {Sequelize} db            Base de datos correspondiente al servidor sobre el que se está operando.
+ * @param {object}    twitch_info   Información de streams obtenida de la consulta a la API de Twitch. Se trata
  *                                  del objeto devuelto por el método get_twitch_streams_info().
  */
 async function announce_live_streams(guild, guild_streams, db, twitch_info) {
@@ -224,5 +224,5 @@ async function announce_live_streams(guild, guild_streams, db, twitch_info) {
 
 module.exports = {
 	stream_alta, stream_baja, set_stream_role, streams_data,
-	get_twitch_streams_info, announce_live_streams
+	get_twitch_streams_info, announce_live_streams,
 };

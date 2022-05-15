@@ -11,12 +11,12 @@ const { seed_in_create_race } = require('./race_seed_util');
 
 
 /**
- * @summary Llamado como parte de la rutina del comando /carrera forzar final y de /done y /forfeit (si es el 
+ * @summary Llamado como parte de la rutina del comando /carrera forzar final y de /done y /forfeit (si es el
  * último jugador de la carrera el que lo invoca.)
- * 
- * @description Cierra una carrera: bloquea la ejecución de más comandos por parte de los jugadores, copia los 
+ *
+ * @description Cierra una carrera: bloquea la ejecución de más comandos por parte de los jugadores, copia los
  * resultados al historial y actualiza las puntuaciones de los jugadores (si la carrera es puntuable.)
- * 
+ *
  * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
  * @param {Sequelize}          db          Base de datos del servidor en el que se invocó el comando.
  * @param {Model}              race        Carrera a cerrar, tal y como figura en base de datos.
@@ -89,10 +89,10 @@ async function cerrar_carrera(interaction, db, race) {
 
 /**
  * @summary Invocado por el comando /carrera crear.
- * 
- * @description Crea un hilo de Discord para gestionar una nueva carrera. Genera una seed para la carrera si es 
+ *
+ * @description Crea un hilo de Discord para gestionar una nueva carrera. Genera una seed para la carrera si es
  * necesario.
- * 
+ *
  * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
  * @param {Sequelize}          db          Base de datos del servidor en el que se invocó el comando.
  */
@@ -157,9 +157,9 @@ async function carrera_crear(interaction, db) {
 
 /**
  * @summary Invocado por el comando /carrera entrar.
- * 
+ *
  * @description Registra al jugador que utilizó el comando en la carrera.
- * 
+ *
  * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
  * @param {Sequelize}          db          Base de datos del servidor en el que se invocó el comando.
  */
@@ -195,9 +195,9 @@ async function carrera_entrar(interaction, db) {
 
 /**
  * @summary Invocado por el comando /carrera salir.
- * 
+ *
  * @description Retira al jugador que utilizó el comando de la carrera, siempre y cuando esta no haya empezado.
- * 
+ *
  * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
  * @param {Sequelize}          db          Base de datos del servidor en el que se invocó el comando.
  */
@@ -232,9 +232,9 @@ async function carrera_salir(interaction, db) {
 
 /**
  * @summary Invocado por el comando /carrera listo.
- * 
+ *
  * @description Declara al jugador que utilizó el comando como listo para iniciar la carrera.
- * 
+ *
  * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
  * @param {Sequelize}          db          Base de datos del servidor en el que se invocó el comando.
  */
@@ -281,9 +281,9 @@ async function carrera_listo(interaction, db) {
 
 /**
  * @summary Invocado por el comando /carrera no_listo.
- * 
+ *
  * @description Retira el estado de listo para empezar la carrera al jugador que utilizó el comando.
- * 
+ *
  * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
  * @param {Sequelize}          db          Base de datos del servidor en el que se invocó el comando.
  */
@@ -318,9 +318,9 @@ async function carrera_no_listo(interaction, db) {
 
 /**
  * @summary Invocado por el comando /carrera forzar inicio.
- * 
+ *
  * @description Considera todos los jugadores como listos e inicia inmediatamente la carrera.
- * 
+ *
  * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
  * @param {Sequelize}          db          Base de datos del servidor en el que se invocó el comando.
  */
@@ -362,9 +362,9 @@ async function carrera_forzar_inicio(interaction, db) {
 
 /**
  * @summary Invocado por el comando /carrera forzar final.
- * 
+ *
  * @description Finaliza una carrera en curso, asignando forfeits a los jugadores que no hayan terminado.
- * 
+ *
  * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
  * @param {Sequelize}          db          Base de datos del servidor en el que se invocó el comando.
  */
@@ -402,9 +402,9 @@ async function carrera_forzar_final(interaction, db) {
 
 /**
  * @summary Invocado por el comando /carrera forzar cancelar.
- * 
+ *
  * @description Anula una carrera que aún no ha empezado.
- * 
+ *
  * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
  * @param {Sequelize}          db          Base de datos del servidor en el que se invocó el comando.
  */
@@ -437,5 +437,5 @@ async function carrera_forzar_cancelar(interaction, db) {
 
 module.exports = {
 	cerrar_carrera, carrera_crear, carrera_entrar, carrera_salir, carrera_listo, carrera_no_listo, carrera_forzar_inicio,
-	carrera_forzar_final, carrera_forzar_cancelar
+	carrera_forzar_final, carrera_forzar_cancelar,
 };

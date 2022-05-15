@@ -24,12 +24,12 @@ const extra_varia = '**spoiler: **Permite que la seed pueda ser resuelta por el 
 
 /**
  * @summary Invocado con /seed ayuda presets.
- * 
- * @description Contesta con información acerca del preset dado como parámetro. Si no se da un preset como 
+ *
+ * @description Contesta con información acerca del preset dado como parámetro. Si no se da un preset como
  * parámetro, devuelve una lista de presets disponibles.
- * 
+ *
  * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
- * 
+ *
  * @returns {MessageEmbed} Información sobre el preset, o lista de presets.
  */
 function preset_help(interaction) {
@@ -67,11 +67,11 @@ function preset_help(interaction) {
 
 /**
  * @summary Invocado con /seed ayuda extra.
- * 
+ *
  * @description Contesta con información acerca de las opciones extra disponibles para cada tipo de seed.
- * 
+ *
  * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
- * 
+ *
  * @returns {MessageEmbed} Información sobre las opciones extra disponibles.
  */
 function extra_help(interaction) {
