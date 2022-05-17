@@ -31,9 +31,6 @@ async function get_data_models(server) {
 		PlayerScoreChannel: {
 			type: DataTypes.TEXT,
 		},
-		MultiworldSettingsChannel: {
-			type: DataTypes.TEXT,
-		},
 		StreamAlertsChannel: {
 			type: DataTypes.TEXT,
 		},

@@ -60,83 +60,72 @@ async function get_multiworld_game(attachment, spoiler) {
 /**
  * @summary Llamado por el comando /multiworld crear.
  *
- * @description Crea una nueva partida de Archipelago Multiworld: busca un archivo comprimido .zip conteniendo
- * los ajustes de cada jugador entre los mensajes más recientes del canal de ajustes de multiworld, genera una
- * nueva partida usando la API de Archipelago, y crea un nuevo hilo en el servidor de Discord para la partida.
+ * @description Crea una nueva partida de Archipelago Multiworld: recibe como parámetro en el comando un archivo
+ * comprimido .zip con los ajustes para cada jugador, genera una nueva partida usando la API de Archipelago, y
+ * crea un nuevo hilo en el servidor de Discord para la partida.
  *
  * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
  * @param {Sequelize}          db          Base de datos del servidor en el que se invocó el comando.
  */
 async function crear_multiworld(interaction, db) {
-	const global_var = await get_global_var(db);
-	if (!global_var.MultiworldSettingsChannel) {
-		throw { 'message': 'No hay un canal fijado para buscar ajustes de multiworld.' };
-	}
-	const yaml_channel = await interaction.guild.channels.fetch(`${global_var.MultiworldSettingsChannel}`);
-	if (!yaml_channel) {
-		throw { 'message': 'No hay un canal fijado para buscar ajustes de multiworld.' };
-	}
 	if (interaction.channel.isThread()) {
 		throw { 'message': 'Este comando no puede ser usado en hilos.' };
 	}
 
 	await interaction.deferReply();
 
-	const messages = await yaml_channel.messages.fetch({ limit: 10 });
-	for (const m of messages) {
-		const content = m[1];
-		if (content.attachments.size != 0 && content.attachments.first().contentType == 'application/zip') {
-			const game = await get_multiworld_game(content.attachments.first(), interaction.options.getBoolean('spoiler'));
+	const zip_ajustes = interaction.options.getAttachment('ajustes');
 
-			if (game.status == 201) {
-				let thread_name = interaction.options.getString('nombre');
-				if (!thread_name) {
-					thread_name = `${random_words[Math.floor(Math.random() * random_words.length)]}${random_words[Math.floor(Math.random() * random_words.length)]}`;
-				}
-				thread_name = thread_name.substring(0, 20);
-
-				const multi_thread = await interaction.channel.threads.create({
-					name: thread_name,
-					autoArchiveDuration: 1440,
-				});
-				const thread_embed = new MessageEmbed()
-					.setColor('#0099ff')
-					.setTitle('Multiworld')
-					.setURL(game.data.url)
-					.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
-					.addField('URL', game.data.url)
-					.setTimestamp();
-				const multi_msg = await multi_thread.send({ embeds: [thread_embed] });
-				await multi_msg.pin();
-
-				const main_embed = new MessageEmbed()
-					.setColor('#0099ff')
-					.setTitle('Éxito')
-					.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
-					.setDescription(`Nueva partida de multiworld iniciada en ${multi_thread}`)
-					.setTimestamp();
-				await interaction.editReply({ embeds: [main_embed] });
-			}
-
-			else {
-				const image_name = `almeida${Math.floor(Math.random() * 4)}.png`;
-				const image = new MessageAttachment(`res/${image_name}`);
-				const embed = new MessageEmbed()
-					.setColor('#0099ff')
-					.setTitle('Error')
-					.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
-					.setDescription(`${game.status} ${game.statusText}`)
-					.addField('Detalles', game.data.text)
-					.setImage(`attachment://${image_name}`)
-					.setTimestamp();
-
-				await interaction.editReply({ embeds: [embed], files: [image] });
-			}
-			return;
-		}
+	if (zip_ajustes.size == 0 || zip_ajustes.contentType != 'application/zip') {
+		throw { 'message': 'El archivo adjunto no es un .zip de ajustes válido.' };
 	}
 
-	throw { 'message': 'No se ha subido recientemente un .zip en el canal de ajustes.' };
+	const game = await get_multiworld_game(zip_ajustes, interaction.options.getBoolean('spoiler'));
+
+	if (game.status == 201) {
+		let thread_name = interaction.options.getString('nombre');
+		if (!thread_name) {
+			thread_name = `${random_words[Math.floor(Math.random() * random_words.length)]}${random_words[Math.floor(Math.random() * random_words.length)]}`;
+		}
+		thread_name = thread_name.substring(0, 20);
+
+		const multi_thread = await interaction.channel.threads.create({
+			name: thread_name,
+			autoArchiveDuration: 1440,
+		});
+		const thread_embed = new MessageEmbed()
+			.setColor('#0099ff')
+			.setTitle('Multiworld')
+			.setURL(game.data.url)
+			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
+			.addField('URL', game.data.url)
+			.setTimestamp();
+		const multi_msg = await multi_thread.send({ embeds: [thread_embed] });
+		await multi_msg.pin();
+
+		const main_embed = new MessageEmbed()
+			.setColor('#0099ff')
+			.setTitle('Éxito')
+			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
+			.setDescription(`Nueva partida de multiworld iniciada en ${multi_thread}`)
+			.setTimestamp();
+		await interaction.editReply({ embeds: [main_embed] });
+	}
+
+	else {
+		const image_name = `almeida${Math.floor(Math.random() * 4)}.png`;
+		const image = new MessageAttachment(`res/${image_name}`);
+		const embed = new MessageEmbed()
+			.setColor('#0099ff')
+			.setTitle('Error')
+			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
+			.setDescription(`${game.status} ${game.statusText}`)
+			.addField('Detalles', game.data.text)
+			.setImage(`attachment://${image_name}`)
+			.setTimestamp();
+
+		await interaction.editReply({ embeds: [embed], files: [image] });
+	}
 }
 
 module.exports = { crear_multiworld };

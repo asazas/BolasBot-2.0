@@ -27,15 +27,8 @@ name: YourName{number}
 game:
   Slay the Spire: 1
 requires:
-  version: 0.2.0 # Version of Archipelago required for this yaml to work as expected.
+  version: 0.3.1 # Version of Archipelago required for this yaml to work as expected.
 # Shared Options supported by all games:
-accessibility:
-  items: 0 # Guarantees you will be able to acquire all items, but you may not be able to access all locations
-  locations: 50 # Guarantees you will be able to access all locations, and therefore all items
-  none: 0 # Guarantees only that the game is beatable. You may not be able to access all locations or acquire all items
-progression_balancing:
-  on: 50 # A system to reduce BK, as in times during which you can't do anything by moving your items into an earlier access sphere to make it likely you have stuff to do
-  off: 0 # Turn this off if you don't mind a longer multiworld, or can glitch/sequence break around missing items.
 Slay the Spire:
   character: # Pick What Character you wish to play with.
     ironclad: 50
@@ -53,6 +46,16 @@ Slay the Spire:
     #     and beat the heart to finish the game.
     false: 50
     true: 0
+  progression_balancing: # A system that moves progression earlier, to try and prevent the player from getting stuck and bored early.
+    false: 0
+    true: 50
+  accessibility: # Set rules for reachability of your items/locations.
+    #    Locations: ensure everything can be reached and acquired.
+    #    Items: ensure all logically relevant items can be acquired.
+    #    Minimal: ensure what is needed to reach your goal can be acquired.
+    locations: 0
+    items: 50
+    minimal: 0
   local_items: # Forces these items to be in their native world.
     []
 
@@ -65,10 +68,16 @@ Slay the Spire:
   start_hints: # Start with these item's locations prefilled into the !hint command.
     []
 
-  start_location_hints:
+  start_location_hints: # Start with these locations and their item prefilled into the !hint command
     []
 
-  exclude_locations:
+  exclude_locations: # Prevent these locations from having an important item
+    []
+
+  priority_locations: # Prevent these locations from having an unimportant item
+    []
+
+  item_links: # Share part of your item pool with other players.
     []
 
   

@@ -19,7 +19,7 @@
 
 description: Default Ocarina of Time Template # Used to describe your yaml. Useful if you have multiple files
 # Your name in-game. Spaces will be replaced with underscores and there is a 16 character limit
-name: Mat
+name: YourName{number}
 #{player} will be replaced with the player's slot number.
 #{PLAYER} will be replaced with the player's slot number if that slot number is greater than 1.
 #{number} will be replaced with the counter value of the name.
@@ -27,15 +27,8 @@ name: Mat
 game:
   Ocarina of Time: 1
 requires:
-  version: 0.2.0 # Version of Archipelago required for this yaml to work as expected.
+  version: 0.3.1 # Version of Archipelago required for this yaml to work as expected.
 # Shared Options supported by all games:
-accessibility:
-  items: 0 # Guarantees you will be able to acquire all items, but you may not be able to access all locations
-  locations: 50 # Guarantees you will be able to access all locations, and therefore all items
-  none: 0 # Guarantees only that the game is beatable. You may not be able to access all locations or acquire all items
-progression_balancing:
-  on: 50 # A system to reduce BK, as in times during which you can't do anything by moving your items into an earlier access sphere to make it likely you have stuff to do
-  off: 0 # Turn this off if you don't mind a longer multiworld, or can glitch/sequence break around missing items.
 Ocarina of Time:
   logic_rules: # Set the logic used for the generator.
     glitchless: 50
@@ -79,7 +72,7 @@ Ocarina of Time:
     random-high: 0
   starting_age: # Choose which age Link will start as.
     child: 50
-    adult: 50
+    adult: 0
   shuffle_interior_entrances: # Shuffles interior entrances. "Simple" shuffles houses and Great Fairies; "All" includes Windmill, Link's House, Temple of Time, and Kak potion shop.
     off: 50
     simple: 0
@@ -264,8 +257,8 @@ Ocarina of Time:
     false: 50
     true: 0
   shuffle_kokiri_sword: # Shuffle Kokiri Sword into the item pool.
-    false: 0
-    true: 20
+    false: 50
+    true: 0
   shuffle_ocarinas: # Shuffle the Fairy Ocarina and Ocarina of Time into the item pool.
     false: 50
     true: 0
@@ -282,8 +275,8 @@ Ocarina of Time:
     false: 50
     true: 0
   skip_child_zelda: # Game starts with Zelda's Letter, the item at Zelda's Lullaby, and the relevant events already completed.
-    false: 0
-    true: 20
+    false: 50
+    true: 0
   no_escape_sequence: # Skips the tower collapse sequence between the Ganondorf and Ganon fights.
     false: 0
     true: 50
@@ -306,28 +299,31 @@ Ocarina of Time:
     false: 0
     true: 50
   free_scarecrow: # Pulling out the ocarina near a scarecrow spot spawns Pierre without needing the song.
-    false: 0
-    true: 20
+    false: 50
+    true: 0
   fast_bunny_hood: # Bunny Hood lets you move 1.5x faster like in Majora's Mask.
-    false: 0
-    true: 20
+    false: 50
+    true: 0
   chicken_count: # Controls the number of Cuccos for Anju to give an item as child.
     # you can add additional values between minimum and maximum
     0: 0 # minimum value
     7: 50 # maximum value
-    random: 20
+    random: 0
     random-low: 0
     random-high: 0
   correct_chest_sizes: # Changes chests containing progression into large chests, and nonprogression into small chests.
-    false: 0
-    true: 20
+    false: 50
+    true: 0
   hints: # Gossip Stones can give hints about item locations.
     none: 0
     mask: 0
     agony: 0
     always: 50
+  misc_hints: # Controls whether the Temple of Time altar gives dungeon prize info and whether Ganondorf hints the Light Arrows.
+    false: 0
+    true: 50
   hint_dist: # Choose the hint distribution to use. Affects the frequency of strong hints, which items are always hinted, etc.
-    balanced: 0
+    balanced: 50
     ddr: 0
     league: 0
     mw2: 0
@@ -335,7 +331,7 @@ Ocarina of Time:
     strong: 0
     tournament: 0
     useless: 0
-    very_strong: 20
+    very_strong: 0
     async: 0
   text_shuffle: # Randomizes text in the game for comedic effect.
     none: 50
@@ -361,11 +357,11 @@ Ocarina of Time:
     midnight: 0
     witching_hour: 0
   start_with_consumables: # Start the game with full Deku Sticks and Deku Nuts.
-    false: 0
-    true: 20
+    false: 50
+    true: 0
   start_with_rupees: # Start with a full wallet. Wallet upgrades will also fill your wallet.
-    false: 0
-    true: 20
+    false: 50
+    true: 0
   item_pool_value: # Changes the number of items available in the game.
     plentiful: 0
     balanced: 50
@@ -388,10 +384,10 @@ Ocarina of Time:
     odd_mushroom: 0
     poachers_saw: 0
     broken_sword: 0
-    prescription: 0
+    prescription: 50
     eyeball_frog: 0
     eyedrops: 0
-    claim_check: 20
+    claim_check: 0
   logic_latest_adult_trade: # Latest item that can appear in the adult trade sequence.
     pocket_egg: 0
     pocket_cucco: 0
@@ -424,9 +420,9 @@ Ocarina of Time:
     false: 50
     true: 0
   kokiri_color: # Choose a color. "random_choice" selects a random option. "completely_random" generates a random hex code.
-    random_choice: 20
+    random_choice: 0
     completely_random: 0
-    kokiri_green: 0
+    kokiri_green: 50
     goron_red: 0
     zora_blue: 0
     black: 0
@@ -458,10 +454,10 @@ Ocarina of Time:
     dark_green: 0
     lumen: 0
   goron_color: # Choose a color. "random_choice" selects a random option. "completely_random" generates a random hex code.
-    random_choice: 20
+    random_choice: 0
     completely_random: 0
     kokiri_green: 0
-    goron_red: 0
+    goron_red: 50
     zora_blue: 0
     black: 0
     white: 0
@@ -492,11 +488,11 @@ Ocarina of Time:
     dark_green: 0
     lumen: 0
   zora_color: # Choose a color. "random_choice" selects a random option. "completely_random" generates a random hex code.
-    random_choice: 20
+    random_choice: 0
     completely_random: 0
     kokiri_green: 0
     goron_red: 0
-    zora_blue: 0
+    zora_blue: 50
     black: 0
     white: 0
     azure_blue: 0
@@ -1234,6 +1230,16 @@ Ocarina of Time:
   death_link: # When you die, everyone dies. Of course the reverse is true too.
     false: 50
     true: 0
+  progression_balancing: # A system that moves progression earlier, to try and prevent the player from getting stuck and bored early.
+    false: 0
+    true: 50
+  accessibility: # Set rules for reachability of your items/locations.
+    #    Locations: ensure everything can be reached and acquired.
+    #    Items: ensure all logically relevant items can be acquired.
+    #    Minimal: ensure what is needed to reach your goal can be acquired.
+    locations: 0
+    items: 50
+    minimal: 0
   local_items: # Forces these items to be in their native world.
     []
 
@@ -1241,15 +1247,21 @@ Ocarina of Time:
     []
 
   start_inventory: # Start with these items.
-    {Bunny Hood}
+    {}
 
   start_hints: # Start with these item's locations prefilled into the !hint command.
     []
 
-  start_location_hints:
+  start_location_hints: # Start with these locations and their item prefilled into the !hint command
     []
 
-  exclude_locations:
+  exclude_locations: # Prevent these locations from having an important item
+    []
+
+  priority_locations: # Prevent these locations from having an unimportant item
+    []
+
+  item_links: # Share part of your item pool with other players.
     []
 
   

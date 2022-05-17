@@ -17,7 +17,7 @@
 # To test if your yaml is valid or not, you can use this website:
 # http://www.yamllint.com/
 
-description: Default Final Fantasy Template # Used to describe your yaml. Useful if you have multiple files
+description: Default Meritous Template # Used to describe your yaml. Useful if you have multiple files
 # Your name in-game. Spaces will be replaced with underscores and there is a 16 character limit
 name: YourName{number}
 #{player} will be replaced with the player's slot number.
@@ -25,20 +25,35 @@ name: YourName{number}
 #{number} will be replaced with the counter value of the name.
 #{NUMBER} will be replaced with the counter value of the name if the counter value is greater than 1.
 game:
-  Final Fantasy: 1
+  Meritous: 1
 requires:
-  version: 0.2.3 # Version of Archipelago required for this yaml to work as expected.
+  version: 0.3.1 # Version of Archipelago required for this yaml to work as expected.
 # Shared Options supported by all games:
-Final Fantasy:
-  locations:
-    {}
-
-  items:
-    {}
-
-  rules:
-    {}
-
+Meritous:
+  goal: # Which goal must be achieved to trigger completion.
+    return_the_cursed_seal: 50
+    any_ending: 0
+    true_ending: 0
+  include_psi_keys: # Whether PSI Keys should be included in the multiworld pool. If not, they will be in their vanilla locations.
+    false: 0
+    true: 50
+  include_evolution_traps: # 
+    #        Whether evolution traps should be included in the multiworld pool.
+    #        If not, they will be activated by bosses, as in vanilla.
+    #    
+    false: 50
+    true: 0
+  item_cache_cost: # 
+    #        Determines how the cost for Alpha, Beta, and Gamma caches will scale.
+    #        Vanilla has a total cost of about 1B crystals on Normal difficulty;
+    #        Reduced has about 750M; and Heavily Reduced has about 600M.
+    #    
+    vanilla: 50
+    reduced: 0
+    heavily_reduced: 0
+  death_link: # When you die, everyone dies. Of course the reverse is true too.
+    false: 50
+    true: 0
   progression_balancing: # A system that moves progression earlier, to try and prevent the player from getting stuck and bored early.
     false: 0
     true: 50
@@ -65,6 +80,12 @@ Final Fantasy:
     []
 
   exclude_locations: # Prevent these locations from having an important item
+    []
+
+  priority_locations: # Prevent these locations from having an unimportant item
+    []
+
+  item_links: # Share part of your item pool with other players.
     []
 
   

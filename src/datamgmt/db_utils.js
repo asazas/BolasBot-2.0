@@ -279,37 +279,7 @@ async function set_player_score_channel(sequelize, score_channel) {
 	}
 }
 
-/**
- * @summary Invocado por el comando /multiworld yaml_channel.
- *
- * @description Almacena el ID del canal para ajustes de multiworld en la tabla de variables globales del servidor.
- *
- * @param {Sequelize} sequelize     Base de datos del servidor.
- * @param {string}    multi_channel ID del canal para ajustes de multiworld.
- *
- * @returns {[number]} Array con un elemento: el número de filas afectadas por la operación.
- */
-async function set_multi_settings_channel(sequelize, multi_channel) {
-	const global_var = sequelize.models.GlobalVar;
-	try {
-		return await sequelize.transaction(async (t) => {
-			return await global_var.update({ MultiworldSettingsChannel: multi_channel }, {
-				where: {
-					ServerId: {
-						[Op.ne]: null,
-					},
-				},
-				transaction: t,
-			});
-		});
-	}
-	catch (error) {
-		console.log(error['message']);
-	}
-}
-
 module.exports = {
 	get_or_insert_player, get_ranked_players, update_player_score, reset_player_scores, get_global_var,
 	set_async_submit_category, set_async_history_channel, set_race_history_channel, set_player_score_channel,
-	set_multi_settings_channel,
 };

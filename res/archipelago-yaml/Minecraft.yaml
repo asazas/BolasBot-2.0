@@ -27,44 +27,42 @@ name: YourName{number}
 game:
   Minecraft: 1
 requires:
-  version: 0.2.0 # Version of Archipelago required for this yaml to work as expected.
+  version: 0.3.1 # Version of Archipelago required for this yaml to work as expected.
 # Shared Options supported by all games:
-accessibility:
-  items: 0 # Guarantees you will be able to acquire all items, but you may not be able to access all locations
-  locations: 50 # Guarantees you will be able to access all locations, and therefore all items
-  none: 0 # Guarantees only that the game is beatable. You may not be able to access all locations or acquire all items
-progression_balancing:
-  on: 50 # A system to reduce BK, as in times during which you can't do anything by moving your items into an earlier access sphere to make it likely you have stuff to do
-  off: 0 # Turn this off if you don't mind a longer multiworld, or can glitch/sequence break around missing items.
 Minecraft:
-  advancement_goal: # Number of advancements required to spawn the Ender Dragon.
+  advancement_goal: # Number of advancements required to spawn bosses.
     # you can add additional values between minimum and maximum
     0: 0 # minimum value
-    87: 0 # maximum value
+    92: 0 # maximum value
     random: 0
     random-low: 0
     random-high: 0
-    50: 50
-  egg_shards_required: # Number of dragon egg shards to collect before the Ender Dragon will spawn.
+    40: 50
+  egg_shards_required: # Number of dragon egg shards to collect to spawn bosses.
     # you can add additional values between minimum and maximum
     0: 50 # minimum value
-    30: 0 # maximum value
+    40: 0 # maximum value
     random: 0
     random-low: 0
     random-high: 0
   egg_shards_available: # Number of dragon egg shards available to collect.
     # you can add additional values between minimum and maximum
     0: 50 # minimum value
-    30: 0 # maximum value
+    40: 0 # maximum value
     random: 0
     random-low: 0
     random-high: 0
+  required_bosses: # Bosses which must be defeated to finish the game.
+    none: 0
+    ender_dragon: 50
+    wither: 0
+    both: 0
   shuffle_structures: # Enables shuffling of villages, outposts, fortresses, bastions, and end cities.
-    false: 50
-    true: 0
+    false: 0
+    true: 50
   structure_compasses: # Adds structure compasses to the item pool, which point to the nearest indicated structure.
-    false: 50
-    true: 0
+    false: 0
+    true: 50
   bee_traps: # Replaces a percentage of junk items with bee traps, which spawn multiple angered bees around every player when received.
     # you can add additional values between minimum and maximum
     0: 50 # minimum value
@@ -79,15 +77,31 @@ Minecraft:
   include_hard_advancements: # Enables certain RNG-reliant or tedious advancements.
     false: 50
     true: 0
-  include_insane_advancements: # Enables the extremely difficult advancements "How Did We Get Here?" and "Adventuring Time."
+  include_unreasonable_advancements: # Enables the extremely difficult advancements "How Did We Get Here?" and "Adventuring Time."
     false: 50
     true: 0
-  include_postgame_advancements: # Enables advancements that require spawning and defeating the Ender Dragon.
+  include_postgame_advancements: # Enables advancements that require spawning and defeating the required bosses.
     false: 50
     true: 0
   send_defeated_mobs: # Send killed mobs to other Minecraft worlds which have this option enabled.
     false: 50
     true: 0
+  starting_items: # Start with these items. Each entry should be of this format: {item: "item_name", amount: #, nbt: "nbt_string"}
+    []
+
+  death_link: # When you die, everyone dies. Of course the reverse is true too.
+    false: 50
+    true: 0
+  progression_balancing: # A system that moves progression earlier, to try and prevent the player from getting stuck and bored early.
+    false: 0
+    true: 50
+  accessibility: # Set rules for reachability of your items/locations.
+    #    Locations: ensure everything can be reached and acquired.
+    #    Items: ensure all logically relevant items can be acquired.
+    #    Minimal: ensure what is needed to reach your goal can be acquired.
+    locations: 0
+    items: 50
+    minimal: 0
   local_items: # Forces these items to be in their native world.
     []
 
@@ -100,10 +114,16 @@ Minecraft:
   start_hints: # Start with these item's locations prefilled into the !hint command.
     []
 
-  start_location_hints:
+  start_location_hints: # Start with these locations and their item prefilled into the !hint command
     []
 
-  exclude_locations:
+  exclude_locations: # Prevent these locations from having an important item
+    []
+
+  priority_locations: # Prevent these locations from having an unimportant item
+    []
+
+  item_links: # Share part of your item pool with other players.
     []
 
   
