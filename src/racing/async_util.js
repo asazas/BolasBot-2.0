@@ -147,6 +147,11 @@ async function async_crear(interaction, db) {
 	}
 	const channel_name = name.substring(0, 20);
 
+	// Crear o recuperar seed
+	const seed_details = await seed_in_create_race(interaction);
+	const full_preset = seed_details['full_preset'];
+	const seed_info = seed_details['seed_info'];
+
 	// Tomar categoría de async-submit, crear si no existe.
 	const global_var = await get_global_var(db);
 	let async_submit_category = null;
@@ -164,11 +169,6 @@ async function async_crear(interaction, db) {
 		});
 		await set_async_submit_category(db, async_submit_category.id);
 	}
-
-	// Crear o recuperar seed
-	const seed_details = await seed_in_create_race(interaction);
-	const full_preset = seed_details['full_preset'];
-	const seed_info = seed_details['seed_info'];
 
 	// Crear canales y rol para la async
 	let async_role = null;

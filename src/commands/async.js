@@ -7,7 +7,7 @@ const { async_crear, async_cerrar, async_reabrir, async_purgar } = require('../r
 const preset_files = glob.sync('rando-settings/**/*.json');
 const preset_option = new SlashCommandStringOption();
 preset_option.setName('preset')
-	.setDescription('Preset.');
+	.setDescription('Preset disponible en BolasBot.');
 
 for (const file of preset_files) {
 	const filename = path.basename(file, '.json');
@@ -22,19 +22,28 @@ command.data = new SlashCommandBuilder()
 	.addSubcommand(subcommand =>
 		subcommand.setName('crear')
 			.setDescription('Crea una carrera asíncrona.')
+
 			.addStringOption(option =>
 				option.setName('nombre')
 					.setDescription('Nombre de la carrera asíncrona'))
+
 			.addBooleanOption(option =>
 				option.setName('ranked')
 					.setDescription('Determina si la carrera es puntuable y vinculante.'))
-			.addStringOption(preset_option)
-			.addStringOption(option =>
-				option.setName('extra')
-					.setDescription('Opciones extra para preset.'))
+
+			.addAttachmentOption(option =>
+				option.setName('archivo')
+					.setDescription('Archivo de preset .json (formato BolasBot) o .yaml (formato SahasrahBot) para generar la seed.'))
+
 			.addStringOption(option =>
 				option.setName('url')
-					.setDescription('URL de la seed. Tiene precedencia sobre el preset.')))
+					.setDescription('URL de la seed.'))
+
+			.addStringOption(preset_option)
+
+			.addStringOption(option =>
+				option.setName('extra')
+					.setDescription('Opciones extra para preset.')))
 
 	.addSubcommand(subcommand =>
 		subcommand.setName('cerrar')

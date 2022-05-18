@@ -25,7 +25,8 @@
     "sequelize": "^6.19.1",
     "slugid": "^3.0.0",
     "sqlite3": "^5.0.8",
-    "tmp": "^0.2.1"
+    "tmp": "^0.2.1",
+    "yaml": "^2.1.0"
   },
   "devDependencies": {
     "eslint": "^8.15.0"

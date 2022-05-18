@@ -299,7 +299,62 @@ async function generate_random(preset_data, extra, recursion = 0) {
 
 
 /**
- * @summary Inicio de la generación de una seed mediante preset, llamado en /seed crear, /seed multi,
+ * @summary Inicio de la generación de una seed mediante archivo de preset, llamado en /seed crear, /seed multi,
+ * /async crear y /carrera crear.
+ *
+ * @description Llama a la rutina de generación de seed correspondiente al archivo de preset dado.
+ *
+ * @param {object} cont_preset   Objeto que incluye los contenidos del archivo de preset.
+ * @param {string} nombre_preset Nombre del preset.
+ * @param {string} extra         Lista de opciones extra, separadas por espacios.
+ * @param {number} jugadores     Número de jugadores (solo relevante en /seed multi.)
+ * @param {string} nombres       Lista de nombres de jugadores, separados por comas (solo relevante en
+ *                               /seed multi.)
+ * @param {number} recursion     Niveles de recursión, solo relevante en presets de tipo 'random' para evitar un
+ *                               potencial bucle infinito en la generación de la seed.
+ *
+ * @returns {[string, object]} Un array con dos elementos: en la posición [0], un string que contiene el preset y
+ * opciones extra especificadas en el comando; y en la posición [1], un objeto que contiene los datos de la seed
+ * generada, tal y como lo devuelve la API del randomizer correspondiente.
+ */
+async function generate_from_file(cont_preset, nombre_preset, extra, jugadores = 1, nombres = '', recursion = 0) {
+	const full_preset = extra ? nombre_preset + ' ' + extra : nombre_preset;
+	if (cont_preset['randomizer']) {
+		switch (cont_preset['randomizer'].toLowerCase()) {
+		case 'alttp':
+		case 'alttpr':
+			return [full_preset, await generate_alttpr(cont_preset, extra)];
+		case 'mystery':
+			return [full_preset, await generate_alttpr(mystery_settings(cont_preset), extra)];
+		case 'sm':
+			return [full_preset, await generate_sm(cont_preset, extra, jugadores, nombres)];
+		case 'smz3':
+			return [full_preset, await generate_smz3(cont_preset, extra, jugadores, nombres)];
+		case 'varia':
+			return [full_preset, await generate_varia(cont_preset, extra)];
+		case 'random':
+			return await generate_random(cont_preset, extra, recursion);
+		}
+	}
+
+	// Algunos presets en SahasrahBot no tienen un parámetro "randomizer"
+	// Presets de ALTTPR tienen un parámetro "customizer" cuyo valor es true/false
+	if (cont_preset['customizer'] !== undefined && typeof cont_preset['customizer'] == 'boolean') {
+		return [full_preset, await generate_alttpr(cont_preset, extra)];
+	}
+
+	// Presets de Mystery no tienen un parámetro "settings"
+	if (cont_preset['settings'] === undefined) {
+		return [full_preset, await generate_alttpr(mystery_settings(cont_preset), extra)];
+	}
+
+	// Si no se retornó ningún valor todavía, el preset no es válido
+	throw { 'message': 'El archivo de preset proporcionado no es válido.' };
+}
+
+
+/**
+ * @summary Inicio de la generación de una seed mediante nombre de preset, llamado en /seed crear, /seed multi,
  * /async crear y /carrera crear.
  *
  * @description Comprueba que existe el archivo del preset invocado y llama a la rutina de generación
@@ -317,24 +372,10 @@ async function generate_random(preset_data, extra, recursion = 0) {
  * generada, tal y como lo devuelve la API del randomizer correspondiente.
  */
 async function generate_from_preset(preset, extra, jugadores = 1, nombres = '', recursion = 0) {
-	const full_preset = extra ? preset + ' ' + extra : preset;
 	const preset_file_loc = preset_file(preset);
 	if (preset_file_loc) {
 		const preset_data = JSON.parse(fs.readFileSync(preset_file_loc));
-		switch (preset_data['randomizer']) {
-		case 'alttp':
-			return [full_preset, await generate_alttpr(preset_data, extra)];
-		case 'mystery':
-			return [full_preset, await generate_alttpr(mystery_settings(preset_data), extra)];
-		case 'sm':
-			return [full_preset, await generate_sm(preset_data, extra, jugadores, nombres)];
-		case 'smz3':
-			return [full_preset, await generate_smz3(preset_data, extra, jugadores, nombres)];
-		case 'varia':
-			return [full_preset, await generate_varia(preset_data, extra)];
-		case 'random':
-			return await generate_random(preset_data, extra, recursion);
-		}
+		return await generate_from_file(preset_data, preset, extra, jugadores, nombres, recursion);
 	}
 }
 
@@ -387,4 +428,4 @@ async function retrieve_from_url(url) {
 	return null;
 }
 
-module.exports = { preset_file, generate_from_preset, generate_varia_finetune, retrieve_from_url };
+module.exports = { preset_file, generate_from_file, generate_from_preset, generate_varia_finetune, retrieve_from_url };

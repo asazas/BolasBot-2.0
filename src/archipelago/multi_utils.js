@@ -8,7 +8,6 @@ const axios = require('axios').default;
 const FormData = require('form-data');
 const tmp = require('tmp');
 
-const { get_global_var } = require('../datamgmt/db_utils');
 const { random_words } = require('../racing/async_util');
 
 

@@ -1,10 +1,33 @@
 const glob = require('glob');
 const path = require('path');
+const gaxios = require('gaxios');
+const YAML = require('yaml');
 const { SlashCommandBuilder, SlashCommandStringOption } = require('@discordjs/builders');
-const { generate_from_preset, generate_varia_finetune, retrieve_from_url, preset_file } = require('../seedgen/seedgen');
+const { generate_from_preset, generate_varia_finetune, retrieve_from_url, preset_file, generate_from_file } = require('../seedgen/seedgen');
 const { seed_info_embed, varia_info_embed } = require('../seedgen/info_embeds');
 const { preset_help, extra_help } = require('../seedgen/help');
 const { CommandInteraction } = require('discord.js');
+
+
+/**
+ * @summary Llamado al terminar el proceso de generación de una seed con /seed crear y /seed multi.
+ *
+ * @description Obtiene un embed con los datos de la seed generada y responde al comando inicialmente invocado.
+ *
+ * @param {CommandInteraction} interaction Interacción correspondiente al comando inicialmente invocado.
+ * @param {object}             seed        Objeto con los datos de la seed, tal y como lo devuelve la API del
+ *                                         randomizer correspondiente.
+ * @param {string}             full_preset Preset de la seed generada y opciones extra, separadas por espacios.
+ */
+async function responder_seed(interaction, seed, full_preset) {
+	const info_embed = seed_info_embed(seed, interaction, full_preset);
+	if (info_embed[1]) {
+		await interaction.editReply({ embeds: [info_embed[0]], files: [info_embed[1]] });
+	}
+	else {
+		await interaction.editReply({ embeds: [info_embed[0]] });
+	}
+}
 
 
 /**
@@ -19,25 +42,52 @@ const { CommandInteraction } = require('discord.js');
  */
 async function seed_crear(interaction, jugadores = 1, nombres = '') {
 	await interaction.deferReply();
-	const preset = interaction.options.getString('preset').toLowerCase();
+
 	let extra = interaction.options.getString('extra');
 	if (extra) {
 		extra = extra.toLowerCase();
 	}
-	const [full_preset, seed] = await generate_from_preset(preset, extra, jugadores, nombres);
 
-	const info_embed = seed_info_embed(seed, interaction, full_preset);
-	if (info_embed[1]) {
-		await interaction.editReply({ embeds: [info_embed[0]], files: [info_embed[1]] });
+	const archivo = interaction.options.getAttachment('archivo');
+	if (archivo) {
+		const settings_file = await gaxios.request({ url: archivo.url, responseType: 'text', retry: true });
+		let settings_data;
+		try {
+			settings_data = JSON.parse(settings_file.data);
+		}
+		catch (error1) {
+			try {
+				settings_data = YAML.parse(settings_file.data);
+			}
+			catch (error2) {
+				throw { 'message': 'El archivo proporcionado no es un fichero .json o .yaml válido.' };
+			}
+		}
+		const [full_preset, seed] = await generate_from_file(settings_data, archivo.name, extra, jugadores, nombres);
+		responder_seed(interaction, seed, full_preset);
+		return;
 	}
-	else {
-		await interaction.editReply({ embeds: [info_embed[0]] });
+
+	const url = interaction.options.getString('url');
+	if (url) {
+		await seed_info(interaction);
+		return;
 	}
+
+	let preset = interaction.options.getString('preset');
+	if (preset) {
+		preset = preset.toLowerCase();
+		const [full_preset, seed] = await generate_from_preset(preset, extra, jugadores, nombres);
+		responder_seed(interaction, seed, full_preset);
+		return;
+	}
+
+	throw { 'message': 'No se ha dado archivo, URL ni preset para crear la seed.' };
 }
 
 
 /**
- * @summary Punto de entrada para /seed info.
+ * @summary Respuesta para /seed crear cuando se pasa una URL como parámetro.
  *
  * @description Obtiene la información de una seed a partir de su URL y responde con un embed.
  *
@@ -45,7 +95,6 @@ async function seed_crear(interaction, jugadores = 1, nombres = '') {
  */
 async function seed_info(interaction) {
 	const url = interaction.options.getString('url');
-	await interaction.deferReply();
 	const seed = await retrieve_from_url(url);
 
 	if (seed) {
@@ -66,8 +115,8 @@ async function seed_info(interaction) {
 const preset_files = glob.sync('rando-settings/**/*.json');
 const preset_option = new SlashCommandStringOption();
 preset_option.setName('preset')
-	.setDescription('Preset.')
-	.setRequired(true);
+	.setDescription('Preset disponible en BolasBot.');
+
 const preset_option_help = new SlashCommandStringOption();
 preset_option_help.setName('preset')
 	.setDescription('Preset del que obtener información');
@@ -82,8 +131,8 @@ for (const file of preset_files) {
 const sm_preset_files = glob.sync('rando-settings/sm*/*.json');
 const preset_multi = new SlashCommandStringOption();
 preset_multi.setName('preset')
-	.setDescription('Preset.')
-	.setRequired(true);
+	.setDescription('Preset disponible en BolasBot.');
+
 for (const file of sm_preset_files) {
 	const filename = path.basename(file, '.json');
 	const dirname = path.basename(path.dirname(file)).toUpperCase();
@@ -96,8 +145,18 @@ command.data = new SlashCommandBuilder()
 	.setDescription('Genera seed.')
 	.addSubcommand(subcommand =>
 		subcommand.setName('crear')
-			.setDescription('Crea una seed a partir de un preset.')
+			.setDescription('Crea una seed a partir de un preset adjunto, URL o preset de BolasBot.')
+
+			.addAttachmentOption(option =>
+				option.setName('archivo')
+					.setDescription('Archivo de preset .json (formato BolasBot) o .yaml (formato SahasrahBot)'))
+
+			.addStringOption(option =>
+				option.setName('url')
+					.setDescription('URL de la seed.'))
+
 			.addStringOption(preset_option)
+
 			.addStringOption(option =>
 				option.setName('extra')
 					.setDescription('Opciones extra.')))
@@ -120,29 +179,29 @@ command.data = new SlashCommandBuilder()
 	.addSubcommand(subcommand =>
 		subcommand.setName('multi')
 			.setDescription('Crear partida de multiworld via SMZ3.')
-			.addStringOption(preset_multi)
+
 			.addIntegerOption(option =>
 				option.setName('jugadores')
 					.setDescription('Número de jugadores, máximo 20')
 					.setRequired(true))
+
+			.addAttachmentOption(option =>
+				option.setName('archivo')
+					.setDescription('Archivo de preset .json (formato BolasBot) o .yaml (formato SahasrahBot)'))
+
+			.addStringOption(preset_multi)
+
 			.addStringOption(option =>
 				option.setName('nombres')
 					.setDescription('Lista de nombres de jugadores, separados por comas'))
+
 			.addStringOption(option =>
 				option.setName('extra')
 					.setDescription('Opciones extra.')))
 
 	.addSubcommand(subcommand =>
-		subcommand.setName('info')
-			.setDescription('Obtener información de una seed a partir de su URL.')
-			.addStringOption(option =>
-				option.setName('url')
-					.setDescription('URL de la seed.')
-					.setRequired(true)))
-
-	.addSubcommand(subcommand =>
 		subcommand.setName('config')
-			.setDescription('Obtener el archivo de configuración de un preset.')
+			.setDescription('Obtener el archivo de configuración de un preset de BolasBot.')
 			.addStringOption(preset_option))
 
 	.addSubcommandGroup(subcommandGroup =>
@@ -170,11 +229,6 @@ command.execute = async function(interaction) {
 		if (jugadores < 1) jugadores = 1;
 		const nombres = interaction.options.getString('nombres');
 		await seed_crear(interaction, jugadores, nombres);
-		return;
-	}
-
-	else if (interaction.options.getSubcommand() == 'info') {
-		await seed_info(interaction);
 		return;
 	}
 
