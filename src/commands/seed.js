@@ -117,6 +117,11 @@ const preset_option = new SlashCommandStringOption();
 preset_option.setName('preset')
 	.setDescription('Preset disponible en BolasBot.');
 
+const preset_option_config = new SlashCommandStringOption();
+preset_option_config.setName('preset')
+	.setDescription('Preset del que obtener el archivo de configuración')
+	.setRequired(true);
+
 const preset_option_help = new SlashCommandStringOption();
 preset_option_help.setName('preset')
 	.setDescription('Preset del que obtener información');
@@ -125,6 +130,7 @@ for (const file of preset_files) {
 	const filename = path.basename(file, '.json');
 	const dirname = path.basename(path.dirname(file)).toUpperCase();
 	preset_option.addChoices({ name: `${dirname} - ${filename}`, value: filename });
+	preset_option_config.addChoices({ name: `${dirname} - ${filename}`, value: filename });
 	preset_option_help.addChoices({ name: `${dirname} - ${filename}`, value: filename });
 }
 
@@ -202,7 +208,7 @@ command.data = new SlashCommandBuilder()
 	.addSubcommand(subcommand =>
 		subcommand.setName('config')
 			.setDescription('Obtener el archivo de configuración de un preset de BolasBot.')
-			.addStringOption(preset_option))
+			.addStringOption(preset_option_config))
 
 	.addSubcommandGroup(subcommandGroup =>
 		subcommandGroup.setName('ayuda')
