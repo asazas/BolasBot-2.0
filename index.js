@@ -28,9 +28,11 @@ for (const file of commandFiles) {
 	discord_client.commands.set(command.data.name, command);
 }
 
-// Prepare Twitch client
-const twitch_auth_provider = new ClientCredentialsAuthProvider(twitchClientId, twitchClientSecret);
-const twitch_api_client = new ApiClient({ authProvider: twitch_auth_provider });
+// Preparar cliente de Twitch (si se proporcionan credenciales)
+let twitch_api_client = null;
+if (twitchClientId && twitchClientSecret) {
+	twitch_api_client = new ApiClient({ authProvider: new ClientCredentialsAuthProvider(twitchClientId, twitchClientSecret) });
+}
 
 const db = {};
 const role_channels = {};
@@ -50,29 +52,31 @@ discord_client.once('ready', async () => {
 	// populate seed code emojis (if available)
 	await initialize_code_emojis(discord_client, discordEmojiGuildId);
 
-	// schedule stream alerts
-	const job = new CronJob('0 */12 * * * *', async function() {
-		try {
-			let all_streams = {};
-			const guild_streams_list = [];
-			for (const my_guild of discord_client.guilds.cache.map(guild => guild)) {
-				const my_guild_streams = await streams_data(db[my_guild.id]);
-				if (Object.entries(my_guild_streams).length > 0) {
-					all_streams = { ...all_streams, ...my_guild_streams };
-					guild_streams_list.push([my_guild, my_guild_streams]);
+	// schedule stream alerts, if twitch client is available
+	if (twitch_api_client) {
+		const job = new CronJob('0 */12 * * * *', async function() {
+			try {
+				let all_streams = {};
+				const guild_streams_list = [];
+				for (const my_guild of discord_client.guilds.cache.map(guild => guild)) {
+					const my_guild_streams = await streams_data(db[my_guild.id]);
+					if (Object.entries(my_guild_streams).length > 0) {
+						all_streams = { ...all_streams, ...my_guild_streams };
+						guild_streams_list.push([my_guild, my_guild_streams]);
+					}
+				}
+				if (Object.entries(all_streams).length === 0) return;
+				const twitch_info = await get_twitch_streams_info(Object.keys(all_streams), twitch_api_client);
+				for (const [my_guild, my_guild_streams] of guild_streams_list) {
+					await announce_live_streams(my_guild, my_guild_streams, db[my_guild.id], twitch_info);
 				}
 			}
-			if (Object.entries(all_streams).length === 0) return;
-			const twitch_info = await get_twitch_streams_info(Object.keys(all_streams), twitch_api_client);
-			for (const [my_guild, my_guild_streams] of guild_streams_list) {
-				await announce_live_streams(my_guild, my_guild_streams, db[my_guild.id], twitch_info);
+			catch (error) {
+				console.log(error);
 			}
-		}
-		catch (error) {
-			console.log(error);
-		}
-	});
-	job.start();
+		});
+		job.start();
+	}
 
 	console.log(`Ready! Logged in as ${discord_client.user.tag}`);
 });
