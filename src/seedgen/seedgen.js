@@ -72,6 +72,9 @@ async function generate_alttpr(preset_data, extra) {
 		if (extra_params.includes('hard')) {
 			preset_data['settings']['item']['pool'] = 'hard';
 		}
+		if (extra_params.includes('keys')) {
+			preset_data['settings']['dungeon_items'] = 'full';
+		}
 		if (extra_params.includes('botas')) {
 			preset_data = add_default_customizer(preset_data);
 			preset_data['customizer'] = true;
