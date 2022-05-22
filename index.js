@@ -1,4 +1,6 @@
 const fs = require('fs');
+const glob = require('glob');
+const path = require('path');
 // Require the necessary discord.js classes
 const { Client, Collection, Intents } = require('discord.js');
 const { ClientCredentialsAuthProvider } = require('@twurple/auth');
@@ -26,6 +28,33 @@ const commandFiles = fs.readdirSync('./src/commands').filter(file => file.endsWi
 for (const file of commandFiles) {
 	const command = require(`./src/commands/${file}`);
 	discord_client.commands.set(command.data.name, command);
+}
+
+// Registrar presets de BolasBot (clasificarlos por randomizers para sugerencias de opciones extra)
+const all_extra = ['spoiler', 'noqs', 'pistas', 'ad', 'hard', 'keys', 'botas', 'split'];
+const alttp_extra = ['spoiler', 'noqs', 'pistas', 'ad', 'hard', 'keys', 'botas'];
+const presets_alttp = [];
+for (const file of glob.sync('rando-settings/alttp/*.json')) {
+	presets_alttp.push(path.basename(file, '.json'));
+}
+const presets_mystery = [];
+for (const file of glob.sync('rando-settings/mystery/*.json')) {
+	presets_mystery.push(path.basename(file, '.json'));
+}
+const sm_extra = ['spoiler', 'split', 'hard'];
+const presets_sm = [];
+for (const file of glob.sync('rando-settings/sm/*.json')) {
+	presets_sm.push(path.basename(file, '.json'));
+}
+const smz3_extra = ['spoiler', 'ad', 'hard', 'keys'];
+const presets_smz3 = [];
+for (const file of glob.sync('rando-settings/smz3/*.json')) {
+	presets_smz3.push(path.basename(file, '.json'));
+}
+const varia_extra = ['spoiler'];
+const presets_varia = [];
+for (const file of glob.sync('rando-settings/varia/*.json')) {
+	presets_varia.push(path.basename(file, '.json'));
 }
 
 // Preparar cliente de Twitch (si se proporcionan credenciales)
@@ -85,9 +114,33 @@ discord_client.once('ready', async () => {
 /**
  * Código de respuesta a interacciones.
  *
+ * Si la interacción es autocompletado (para opciones extra en seeds), presentar sugerencias.
  * Si la interacción es un comando, ejecutarlo.
  */
 discord_client.on('interactionCreate', async interaction => {
+
+	if (interaction.isAutocomplete) {
+		const archivo = interaction.options.getAttachment('archivo');
+		const url = interaction.options.getString('url');
+		if (archivo != null || url != null) {
+			return interaction.respond(all_extra.map((el) => ({ name: el, value: el })));
+		}
+		const preset = interaction.options.getString('preset');
+		if (presets_alttp.includes(preset) || presets_mystery.includes(preset)) {
+			return interaction.respond(alttp_extra.map((el) => ({ name: el, value: el })));
+		}
+		if (presets_sm.includes(preset)) {
+			return interaction.respond(sm_extra.map((el) => ({ name: el, value: el })));
+		}
+		if (presets_smz3.includes(preset)) {
+			return interaction.respond(smz3_extra.map((el) => ({ name: el, value: el })));
+		}
+		if (presets_varia.includes(preset)) {
+			return interaction.respond(varia_extra.map((el) => ({ name: el, value: el })));
+		}
+		return interaction.respond(all_extra.map((el) => ({ name: el, value: el })));
+	}
+
 	if (!interaction.isCommand()) return;
 
 	const command = discord_client.commands.get(interaction.commandName);

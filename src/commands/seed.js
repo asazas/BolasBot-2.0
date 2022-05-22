@@ -165,7 +165,8 @@ command.data = new SlashCommandBuilder()
 
 			.addStringOption(option =>
 				option.setName('extra')
-					.setDescription('Opciones extra.')))
+					.setDescription('Opciones extra.')
+					.setAutocomplete(true)))
 
 	.addSubcommand(subcommand =>
 		subcommand.setName('varia')
@@ -180,7 +181,8 @@ command.data = new SlashCommandBuilder()
 					.setRequired(true))
 			.addStringOption(option =>
 				option.setName('extra')
-					.setDescription('Opciones extra.')))
+					.setDescription('Opciones extra.')
+					.setAutocomplete(true)))
 
 	.addSubcommand(subcommand =>
 		subcommand.setName('multi')
@@ -203,7 +205,8 @@ command.data = new SlashCommandBuilder()
 
 			.addStringOption(option =>
 				option.setName('extra')
-					.setDescription('Opciones extra.')))
+					.setDescription('Opciones extra.')
+					.setAutocomplete(true)))
 
 	.addSubcommand(subcommand =>
 		subcommand.setName('config')

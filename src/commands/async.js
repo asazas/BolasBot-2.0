@@ -43,7 +43,8 @@ command.data = new SlashCommandBuilder()
 
 			.addStringOption(option =>
 				option.setName('extra')
-					.setDescription('Opciones extra para preset.')))
+					.setDescription('Opciones extra para preset.')
+					.setAutocomplete(true)))
 
 	.addSubcommand(subcommand =>
 		subcommand.setName('cerrar')
