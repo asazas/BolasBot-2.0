@@ -119,7 +119,7 @@ discord_client.once('ready', async () => {
  */
 discord_client.on('interactionCreate', async interaction => {
 
-	if (interaction.isAutocomplete) {
+	if (interaction.isAutocomplete()) {
 		const archivo = interaction.options.getAttachment('archivo');
 		const url = interaction.options.getString('url');
 		if (archivo != null || url != null) {
