@@ -82,33 +82,45 @@ async function crear_multiworld(interaction, db) {
 	const game = await get_multiworld_game(zip_ajustes, interaction.options.getBoolean('spoiler'));
 
 	if (game.status == 201) {
-		let thread_name = interaction.options.getString('nombre');
-		if (!thread_name) {
-			thread_name = `${random_words[Math.floor(Math.random() * random_words.length)]}${random_words[Math.floor(Math.random() * random_words.length)]}`;
-		}
-		thread_name = thread_name.substring(0, 20);
 
-		const multi_thread = await interaction.channel.threads.create({
-			name: thread_name,
-			autoArchiveDuration: 1440,
-		});
-		const thread_embed = new MessageEmbed()
+		const multi_embed = new MessageEmbed()
 			.setColor('#0099ff')
 			.setTitle('Multiworld')
 			.setURL(game.data.url)
 			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 			.addField('URL', game.data.url)
 			.setTimestamp();
-		const multi_msg = await multi_thread.send({ embeds: [thread_embed] });
-		await multi_msg.pin();
 
-		const main_embed = new MessageEmbed()
-			.setColor('#0099ff')
-			.setTitle('Éxito')
-			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
-			.setDescription(`Nueva partida de multiworld iniciada en ${multi_thread}`)
-			.setTimestamp();
-		await interaction.editReply({ embeds: [main_embed] });
+		// comando en servidor -> crear nuevo hilo
+		if (interaction.inGuild()) {
+			let thread_name = interaction.options.getString('nombre');
+			if (!thread_name) {
+				thread_name = `${random_words[Math.floor(Math.random() * random_words.length)]}${random_words[Math.floor(Math.random() * random_words.length)]}`;
+			}
+			thread_name = thread_name.substring(0, 20);
+
+			const multi_thread = await interaction.channel.threads.create({
+				name: thread_name,
+				autoArchiveDuration: 1440,
+			});
+
+			const multi_msg = await multi_thread.send({ embeds: [multi_embed] });
+			await multi_msg.pin();
+
+			const main_embed = new MessageEmbed()
+				.setColor('#0099ff')
+				.setTitle('Éxito')
+				.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
+				.setDescription(`Nueva partida de multiworld iniciada en ${multi_thread}`)
+				.setTimestamp();
+			await interaction.editReply({ embeds: [main_embed] });
+		}
+
+		// comando en DMs -> responder directamente con información de la partida
+		else {
+			await interaction.editReply({ embeds: [multi_embed] });
+		}
+
 	}
 
 	else {

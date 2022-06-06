@@ -40,9 +40,6 @@ command.data = new SlashCommandBuilder()
 command.execute = async function(interaction, db) {
 
 	if (interaction.options.getSubcommand() == 'crear') {
-		if (!interaction.inGuild()) {
-			throw { 'message': 'Este comando no puede ser usado en mensajes directos.' };
-		}
 		await crear_multiworld(interaction, db);
 		return;
 	}
