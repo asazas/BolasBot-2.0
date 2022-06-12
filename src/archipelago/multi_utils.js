@@ -125,7 +125,7 @@ async function crear_multiworld(interaction, db) {
 
 	else {
 		const image_name = `almeida${Math.floor(Math.random() * 4)}.png`;
-		const image = new MessageAttachment(`res/${image_name}`);
+		const image = new MessageAttachment(`res/almeida/${image_name}`);
 		const embed = new MessageEmbed()
 			.setColor('#0099ff')
 			.setTitle('Error')
@@ -135,7 +135,7 @@ async function crear_multiworld(interaction, db) {
 			.setImage(`attachment://${image_name}`)
 			.setTimestamp();
 
-		await interaction.editReply({ embeds: [embed], files: [image] });
+		await interaction.editReply({ embeds: [embed], files: [image], ephemeral: true });
 	}
 }
 

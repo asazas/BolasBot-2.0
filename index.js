@@ -160,7 +160,7 @@ discord_client.on('interactionCreate', async interaction => {
 	}
 	catch (error) {
 		console.error(error);
-		const image_path = `res/almeida${Math.floor(Math.random() * 4)}.png`;
+		const image_path = `res/almeida/almeida${Math.floor(Math.random() * 4)}.png`;
 		if (interaction.deferred || interaction.replied) {
 			return await interaction.editReply({ content: error['message'], files: [image_path], ephemeral: true });
 		}

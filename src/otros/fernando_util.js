@@ -17,8 +17,8 @@ const exec = util.promisify(require('child_process').exec);
  * MessageAttachment.
  */
 async function get_fernando_embed() {
-	const image_name = `almeida${Math.floor(Math.random() * 10)}.png`;
-	const image = new MessageAttachment(`res/${image_name}`);
+	const image_name = `almeida${Math.floor(Math.random() * 11)}.png`;
+	const image = new MessageAttachment(`res/almeida/${image_name}`);
 	const ans = new MessageEmbed()
 		.setColor('#0099ff')
 		.setImage(`attachment://${image_name}`)
