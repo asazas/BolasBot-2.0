@@ -8,7 +8,7 @@ const { ApiClient } = require('@twurple/api');
 const { CronJob } = require('cron');
 const { discordEmojiGuildId, discordToken, twitchClientId, twitchClientSecret } = require('./config.json');
 const { get_data_models } = require('./src/datamgmt/setup');
-const { announce_live_streams, streams_data, get_twitch_streams_info } = require('./src/streams/streams_util');
+const { comprueba_streams } = require('./src/streams/streams_util');
 const { get_global_var } = require('./src/datamgmt/db_utils');
 const { asignar_reaction_role, quitar_reaction_role } = require('./src/roles/roles_util');
 const { initialize_code_emojis } = require('./src/seedgen/seedgen_util');
@@ -84,25 +84,7 @@ discord_client.once('ready', async () => {
 	// schedule stream alerts, if twitch client is available
 	if (twitch_api_client) {
 		const job = new CronJob('0 */12 * * * *', async function() {
-			try {
-				let all_streams = {};
-				const guild_streams_list = [];
-				for (const my_guild of discord_client.guilds.cache.map(guild => guild)) {
-					const my_guild_streams = await streams_data(db[my_guild.id]);
-					if (Object.entries(my_guild_streams).length > 0) {
-						all_streams = { ...all_streams, ...my_guild_streams };
-						guild_streams_list.push([my_guild, my_guild_streams]);
-					}
-				}
-				if (Object.entries(all_streams).length === 0) return;
-				const twitch_info = await get_twitch_streams_info(Object.keys(all_streams), twitch_api_client);
-				for (const [my_guild, my_guild_streams] of guild_streams_list) {
-					await announce_live_streams(my_guild, my_guild_streams, db[my_guild.id], twitch_info);
-				}
-			}
-			catch (error) {
-				console.log(error);
-			}
+			comprueba_streams(discord_client, twitch_api_client, db);
 		});
 		job.start();
 	}

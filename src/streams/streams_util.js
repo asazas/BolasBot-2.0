@@ -1,8 +1,43 @@
 const { ApiClient } = require('@twurple/api');
-const { Permissions, MessageEmbed, CommandInteraction, Guild } = require('discord.js');
+const { Permissions, MessageEmbed, CommandInteraction, Guild, Client } = require('discord.js');
 const { Sequelize } = require('sequelize');
 const { get_or_insert_player, get_global_var } = require('../datamgmt/db_utils');
 const { register_stream, unregister_stream, set_stream_alerts_role, get_streams, update_stream_live, set_stream_alerts_channel } = require('../datamgmt/stream_db_utils');
+
+
+/**
+ * @summary Llamado periódicamente por el bot (cada 12 minutos.)
+ *
+ * @description Comprueba el estado de canales de Twitch monitorizados en todos los servidores en los que está el
+ * bot, y envía alertas de stream para los canales que hayan empezado a omitir desde la última comprobación.
+ *
+ * @param {Client}    discord_client    Cliente de discord.js para interactuar con la API de Discord.
+ * @param {ApiClient} twitch_api_client Cliente de Twitch de la librería Twurple.
+ * @param {object}    dbs               Objeto cuyas claves son los IDs de los servidores en los que está el bot y
+ *                                      cuyos valores son los objetos Sequelize que representan las bases de datos
+ *                                      de cada servidor.
+ */
+async function comprueba_streams(discord_client, twitch_api_client, dbs) {
+	try {
+		let all_streams = {};
+		const guild_streams_list = [];
+		for (const my_guild of discord_client.guilds.cache.map(guild => guild)) {
+			const my_guild_streams = await streams_data(dbs[my_guild.id]);
+			if (Object.entries(my_guild_streams).length > 0) {
+				all_streams = { ...all_streams, ...my_guild_streams };
+				guild_streams_list.push([my_guild, my_guild_streams]);
+			}
+		}
+		if (Object.entries(all_streams).length === 0) return;
+		const twitch_info = await get_twitch_streams_info(Object.keys(all_streams), twitch_api_client);
+		for (const [my_guild, my_guild_streams] of guild_streams_list) {
+			await announce_live_streams(my_guild, my_guild_streams, dbs[my_guild.id], twitch_info);
+		}
+	}
+	catch (error) {
+		console.log(error);
+	}
+}
 
 
 /**
@@ -223,6 +258,5 @@ async function announce_live_streams(guild, guild_streams, db, twitch_info) {
 }
 
 module.exports = {
-	stream_alta, stream_baja, set_stream_role, streams_data,
-	get_twitch_streams_info, announce_live_streams,
+	comprueba_streams, stream_alta, stream_baja, set_stream_role,
 };
