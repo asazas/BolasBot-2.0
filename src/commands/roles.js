@@ -1,4 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
+const { PermissionFlagsBits } = require('discord-api-types/v10');
 const { Permissions } = require('discord.js');
 const { crear_categoria_roles, crear_rol, eliminar_categoria_roles, eliminar_rol } = require('../roles/roles_util');
 
@@ -6,6 +7,8 @@ const command = {};
 command.data = new SlashCommandBuilder()
 	.setName('roles')
 	.setDescription('Asignación automática de roles mediante reacciones.')
+	.setDMPermission(false)
+	.setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels)
 	.addSubcommandGroup(subcommandGroup =>
 		subcommandGroup.setName('crear')
 			.setDescription('Crear rol o categoría')

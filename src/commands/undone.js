@@ -5,7 +5,8 @@ const { undone_race } = require('../racing/done_util');
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('undone')
-		.setDescription('Usar cuando se quiera deshacer un done de una carrera.'),
+		.setDescription('Usar cuando se quiera deshacer un done de una carrera.')
+		.setDMPermission(false),
 
 	async execute(interaction, db) {
 		if (!interaction.inGuild()) {

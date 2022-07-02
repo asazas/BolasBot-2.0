@@ -1,8 +1,8 @@
 const { REST } = require('@discordjs/rest');
-const { Routes } = require('discord-api-types/v9');
+const { Routes } = require('discord-api-types/v10');
 const { discordClientId, discordToken } = require('./config.json');
 
-const rest = new REST({ version: '9' }).setToken(discordToken);
+const rest = new REST({ version: '10' }).setToken(discordToken);
 
 rest.get(Routes.applicationCommands(discordClientId))
 	.then(data => {

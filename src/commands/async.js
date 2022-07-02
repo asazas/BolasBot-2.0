@@ -19,6 +19,7 @@ const command = {};
 command.data = new SlashCommandBuilder()
 	.setName('async')
 	.setDescription('Manejo de carreras asíncronas.')
+	.setDMPermission(false)
 	.addSubcommand(subcommand =>
 		subcommand.setName('crear')
 			.setDescription('Crea una carrera asíncrona.')

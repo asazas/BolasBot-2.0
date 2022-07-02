@@ -1,11 +1,14 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
+const { PermissionFlagsBits } = require('discord-api-types/v10');
 const { Permissions, MessageEmbed } = require('discord.js');
 const { reset_player_scores } = require('../datamgmt/db_utils');
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('resetear_puntos')
-		.setDescription('Resetea el ranking de jugadores.'),
+		.setDescription('Resetea el ranking de jugadores.')
+		.setDMPermission(false)
+		.setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels),
 
 	async execute(interaction, db) {
 		if (!interaction.inGuild()) {

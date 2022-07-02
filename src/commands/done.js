@@ -7,6 +7,7 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('done')
 		.setDescription('Usar cuando se termine una carrera')
+		.setDMPermission(false)
 		.addStringOption(option =>
 			option.setName('tiempo')
 				.setDescription('En carreras asíncronas, tiempo en formato HH:MM:SS.'))

@@ -6,7 +6,8 @@ const { done_async, done_race } = require('../racing/done_util');
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('forfeit')
-		.setDescription('Usar para retirarse de una carrera'),
+		.setDescription('Usar para retirarse de una carrera')
+		.setDMPermission(false),
 
 	async execute(interaction, db) {
 		if (!interaction.inGuild()) {

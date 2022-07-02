@@ -19,6 +19,7 @@ const command = {};
 command.data = new SlashCommandBuilder()
 	.setName('carrera')
 	.setDescription('Manejo de carreras.')
+	.setDMPermission(false)
 	.addSubcommand(subcommand =>
 		subcommand.setName('crear')
 			.setDescription('Crea una carrera.')

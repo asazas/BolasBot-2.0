@@ -1,4 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
+const { PermissionFlagsBits } = require('discord-api-types/v10');
 const { Permissions } = require('discord.js');
 const { crear_comando, eliminar_comando } = require('../otros/comandos_util');
 
@@ -6,6 +7,8 @@ const command = {};
 command.data = new SlashCommandBuilder()
 	.setName('comandos')
 	.setDescription('Gestión de comandos de texto específicos de servidor.')
+	.setDMPermission(false)
+	.setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels)
 	.addSubcommand(subcommand =>
 		subcommand.setName('crear')
 			.setDescription('Crea un comando de texto de servidor.')

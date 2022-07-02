@@ -1,4 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
+const { PermissionFlagsBits } = require('discord-api-types/v10');
 const { Permissions } = require('discord.js');
 const { stream_alta, stream_baja, set_stream_role } = require('../streams/streams_util');
 
@@ -6,6 +7,8 @@ const command = {};
 command.data = new SlashCommandBuilder()
 	.setName('streams')
 	.setDescription('Gestión de avisos para streams de Twitch.')
+	.setDMPermission(false)
+	.setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels)
 	.addSubcommand(subcommand =>
 		subcommand.setName('alta')
 			.setDescription('Registra un stream de Twitch para realizar avisos en el servidor.')

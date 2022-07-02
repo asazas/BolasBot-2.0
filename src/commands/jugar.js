@@ -8,7 +8,8 @@ const { retrieve_from_url } = require('../seedgen/seedgen');
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('jugar')
-		.setDescription('Usar en una carrera asíncrona puntuable para obtener la seed.'),
+		.setDescription('Usar en una carrera asíncrona puntuable para obtener la seed.')
+		.setDMPermission(false),
 
 	async execute(interaction, db) {
 		if (!interaction.inGuild()) {
