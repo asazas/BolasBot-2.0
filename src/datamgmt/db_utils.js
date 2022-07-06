@@ -106,6 +106,64 @@ async function update_player_score(sequelize, discord_id, score) {
 
 
 /**
+ * @summary Invocado por el comando /vetos banear.
+ *
+ * @description Establece un usuario como vetado.
+ *
+ * @param {Sequelize} sequelize  Base de datos del servidor.
+ * @param {string}    discord_id ID de Discord del jugador a vetar.
+ */
+async function ban_player(sequelize, discord_id) {
+	const players = sequelize.models.Players;
+	try {
+		return await sequelize.transaction(async (t) => {
+			const player = await players.findOne({
+				where: {
+					DiscordId: discord_id,
+				},
+				transaction: t,
+				lock: t.LOCK.UPDATE,
+			});
+			player.Banned = true;
+			await player.save({ transaction: t });
+		});
+	}
+	catch (error) {
+		console.log(error['message']);
+	}
+}
+
+
+/**
+ * @summary Invocado por el comando /vetos levantar.
+ *
+ * @description Retira el veto sobre un usuario.
+ *
+ * @param {Sequelize} sequelize  Base de datos del servidor.
+ * @param {string}    discord_id ID de Discord del jugador al que se levanta el veto.
+ */
+async function unban_player(sequelize, discord_id) {
+	const players = sequelize.models.Players;
+	try {
+		return await sequelize.transaction(async (t) => {
+			const player = await players.findOne({
+				where: {
+					DiscordId: discord_id,
+				},
+				transaction: t,
+				lock: t.LOCK.UPDATE,
+			});
+			player.Banned = false;
+			await player.save({ transaction: t });
+		});
+	}
+	catch (error) {
+		console.log(error['message']);
+	}
+}
+
+
+/**
  * @summary Invocado por el comando /resetear_puntos.
  *
  * @description Resetea las puntuaciones y carreras disputadas de todos los jugadores a sus valores por defecto.
@@ -280,6 +338,6 @@ async function set_player_score_channel(sequelize, score_channel) {
 }
 
 module.exports = {
-	get_or_insert_player, get_ranked_players, update_player_score, reset_player_scores, get_global_var,
-	set_async_submit_category, set_async_history_channel, set_race_history_channel, set_player_score_channel,
+	get_or_insert_player, get_ranked_players, update_player_score, ban_player, unban_player, reset_player_scores,
+	get_global_var, set_async_submit_category, set_async_history_channel, set_race_history_channel, set_player_score_channel,
 };

@@ -17,9 +17,9 @@
     "@twurple/eventsub": "^5.1.6",
     "axios": "^0.27.2",
     "cron": "^2.0.0",
-    "discord-api-types": "^0.35.0",
+    "discord-api-types": "^0.36.1",
     "discord.js": "^13.8.1",
-    "gaxios": "^5.0.0",
+    "gaxios": "^5.0.1",
     "glob": "^8.0.3",
     "luxon": "^2.4.0",
     "sequelize": "^6.21.2",
@@ -29,6 +29,6 @@
     "yaml": "^2.1.1"
   },
   "devDependencies": {
-    "eslint": "^8.18.0"
+    "eslint": "^8.19.0"
   }
 }
