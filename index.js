@@ -13,6 +13,7 @@ const { get_global_var } = require('./src/datamgmt/db_utils');
 const { asignar_reaction_role, quitar_reaction_role } = require('./src/roles/roles_util');
 const { initialize_code_emojis } = require('./src/seedgen/seedgen_util');
 const { responder_comando_de_servidor } = require('./src/otros/comandos_util');
+const { resetear_puntos_elo } = require('./src/otros/resetear_puntos_util');
 
 // Create a new Discord client instance
 const discord_client = new Client({
@@ -101,6 +102,7 @@ discord_client.once('ready', async () => {
  */
 discord_client.on('interactionCreate', async interaction => {
 
+	// Autocompletado de opciones extra para seeds
 	if (interaction.isAutocomplete()) {
 		const archivo = interaction.options.getAttachment('archivo');
 		const url = interaction.options.getString('url');
@@ -121,6 +123,14 @@ discord_client.on('interactionCreate', async interaction => {
 			return interaction.respond(varia_extra.map((el) => ({ name: el, value: el })));
 		}
 		return interaction.respond(all_extra.map((el) => ({ name: el, value: el })));
+	}
+
+	// Respuesta a interacción con botones
+	if (interaction.isButton()) {
+		// Confirmación de resetear puntos
+		if (interaction.customId === 'resetear') {
+			resetear_puntos_elo(interaction, db[interaction.guildId]);
+		}
 	}
 
 	if (!interaction.isCommand()) return;

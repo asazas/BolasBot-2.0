@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { PermissionFlagsBits } = require('discord-api-types/v10');
-const { Permissions, MessageEmbed } = require('discord.js');
+const { Permissions, MessageEmbed, MessageActionRow, MessageButton } = require('discord.js');
 const { reset_player_scores } = require('../datamgmt/db_utils');
 
 module.exports = {
@@ -18,12 +18,19 @@ module.exports = {
 			throw { 'message': 'Solo un moderador puede ejecutar este comando.' };
 		}
 
-		await reset_player_scores(db);
 		const ans_embed = new MessageEmbed()
 			.setColor('#0099ff')
 			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
-			.setDescription('Se ha reseteado el ranking de jugadores.')
+			.setDescription('**¡Una vez se reseteen las puntuaciones, no se podrán recuperar!**\n\nPulsa "Confirmar" si quieres resetear las puntuaciones.')
 			.setTimestamp();
-		await interaction.reply({ embeds: [ans_embed] });
+
+		const row = new MessageActionRow().addComponents(
+			new MessageButton()
+				.setCustomId('resetear')
+				.setLabel('Confirmar')
+				.setStyle('PRIMARY'),
+		);
+
+		await interaction.reply({ embeds: [ans_embed], components: [row], ephemeral: true });
 	},
 };
