@@ -3,7 +3,7 @@ El bot de las bolas 2.0
 
 ## Requisitos
 
- - Node.js 16.6.0 o superior.
+ - Node.js 16.9.0 o superior.
 
 ## Dependencias opcionales (bash)
  - fortunes-es
