@@ -1,5 +1,5 @@
 const fs = require('fs');
-const { MessageEmbed, CommandInteraction } = require('discord.js');
+const { EmbedBuilder, CommandInteraction } = require('discord.js');
 
 const { preset_file } = require('./seedgen');
 
@@ -31,7 +31,7 @@ const extra_varia = '**spoiler: **Permite que la seed pueda ser resuelta por el 
  *
  * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
  *
- * @returns {MessageEmbed} Información sobre el preset, o lista de presets.
+ * @returns {EmbedBuilder} Información sobre el preset, o lista de presets.
  */
 function preset_help(interaction) {
 	const preset = interaction.options.getString('preset');
@@ -39,7 +39,7 @@ function preset_help(interaction) {
 		const file = preset_file(preset);
 		if (file) {
 			const content = JSON.parse(fs.readFileSync(file));
-			return new MessageEmbed()
+			return new EmbedBuilder()
 				.setColor('#0099ff')
 				.setTitle(content['goal_name'])
 				.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
@@ -49,7 +49,7 @@ function preset_help(interaction) {
 	}
 
 	const categories = ['alttp', 'mystery', 'sm', 'smz3', 'varia'];
-	const output = new MessageEmbed()
+	const output = new EmbedBuilder()
 		.setColor('#0099ff')
 		.setTitle('Lista de presets')
 		.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
@@ -60,7 +60,7 @@ function preset_help(interaction) {
 		for (let i = 0; i < files.length; i++) {
 			files[i] = files[i].slice(0, -5);
 		}
-		output.addField(cat, files.join(', '));
+		output.addFields([{ name: cat, value: files.join(', ') }]);
 	}
 	return output;
 }
@@ -73,17 +73,18 @@ function preset_help(interaction) {
  *
  * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
  *
- * @returns {MessageEmbed} Información sobre las opciones extra disponibles.
+ * @returns {EmbedBuilder} Información sobre las opciones extra disponibles.
  */
 function extra_help(interaction) {
-	return new MessageEmbed()
+	return new EmbedBuilder()
 		.setColor('#0099ff')
 		.setTitle('Opciones extra')
 		.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
-		.addField('ALTTP y Mystery', extra_alttp)
-		.addField('SM', extra_sm)
-		.addField('SMZ3', extra_smz3)
-		.addField('VARIA', extra_varia)
+		.addFields([
+			{ name: 'ALTTP y Mystery', value: extra_alttp },
+			{ name: 'SM', value: extra_sm },
+			{ name: 'SMZ3', value: extra_smz3 },
+			{ name: 'VARIA', value: extra_varia }])
 		.setTimestamp();
 }
 

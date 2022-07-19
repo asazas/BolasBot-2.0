@@ -1,4 +1,4 @@
-const { MessageEmbed, Permissions, CommandInteraction } = require('discord.js');
+const { EmbedBuilder, PermissionsBitField, CommandInteraction } = require('discord.js');
 const { Sequelize, Model } = require('sequelize');
 
 const { get_or_insert_player, get_global_var, set_race_history_channel, set_player_score_channel } = require('../datamgmt/db_utils');
@@ -33,15 +33,16 @@ async function cerrar_carrera(interaction, db, race) {
 		my_hist_channel = await interaction.guild.channels.fetch(`${global_var.RaceHistoryChannel}`);
 	}
 	if (!my_hist_channel) {
-		my_hist_channel = await interaction.guild.channels.create('carrera-historico', {
+		my_hist_channel = await interaction.guild.channels.create({
+			name: 'carrera-historico',
 			permissionOverwrites: [
 				{
 					id: interaction.guild.roles.everyone,
-					deny: [Permissions.FLAGS.SEND_MESSAGES],
+					deny: [PermissionsBitField.Flags.SendMessages],
 				},
 				{
-					id: interaction.guild.me,
-					allow: [Permissions.FLAGS.SEND_MESSAGES],
+					id: interaction.guild.members.me,
+					allow: [PermissionsBitField.Flags.SendMessages],
 				},
 			],
 		});
@@ -60,21 +61,22 @@ async function cerrar_carrera(interaction, db, race) {
 			my_score_channel = await interaction.guild.channels.fetch(`${global_var.PlayerScoreChannel}`);
 		}
 		if (!my_score_channel) {
-			my_score_channel = await interaction.guild.channels.create('ranking-jugadores', {
+			my_score_channel = await interaction.guild.channels.create({
+				name: 'ranking-jugadores',
 				permissionOverwrites: [
 					{
 						id: interaction.guild.roles.everyone,
-						deny: [Permissions.FLAGS.SEND_MESSAGES],
+						deny: [PermissionsBitField.Flags.SendMessages],
 					},
 					{
-						id: interaction.guild.me,
-						allow: [Permissions.FLAGS.SEND_MESSAGES],
+						id: interaction.guild.members.me,
+						allow: [PermissionsBitField.Flags.SendMessages],
 					},
 				],
 			});
 			await set_player_score_channel(db, my_score_channel.id);
 		}
-		const score_embed = new MessageEmbed()
+		const score_embed = new EmbedBuilder()
 			.setColor('#0099ff')
 			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 			.setTitle(`Ranking tras ${race.Name}`)
@@ -111,7 +113,7 @@ async function carrera_crear(interaction, db) {
 
 	let ranked = interaction.options.getBoolean('ranked');
 	if (!ranked) ranked = false;
-	if (ranked && !interaction.memberPermissions.has(Permissions.FLAGS.MANAGE_CHANNELS)) {
+	if (ranked && !interaction.memberPermissions.has(PermissionsBitField.Flags.ManageChannels)) {
 		throw { 'message': 'Solo un moderador puede crear carreras puntuables.' };
 	}
 
@@ -146,7 +148,7 @@ async function carrera_crear(interaction, db) {
 	}
 	await data_msg.pin();
 
-	const text_ans = new MessageEmbed()
+	const text_ans = new EmbedBuilder()
 		.setColor('#0099ff')
 		.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 		.setDescription(`Abierta carrera con nombre: ${name}. Participa en ${race_channel}.`)
@@ -176,7 +178,7 @@ async function carrera_entrar(interaction, db) {
 	}
 
 	const race_player = await get_or_insert_race_player(db, race.Id, interaction.user.id);
-	let text_ans = new MessageEmbed()
+	let text_ans = new EmbedBuilder()
 		.setColor('#0099ff')
 		.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 		.setTimestamp();
@@ -210,7 +212,7 @@ async function carrera_salir(interaction, db) {
 	await get_or_insert_player(db, interaction.user.id, interaction.user.username, interaction.user.discriminator, `${interaction.user}`);
 	const delete_code = await delete_race_player_if_present(db, race.Id, interaction.user.id);
 
-	let text_ans = new MessageEmbed()
+	let text_ans = new EmbedBuilder()
 		.setColor('#0099ff')
 		.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 		.setTimestamp();
@@ -247,7 +249,7 @@ async function carrera_listo(interaction, db) {
 	await get_or_insert_player(db, interaction.user.id, interaction.user.username, interaction.user.discriminator, `${interaction.user}`);
 	const ready_code = await set_player_ready(db, race.Id, interaction.user.id);
 
-	let text_ans = new MessageEmbed()
+	let text_ans = new EmbedBuilder()
 		.setColor('#0099ff')
 		.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 		.setTimestamp();
@@ -266,7 +268,7 @@ async function carrera_listo(interaction, db) {
 	await interaction.reply({ embeds: [text_ans] });
 
 	if (typeof ready_code == 'object' && ready_code['all'] >= 2 && ready_code['ready'] == ready_code['all']) {
-		text_ans = new MessageEmbed()
+		text_ans = new EmbedBuilder()
 			.setColor('#0099ff')
 			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 			.setDescription('Todos los jugadores están listos. Iniciando cuenta atrás. ¡Buena suerte!')
@@ -296,7 +298,7 @@ async function carrera_no_listo(interaction, db) {
 	await get_or_insert_player(db, interaction.user.id, interaction.user.username, interaction.user.discriminator, `${interaction.user}`);
 	const unready_code = await set_player_unready(db, race.Id, interaction.user.id);
 
-	let text_ans = new MessageEmbed()
+	let text_ans = new EmbedBuilder()
 		.setColor('#0099ff')
 		.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 		.setTimestamp();
@@ -330,14 +332,14 @@ async function carrera_forzar_inicio(interaction, db) {
 		throw { 'message': 'Este comando solo puede ser usado en canales de carreras.' };
 	}
 
-	if (!interaction.memberPermissions.has(Permissions.FLAGS.MANAGE_CHANNELS) && interaction.user.id != race.Creator) {
+	if (!interaction.memberPermissions.has(PermissionsBitField.Flags.ManageChannels) && interaction.user.id != race.Creator) {
 		throw { 'message': 'Solo el creador de la carrera o un moderador pueden ejecutar este comando.' };
 	}
 
 	await get_or_insert_player(db, interaction.user.id, interaction.user.username, interaction.user.discriminator, `${interaction.user}`);
 	const force_start_code = await set_all_ready_for_force_start(db, race.Id, interaction.user.id);
 
-	let text_ans = new MessageEmbed()
+	let text_ans = new EmbedBuilder()
 		.setColor('#0099ff')
 		.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 		.setTimestamp();
@@ -374,14 +376,14 @@ async function carrera_forzar_final(interaction, db) {
 		throw { 'message': 'Este comando solo puede ser usado en canales de carreras.' };
 	}
 
-	if (!interaction.memberPermissions.has(Permissions.FLAGS.MANAGE_CHANNELS) && interaction.user.id != race.Creator) {
+	if (!interaction.memberPermissions.has(PermissionsBitField.Flags.ManageChannels) && interaction.user.id != race.Creator) {
 		throw { 'message': 'Solo el creador de la carrera o un moderador pueden ejecutar este comando.' };
 	}
 
 	await get_or_insert_player(db, interaction.user.id, interaction.user.username, interaction.user.discriminator, `${interaction.user}`);
 	const force_end_code = await set_all_forfeit_for_force_end(db, race.Id, interaction.user.id);
 
-	let text_ans = new MessageEmbed()
+	let text_ans = new EmbedBuilder()
 		.setColor('#0099ff')
 		.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 		.setTimestamp();
@@ -414,7 +416,7 @@ async function carrera_forzar_cancelar(interaction, db) {
 		throw { 'message': 'Este comando solo puede ser usado en canales de carreras.' };
 	}
 
-	if (!interaction.memberPermissions.has(Permissions.FLAGS.MANAGE_CHANNELS) && interaction.user.id != race.Creator) {
+	if (!interaction.memberPermissions.has(PermissionsBitField.Flags.ManageChannels) && interaction.user.id != race.Creator) {
 		throw { 'message': 'Solo el creador de la carrera o un moderador pueden ejecutar este comando.' };
 	}
 
@@ -422,7 +424,7 @@ async function carrera_forzar_cancelar(interaction, db) {
 		throw { 'message': 'Solo se pueden anular carreras no empezadas.' };
 	}
 
-	const text_ans = new MessageEmbed()
+	const text_ans = new EmbedBuilder()
 		.setColor('#0099ff')
 		.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 		.setDescription('Anulando carrera...')

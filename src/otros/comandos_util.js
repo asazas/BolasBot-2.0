@@ -1,4 +1,4 @@
-const { MessageEmbed, CommandInteraction } = require('discord.js');
+const { EmbedBuilder, CommandInteraction } = require('discord.js');
 const { Sequelize } = require('sequelize');
 const { get_command, create_command, delete_command } = require('../datamgmt/commands_db_utils');
 
@@ -35,7 +35,7 @@ async function crear_comando(interaction, db) {
 	}
 	await create_command(db, nombre_comando.toLowerCase(), texto_comando, nuevo_comando.id);
 
-	const ans_embed = new MessageEmbed()
+	const ans_embed = new EmbedBuilder()
 		.setColor('#0099ff')
 		.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 		.setDescription(embed_desc)
@@ -64,7 +64,7 @@ async function eliminar_comando(interaction, db) {
 	await interaction.guild.commands.delete(comando_en_db.CommandId);
 	await delete_command(db, nombre_comando.toLowerCase());
 
-	const ans_embed = new MessageEmbed()
+	const ans_embed = new EmbedBuilder()
 		.setColor('#0099ff')
 		.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 		.setDescription(`Eliminado el comando: \`/${nombre_comando}\`.`)
@@ -88,7 +88,7 @@ async function responder_comando_de_servidor(interaction, db) {
 		throw { 'message': 'El comando indicado no existe.' };
 	}
 
-	const ans_embed = new MessageEmbed()
+	const ans_embed = new EmbedBuilder()
 		.setColor('#0099ff')
 		.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 		.setTitle(nombre_comando)

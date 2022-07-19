@@ -1,4 +1,4 @@
-const { MessageEmbed } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 const { Sequelize } = require('sequelize');
 const { get_async_by_submit, get_results_for_async } = require('../datamgmt/async_db_utils');
 const { update_player_score, get_ranked_players } = require('../datamgmt/db_utils');
@@ -63,28 +63,29 @@ async function get_async_results_text(db, submit_channel) {
  * @param {Sequelize} db             Base de datos del servidor en el que se invocó el comando.
  * @param {string}    submit_channel ID del canal de envío de resultados de la carrera asíncrona.
  *
- * @returns {MessageEmbed} Embed con los datos de la carrera asíncrona.
+ * @returns {EmbedBuilder} Embed con los datos de la carrera asíncrona.
  */
 async function get_async_data_embed(db, submit_channel) {
 	const my_async = await get_async_by_submit(db, submit_channel);
 
-	const data_embed = new MessageEmbed()
+	const data_embed = new EmbedBuilder()
 		.setColor('#0099ff')
 		.setTitle(`Carrera asíncrona: ${my_async.Name}`)
-		.addField('Creador', my_async.creator.Name)
-		.addField('Fecha de inicio', `<t:${my_async.StartDate}>`)
+		.addFields([
+			{ name: 'Creador', value: my_async.creator.Name },
+			{ name: 'Fecha de inicio', value: `<t:${my_async.StartDate}>` }])
 		.setTimestamp();
 	if (my_async.EndDate) {
-		data_embed.addField('Fecha de cierre', `<t:${my_async.EndDate}>`);
+		data_embed.addFields([{ name: 'Fecha de cierre', value: `<t:${my_async.EndDate}>` }]);
 	}
 	if (my_async.Preset) {
-		data_embed.addField('Descripción', my_async.Preset);
+		data_embed.addFields([{ name: 'Descripción', value: my_async.Preset }]);
 	}
 	if (my_async.SeedUrl) {
-		data_embed.addField('Seed', my_async.SeedUrl);
+		data_embed.addFields([{ name: 'Seed', value:my_async.SeedUrl }]);
 	}
 	if (my_async.SeedCode) {
-		data_embed.addField('Hash', my_async.SeedCode);
+		data_embed.addFields([{ name: 'Hash', value: my_async.SeedCode }]);
 	}
 	return data_embed;
 }
@@ -99,22 +100,23 @@ async function get_async_data_embed(db, submit_channel) {
  * @param {Sequelize} db             Base de datos del servidor en el que se invocó el comando.
  * @param {string}    submit_channel ID del canal de envío de resultados de la carrera asíncrona.
  *
- * @returns {MessageEmbed} Embed con los datos de la carrera asíncrona.
+ * @returns {EmbedBuilder} Embed con los datos de la carrera asíncrona.
  */
 async function get_reduced_async_data_embed(db, submit_channel) {
 	const my_async = await get_async_by_submit(db, submit_channel);
 
-	const data_embed = new MessageEmbed()
+	const data_embed = new EmbedBuilder()
 		.setColor('#0099ff')
 		.setTitle(`Carrera asíncrona: ${my_async.Name}`)
-		.addField('Creador', my_async.creator.Name)
-		.addField('Fecha de inicio', `<t:${my_async.StartDate}>`)
+		.addFields([
+			{ name: 'Creador', value: my_async.creator.Name },
+			{ name: 'Fecha de inicio', value: `<t:${my_async.StartDate}>` }])
 		.setTimestamp();
 	if (my_async.EndDate) {
-		data_embed.addField('Fecha de cierre', `<t:${my_async.EndDate}>`);
+		data_embed.addField([{ name: 'Fecha de cierre', value: `<t:${my_async.EndDate}>` }]);
 	}
 	if (my_async.Preset) {
-		data_embed.addField('Descripción', my_async.Preset);
+		data_embed.addField([{ name: 'Descripción', value: my_async.Preset }]);
 	}
 	return data_embed;
 }
@@ -130,31 +132,32 @@ async function get_reduced_async_data_embed(db, submit_channel) {
  * @param {Sequelize} db             Base de datos del servidor en el que se invocó el comando.
  * @param {string}    submit_channel ID del hilo de envío de resultados de la carrera.
  *
- * @returns {MessageEmbed} Embed con los datos de la carrera.
+ * @returns {EmbedBuilder} Embed con los datos de la carrera.
  */
 async function get_race_data_embed(db, race_channel) {
 	const my_race = await get_race_by_channel(db, race_channel);
 
-	const data_embed = new MessageEmbed()
+	const data_embed = new EmbedBuilder()
 		.setColor('#0099ff')
 		.setTitle(`Carrera: ${my_race.Name}`)
-		.addField('Creador', my_race.creator.Name)
-		.addField('Fecha de creación', `<t:${my_race.CreationDate}>`)
+		.addFields([
+			{ name: 'Creador', value: my_race.creator.Name },
+			{ name: 'Fecha de creación', value: `<t:${my_race.CreationDate}>` }])
 		.setTimestamp();
 	if (my_race.StartDate) {
-		data_embed.addField('Fecha de inicio', `<t:${my_race.StartDate}>`);
+		data_embed.addFields([{ name: 'Fecha de inicio', value: `<t:${my_race.StartDate}>` }]);
 	}
 	if (my_race.EndDate) {
-		data_embed.addField('Fecha de cierre', `<t:${my_race.EndDate}>`);
+		data_embed.addFields([{ name: 'Fecha de cierre', value: `<t:${my_race.EndDate}>` }]);
 	}
 	if (my_race.Preset) {
-		data_embed.addField('Descripción', my_race.Preset);
+		data_embed.addFields([{ name: 'Descripción', value: my_race.Preset }]);
 	}
 	if (my_race.SeedUrl) {
-		data_embed.addField('Seed', my_race.SeedUrl);
+		data_embed.addFields([{ name: 'Seed', value: my_race.SeedUrl }]);
 	}
 	if (my_race.SeedCode) {
-		data_embed.addField('Hash', my_race.SeedCode);
+		data_embed.addFields([{ name: 'Hash', value: my_race.SeedCode }]);
 	}
 	return data_embed;
 }

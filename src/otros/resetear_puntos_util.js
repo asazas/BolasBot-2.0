@@ -1,4 +1,4 @@
-const { MessageEmbed, ButtonInteraction } = require('discord.js');
+const { EmbedBuilder, ButtonInteraction } = require('discord.js');
 const { reset_player_scores } = require('../datamgmt/db_utils');
 
 
@@ -13,7 +13,7 @@ const { reset_player_scores } = require('../datamgmt/db_utils');
  */
 async function resetear_puntos_elo(interaction, db) {
 	await reset_player_scores(db);
-	const ans_embed = new MessageEmbed()
+	const ans_embed = new EmbedBuilder()
 		.setColor('#0099ff')
 		.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 		.setDescription('Se ha reseteado el ranking de jugadores.')

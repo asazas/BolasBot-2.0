@@ -1,4 +1,4 @@
-const { Permissions, MessageEmbed, CommandInteraction } = require('discord.js');
+const { PermissionsBitField, EmbedBuilder, CommandInteraction, ChannelType } = require('discord.js');
 const { Sequelize, Model } = require('sequelize');
 const { get_results_for_async, get_async_by_submit, get_active_async_races, insert_async, update_async_status } = require('../datamgmt/async_db_utils');
 
@@ -10,7 +10,7 @@ const { seed_in_create_race } = require('./race_seed_util');
 /**
  * Lista de palabras para generar nombres aleatorios de carreras.
  */
-const random_words = ['Asazas', 'DiegoA', 'Vilxs', 'Diegolazo', 'Matkap', 'Kitsune', 'Eolina', 'Kaede',
+const random_words = ['Asazas', 'Armando', 'Vilxs', 'Diegolazo', 'Matkap', 'Kitsune', 'Eolina', 'Kaede',
 	'Kodama', 'Akuma', 'Cougars', 'Fantasma', 'Marco', 'Jim', 'Gio', 'Midget',
 
 	'Campeón', 'Scrub', 'Noob', 'Casual', 'Fernando', 'Almeida', 'Genio', 'Fenómeno', 'Lento', 'Trampas',
@@ -43,15 +43,16 @@ async function cerrar_async(interaction, db, race) {
 			my_hist_channel = await interaction.guild.channels.fetch(`${global_var.AsyncHistoryChannel}`);
 		}
 		if (!my_hist_channel) {
-			my_hist_channel = await interaction.guild.channels.create('async-historico', {
+			my_hist_channel = await interaction.guild.channels.create({
+				name: 'async-historico',
 				permissionOverwrites: [
 					{
 						id: interaction.guild.roles.everyone,
-						deny: [Permissions.FLAGS.SEND_MESSAGES],
+						deny: [PermissionsBitField.Flags.SendMessages],
 					},
 					{
-						id: interaction.guild.me,
-						allow: [Permissions.FLAGS.SEND_MESSAGES],
+						id: interaction.guild.members.me,
+						allow: [PermissionsBitField.Flags.SendMessages],
 					},
 				],
 			});
@@ -70,21 +71,22 @@ async function cerrar_async(interaction, db, race) {
 				my_score_channel = await interaction.guild.channels.fetch(`${global_var.PlayerScoreChannel}`);
 			}
 			if (!my_score_channel) {
-				my_score_channel = await interaction.guild.channels.create('ranking-jugadores', {
+				my_score_channel = await interaction.guild.channels.create({
+					name: 'ranking-jugadores',
 					permissionOverwrites: [
 						{
 							id: interaction.guild.roles.everyone,
-							deny: [Permissions.FLAGS.SEND_MESSAGES],
+							deny: [PermissionsBitField.Flags.SendMessages],
 						},
 						{
-							id: interaction.guild.me,
-							allow: [Permissions.FLAGS.SEND_MESSAGES],
+							id: interaction.guild.members.me,
+							allow: [PermissionsBitField.Flags.SendMessages],
 						},
 					],
 				});
 				await set_player_score_channel(db, my_score_channel.id);
 			}
-			const score_embed = new MessageEmbed()
+			const score_embed = new EmbedBuilder()
 				.setColor('#0099ff')
 				.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 				.setTitle(`Ranking tras ${race.Name}`)
@@ -130,7 +132,7 @@ async function async_crear(interaction, db) {
 
 	let ranked = interaction.options.getBoolean('ranked');
 	if (!ranked) ranked = false;
-	if (ranked && !interaction.memberPermissions.has(Permissions.FLAGS.MANAGE_CHANNELS)) {
+	if (ranked && !interaction.memberPermissions.has(PermissionsBitField.Flags.ManageChannels)) {
 		throw { 'message': 'Solo un moderador puede crear carreras puntuables.' };
 	}
 
@@ -164,8 +166,9 @@ async function async_crear(interaction, db) {
 		}
 	}
 	if (!async_submit_category) {
-		async_submit_category = await interaction.guild.channels.create('async-submit', {
-			type: 'GUILD_CATEGORY',
+		async_submit_category = await interaction.guild.channels.create({
+			name: 'async-submit',
+			type: ChannelType.GuildCategory,
 		});
 		await set_async_submit_category(db, async_submit_category.id);
 	}
@@ -178,44 +181,48 @@ async function async_crear(interaction, db) {
 	let spoilers_channel = null;
 
 	async_role = await interaction.guild.roles.create({ name: channel_name });
-	async_category = await interaction.guild.channels.create(channel_name, {
-		type: 'GUILD_CATEGORY',
+	async_category = await interaction.guild.channels.create({
+		name: channel_name,
+		type: ChannelType.GuildCategory,
 		permissionOverwrites: [
 			{
 				id: interaction.guild.roles.everyone,
-				deny: [Permissions.FLAGS.VIEW_CHANNEL],
+				deny: [PermissionsBitField.Flags.ViewChannel],
 			},
 			{
-				id: interaction.guild.me,
-				allow: [Permissions.FLAGS.VIEW_CHANNEL],
+				id: interaction.guild.members.me,
+				allow: [PermissionsBitField.Flags.ViewChannel],
 			},
 			{
 				id: async_role,
-				allow: [Permissions.FLAGS.VIEW_CHANNEL],
+				allow: [PermissionsBitField.Flags.ViewChannel],
 			},
 		],
 	});
-	submit_channel = await interaction.guild.channels.create(`${channel_name}-submit`, {
+	submit_channel = await interaction.guild.channels.create({
+		name: `${channel_name}-submit`,
 		parent: async_submit_category,
 	});
-	results_channel = await interaction.guild.channels.create(`${channel_name}-results`, {
+	results_channel = await interaction.guild.channels.create({
+		name: `${channel_name}-results`,
 		parent: async_category,
 		permissionOverwrites: [
 			{
 				id: interaction.guild.roles.everyone,
-				deny: [Permissions.FLAGS.VIEW_CHANNEL, Permissions.FLAGS.SEND_MESSAGES],
+				deny: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages],
 			},
 			{
-				id: interaction.guild.me,
-				allow: [Permissions.FLAGS.VIEW_CHANNEL, Permissions.FLAGS.SEND_MESSAGES],
+				id: interaction.guild.members.me,
+				allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages],
 			},
 			{
 				id: async_role,
-				allow: [Permissions.FLAGS.VIEW_CHANNEL],
+				allow: [PermissionsBitField.Flags.ViewChannel],
 			},
 		],
 	});
-	spoilers_channel = await interaction.guild.channels.create(`${channel_name}-spoilers`, {
+	spoilers_channel = await interaction.guild.channels.create({
+		name: `${channel_name}-spoilers`,
 		parent: async_category,
 	});
 
@@ -245,7 +252,7 @@ async function async_crear(interaction, db) {
 	}
 
 	// Enviar instrucciones al canal de submit.
-	const instructions = new MessageEmbed()
+	const instructions = new EmbedBuilder()
 		.setColor('#0099ff')
 		.setTitle(`Envío de resultados: ${name}`)
 		.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
@@ -260,7 +267,7 @@ async function async_crear(interaction, db) {
 	await submit_channel.send({ embeds: [instructions] });
 
 	// Responder al comando
-	const text_ans = new MessageEmbed()
+	const text_ans = new EmbedBuilder()
 		.setColor('#0099ff')
 		.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 		.setDescription(`Abierta carrera asíncrona con nombre: ${name}. Envía resultados en ${submit_channel}.`)
@@ -283,7 +290,7 @@ async function async_cerrar(interaction, db) {
 		throw { 'message': 'Este comando solo puede ser usado en canales de carreras.' };
 	}
 
-	if (!interaction.memberPermissions.has(Permissions.FLAGS.MANAGE_CHANNELS) && interaction.user.id != race.Creator) {
+	if (!interaction.memberPermissions.has(PermissionsBitField.Flags.ManageChannels) && interaction.user.id != race.Creator) {
 		throw { 'message': 'Solo el creador de la carrera o un moderador pueden ejecutar este comando.' };
 	}
 
@@ -291,7 +298,7 @@ async function async_cerrar(interaction, db) {
 		const creator = interaction.user;
 		await get_or_insert_player(db, creator.id, creator.username, creator.discriminator, `${creator}`);
 		await update_async_status(db, race.Id, 1);
-		const ans_embed = new MessageEmbed()
+		const ans_embed = new EmbedBuilder()
 			.setColor('#0099ff')
 			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 			.setDescription('Esta carrera ha sido cerrada.')
@@ -318,7 +325,7 @@ async function async_reabrir(interaction, db) {
 		throw { 'message': 'Este comando solo puede ser usado en canales de carreras.' };
 	}
 
-	if (!interaction.memberPermissions.has(Permissions.FLAGS.MANAGE_CHANNELS) && interaction.user.id != race.Creator) {
+	if (!interaction.memberPermissions.has(PermissionsBitField.Flags.ManageChannels) && interaction.user.id != race.Creator) {
 		throw { 'message': 'Solo el creador de la carrera o un moderador pueden ejecutar este comando.' };
 	}
 
@@ -326,7 +333,7 @@ async function async_reabrir(interaction, db) {
 		const creator = interaction.user;
 		await get_or_insert_player(db, creator.id, creator.username, creator.discriminator, `${creator}`);
 		await update_async_status(db, race.Id, 0);
-		const ans_embed = new MessageEmbed()
+		const ans_embed = new EmbedBuilder()
 			.setColor('#0099ff')
 			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 			.setDescription('Esta carrera ha sido reabierta.')
@@ -353,7 +360,7 @@ async function async_purgar(interaction, db) {
 		throw { 'message': 'Este comando solo puede ser usado en canales de carreras.' };
 	}
 
-	if (!interaction.memberPermissions.has(Permissions.FLAGS.MANAGE_CHANNELS) && interaction.user.id != race.Creator) {
+	if (!interaction.memberPermissions.has(PermissionsBitField.Flags.ManageChannels) && interaction.user.id != race.Creator) {
 		throw { 'message': 'Solo el creador de la carrera o un moderador pueden ejecutar este comando.' };
 	}
 
@@ -361,7 +368,7 @@ async function async_purgar(interaction, db) {
 		throw { 'message': 'La carrera debe cerrarse antes de ser purgada.' };
 	}
 
-	const ans_embed = new MessageEmbed()
+	const ans_embed = new EmbedBuilder()
 		.setColor('#0099ff')
 		.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 		.setDescription('Purgando...')

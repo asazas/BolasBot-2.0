@@ -1,6 +1,6 @@
 const process = require('process');
 
-const { MessageEmbed, MessageAttachment } = require('discord.js');
+const { EmbedBuilder, AttachmentBuilder } = require('discord.js');
 
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
@@ -12,14 +12,14 @@ const exec = util.promisify(require('child_process').exec);
  * @description Genera un embed con una imagen aleatoria de Fernando Almeida y una frase aleatoria generada
  * por el comando de consola "fortune es", si este programa está instalado.
  *
- * @returns {[MessageEmbed, MessageAttachment]} Un array con dos elementos: en la posición [0], un MessageEmbed
+ * @returns {[EmbedBuilder, AttachmentBuilder]} Un array con dos elementos: en la posición [0], un EmbedBuilder
  * con la imagen y frase aleatorias; y en la posición [1], la imagen aleatoria de Fernando Almeida como
- * MessageAttachment.
+ * AttachmentBuilder.
  */
 async function get_fernando_embed() {
 	const image_name = `almeida${Math.floor(Math.random() * 11)}.png`;
-	const image = new MessageAttachment(`res/almeida/${image_name}`);
-	const ans = new MessageEmbed()
+	const image = new AttachmentBuilder(`res/almeida/${image_name}`);
+	const ans = new EmbedBuilder()
 		.setColor('#0099ff')
 		.setImage(`attachment://${image_name}`)
 		.setTimestamp();

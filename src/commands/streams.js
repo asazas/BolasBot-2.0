@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { PermissionFlagsBits } = require('discord-api-types/v10');
-const { Permissions } = require('discord.js');
+const { PermissionsBitField } = require('discord.js');
 const { stream_alta, stream_baja, set_stream_role } = require('../streams/streams_util');
 
 const command = {};
@@ -40,7 +40,7 @@ command.execute = async function(interaction, db) {
 	if (!interaction.inGuild()) {
 		throw { 'message': 'Este comando no puede ser usado en mensajes directos.' };
 	}
-	if (!interaction.memberPermissions.has(Permissions.FLAGS.MANAGE_CHANNELS)) {
+	if (!interaction.memberPermissions.has(PermissionsBitField.Flags.ManageChannels)) {
 		throw { 'message': 'Solo un moderador puede ejecutar este comando.' };
 	}
 

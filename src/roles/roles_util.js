@@ -1,4 +1,4 @@
-const { Permissions, MessageEmbed, Guild, CommandInteraction, User, ReactionEmoji, Message } = require('discord.js');
+const { PermissionsBitField, EmbedBuilder, Guild, CommandInteraction, User, ReactionEmoji, Message } = require('discord.js');
 const { Sequelize } = require('sequelize');
 const { get_global_var } = require('../datamgmt/db_utils');
 const { set_reaction_roles_channel, get_role_category, create_reaction_role_category, get_roles_for_category, delete_reaction_role_category, get_all_role_categories, get_role_by_name, create_reaction_role, delete_reaction_role, get_role_by_emoji_id } = require('../datamgmt/role_db_utils');
@@ -91,29 +91,30 @@ async function crear_categoria_roles(interaction, db) {
 		}
 	}
 	if (!roles_channel) {
-		roles_channel = await interaction.guild.channels.create('roles', {
+		roles_channel = await interaction.guild.channels.create({
+			name: 'roles',
 			permissionOverwrites: [
 				{
 					id: interaction.guild.roles.everyone,
-					deny: [Permissions.FLAGS.SEND_MESSAGES],
+					deny: [PermissionsBitField.Flags.SendMessages],
 				},
 				{
-					id: interaction.guild.me,
-					allow: [Permissions.FLAGS.SEND_MESSAGES],
+					id: interaction.guild.members.me,
+					allow: [PermissionsBitField.Flags.SendMessages],
 				},
 			],
 		});
 		await set_reaction_roles_channel(db, roles_channel.id);
 	}
 
-	const role_cat_embed = new MessageEmbed()
+	const role_cat_embed = new EmbedBuilder()
 		.setColor('#0099ff')
 		.setTitle(nombre_cat);
 
 	const cat_msg = await roles_channel.send({ embeds: [role_cat_embed] });
 	await create_reaction_role_category(db, nombre_cat.toLowerCase(), cat_msg.id);
 
-	const ans_embed = new MessageEmbed()
+	const ans_embed = new EmbedBuilder()
 		.setColor('#0099ff')
 		.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 		.setDescription(`Creada la categoría de roles: \`${nombre_cat}\`.`)
@@ -152,7 +153,7 @@ async function eliminar_categoria_roles(interaction, db) {
 
 	await delete_reaction_role_category(db, nombre_cat.toLowerCase());
 
-	const ans_embed = new MessageEmbed()
+	const ans_embed = new EmbedBuilder()
 		.setColor('#0099ff')
 		.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 		.setDescription(`Eliminada la categoría de roles: \`${nombre_cat}\`.`)
@@ -216,7 +217,7 @@ async function crear_rol(interaction, db) {
 
 	cat_msg.react(emoji);
 
-	const ans_embed = new MessageEmbed()
+	const ans_embed = new EmbedBuilder()
 		.setColor('#0099ff')
 		.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 		.setDescription(`Creado el rol: \`${nombre_rol}\`.`)
@@ -258,7 +259,7 @@ async function eliminar_rol(interaction, db) {
 		await reactions.remove();
 	}
 
-	const ans_embed = new MessageEmbed()
+	const ans_embed = new EmbedBuilder()
 		.setColor('#0099ff')
 		.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 		.setDescription(`Eliminado el rol: \`${nombre_rol}\`.`)

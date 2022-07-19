@@ -1,4 +1,4 @@
-const { Permissions, MessageEmbed, CommandInteraction } = require('discord.js');
+const { PermissionsBitField, EmbedBuilder, CommandInteraction } = require('discord.js');
 const { Sequelize } = require('sequelize');
 const { get_or_insert_player, ban_player, unban_player } = require('../datamgmt/db_utils');
 
@@ -21,7 +21,7 @@ async function vetos_banear(interaction, db) {
 	if (!member) {
 		throw { 'message': 'El usuario especificado no es miembro de este servidor.' };
 	}
-	if (member.permissions.has(Permissions.FLAGS.MANAGE_CHANNELS)) {
+	if (member.permissions.has(PermissionsBitField.Flags.ManageChannels)) {
 		throw { 'message': 'Los moderadores no pueden ser vetados.' };
 	}
 
@@ -31,7 +31,7 @@ async function vetos_banear(interaction, db) {
 	}
 
 	await ban_player(db, user.id);
-	const ans_embed = new MessageEmbed()
+	const ans_embed = new EmbedBuilder()
 		.setColor('#0099ff')
 		.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 		.setDescription(`El usuario ${user} ha sido vetado.`)
@@ -61,7 +61,7 @@ async function vetos_levantar(interaction, db) {
 	}
 
 	await unban_player(db, user.id);
-	const ans_embed = new MessageEmbed()
+	const ans_embed = new EmbedBuilder()
 		.setColor('#0099ff')
 		.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 		.setDescription(`Se ha retirado el veto sobre el usuario ${user}.`)

@@ -1,5 +1,5 @@
 const { ApiClient } = require('@twurple/api');
-const { Permissions, MessageEmbed, CommandInteraction, Guild, Client } = require('discord.js');
+const { PermissionsBitField, EmbedBuilder, CommandInteraction, Guild, Client } = require('discord.js');
 const { Sequelize } = require('sequelize');
 const { get_or_insert_player, get_global_var } = require('../datamgmt/db_utils');
 const { register_stream, unregister_stream, set_stream_alerts_role, get_streams, update_stream_live, set_stream_alerts_channel } = require('../datamgmt/stream_db_utils');
@@ -58,7 +58,7 @@ async function stream_alta(interaction, db) {
 	else {
 		await register_stream(db, null, stream.toLowerCase());
 	}
-	const ans_embed = new MessageEmbed()
+	const ans_embed = new EmbedBuilder()
 		.setColor('#0099ff')
 		.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 		.setDescription(`Añadido el stream ${stream} a la lista de alertas.`)
@@ -81,7 +81,7 @@ async function stream_baja(interaction, db) {
 	if (deleted == 0) {
 		throw { 'message': 'El stream proporcionado no está registrado.' };
 	}
-	const ans_embed = new MessageEmbed()
+	const ans_embed = new EmbedBuilder()
 		.setColor('#0099ff')
 		.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 		.setDescription(`Eliminado el stream ${stream} de la lista de alertas.`)
@@ -102,7 +102,7 @@ async function set_stream_role(interaction, db) {
 	const role = interaction.options.getRole('rol');
 	if (role) {
 		await set_stream_alerts_role(db, role.id);
-		const ans_embed = new MessageEmbed()
+		const ans_embed = new EmbedBuilder()
 			.setColor('#0099ff')
 			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 			.setDescription(`Registrado el rol ${role} para pings de alertas de stream.`)
@@ -111,7 +111,7 @@ async function set_stream_role(interaction, db) {
 	}
 	else {
 		await set_stream_alerts_role(db, null);
-		const ans_embed = new MessageEmbed()
+		const ans_embed = new EmbedBuilder()
 			.setColor('#0099ff')
 			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 			.setDescription('No se enviarán pings para alertas de stream.')
@@ -191,14 +191,14 @@ async function announce_live_streams(guild, guild_streams, db, twitch_info) {
 					const member = await guild.members.fetch(stream_db_status['owner']);
 					title = `¡${member.user.username} está en directo!`;
 				}
-				const ans_embed = new MessageEmbed()
+				const ans_embed = new EmbedBuilder()
 					.setColor('#0099ff')
-					.setAuthor({ name: guild.me.user.username, iconURL: guild.me.user.avatarURL() })
+					.setAuthor({ name: guild.members.me.user.username, iconURL: guild.members.me.user.avatarURL() })
 					.setTitle(title)
 					.setURL(`https://www.twitch.tv/${twitch_info[channel_name].userName}`)
 					.setDescription(`${twitch_info[channel_name].title}`)
 					.setImage(`${twitch_info[channel_name].thumbnailUrl.replace('-{width}x{height}', '')}`)
-					.addField('Juego', `${twitch_info[channel_name].gameName}`)
+					.addFields([{ name: 'Juego', value: `${twitch_info[channel_name].gameName}` }])
 					.setTimestamp();
 				messages.push(ans_embed);
 				set_live.push(channel_name);
@@ -233,15 +233,16 @@ async function announce_live_streams(guild, guild_streams, db, twitch_info) {
 			}
 		}
 		if (!alerts_channel) {
-			alerts_channel = await guild.channels.create('streams-comunidad', {
+			alerts_channel = await guild.channels.create({
+				name: 'streams-comunidad',
 				permissionOverwrites: [
 					{
 						id: guild.roles.everyone,
-						deny: [Permissions.FLAGS.SEND_MESSAGES],
+						deny: [PermissionsBitField.Flags.SendMessages],
 					},
 					{
-						id: guild.me,
-						allow: [Permissions.FLAGS.SEND_MESSAGES],
+						id: guild.members.me,
+						allow: [PermissionsBitField.Flags.SendMessages],
 					},
 				],
 			});

@@ -1,4 +1,4 @@
-const { MessageEmbed, MessageAttachment, CommandInteraction } = require('discord.js');
+const { EmbedBuilder, AttachmentBuilder, CommandInteraction } = require('discord.js');
 const slugid = require('slugid');
 
 const { get_formatted_spoiler } = require('./spoiler');
@@ -15,7 +15,7 @@ const { get_seed_code } = require('./seedgen_util');
  * @param {CommandInteraction} interaction Interacción correspondiente al comando inicialmente invocado.
  * @param {string}             preset      Preset y opciones extra indicados en el comando inicialmente invocado.
  *
- * @returns {MessageEmbed} Embed que contiene los datos disponibles de la seed: preset, URL, autor y hash.
+ * @returns {EmbedBuilder} Embed que contiene los datos disponibles de la seed: preset, URL, autor y hash.
  */
 function sm_info_embed(seed, interaction, preset = '') {
 	let seed_guid = seed['data']['guid'];
@@ -41,25 +41,27 @@ function sm_info_embed(seed, interaction, preset = '') {
 
 	let embed;
 	if (preset) {
-		embed = new MessageEmbed()
+		embed = new EmbedBuilder()
 			.setColor('#0099ff')
 			.setTitle(preset)
 			.setURL(url)
 			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
-			.addField('Autor', interaction.user.username)
-			.addField('URL', url)
-			.addField('Hash', seed['data']['hash'])
+			.addFields([
+				{ name: 'Autor', value: interaction.user.username },
+				{ name: 'URL', value: url },
+				{ name: 'Hash', value: seed['data']['hash'] }])
 			.setTimestamp();
 	}
 	else {
-		embed = new MessageEmbed()
+		embed = new EmbedBuilder()
 			.setColor('#0099ff')
 			.setTitle(slug)
 			.setURL(url)
 			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
-			.addField('Solicitado por', interaction.user.username)
-			.addField('URL', url)
-			.addField('Hash', seed['data']['hash'])
+			.addFields([
+				{ name: 'Solicitado por', value: interaction.user.username },
+				{ name: 'URL', value: url },
+				{ name: 'Hash', value: seed['data']['hash'] }])
 			.setTimestamp();
 	}
 	return embed;
@@ -76,7 +78,7 @@ function sm_info_embed(seed, interaction, preset = '') {
  * @param {CommandInteraction} interaction Interacción correspondiente al comando inicialmente invocado.
  * @param {string}             preset      Preset y opciones extra indicados en el comando inicialmente invocado.
  *
- * @returns {MessageEmbed} Embed que contiene los datos disponibles de la seed: preset, URL, autor y hash.
+ * @returns {EmbedBuilder} Embed que contiene los datos disponibles de la seed: preset, URL, autor y hash.
  */
 function alttpr_info_embed(seed, interaction, preset = '') {
 	const code = get_seed_code(seed);
@@ -84,25 +86,27 @@ function alttpr_info_embed(seed, interaction, preset = '') {
 	let embed;
 
 	if (preset) {
-		embed = new MessageEmbed()
+		embed = new EmbedBuilder()
 			.setColor('#0099ff')
 			.setTitle(preset)
 			.setURL(url)
 			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
-			.addField('Autor', interaction.user.username)
-			.addField('URL', url)
-			.addField('Hash', code)
+			.addFields([
+				{ name: 'Autor', value: interaction.user.username },
+				{ name: 'URL', value: url },
+				{ name: 'Hash', value: code }])
 			.setTimestamp();
 	}
 	else {
-		embed = new MessageEmbed()
+		embed = new EmbedBuilder()
 			.setColor('#0099ff')
 			.setTitle(seed.data.hash)
 			.setURL(url)
 			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
-			.addField('Solicitado por', interaction.user.username)
-			.addField('URL', url)
-			.addField('Hash', code)
+			.addFields([
+				{ name: 'Solicitado por', value: interaction.user.username },
+				{ name: 'URL', value: url },
+				{ name: 'Hash', value: code }])
 			.setTimestamp();
 	}
 	return embed;
@@ -119,30 +123,32 @@ function alttpr_info_embed(seed, interaction, preset = '') {
  * @param {CommandInteraction} interaction Interacción correspondiente al comando inicialmente invocado.
  * @param {string}             preset      Preset y opciones extra indicados en el comando inicialmente invocado.
  *
- * @returns {MessageEmbed} Embed que contiene los datos disponibles de la seed: preset, URL y autor.
+ * @returns {EmbedBuilder} Embed que contiene los datos disponibles de la seed: preset, URL y autor.
  */
 function varia_info_embed(seed, interaction, preset = '') {
 	const url = `https://randommetroidsolver.pythonanywhere.com/customizer/${seed.data.seedKey}`;
 
 	let embed;
 	if (preset) {
-		embed = new MessageEmbed()
+		embed = new EmbedBuilder()
 			.setColor('#0099ff')
 			.setTitle(preset)
 			.setURL(url)
 			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
-			.addField('Autor', interaction.user.username)
-			.addField('URL', url)
+			.addFields([
+				{ name: 'Autor', value: interaction.user.username },
+				{ name: 'URL', value: url }])
 			.setTimestamp();
 	}
 	else {
-		embed = new MessageEmbed()
+		embed = new EmbedBuilder()
 			.setColor('#0099ff')
 			.setTitle(seed.data.seedkey)
 			.setURL(url)
 			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
-			.addField('Solicitado por', interaction.user.username)
-			.addField('URL', url)
+			.addFields([
+				{ name: 'Solicitado por', value: interaction.user.username },
+				{ name: 'URL', value: url }])
 			.setTimestamp();
 	}
 	return embed;
@@ -160,9 +166,9 @@ function varia_info_embed(seed, interaction, preset = '') {
  * @param {CommandInteraction} interaction Interacción correspondiente al comando inicialmente invocado.
  * @param {string}             preset      Preset de la seed generada y opciones extra, separadas por espacios.
  *
- * @returns {[MessageEmbed, ?MessageAttachment]} Array con dos elementos: en la posición [0], el MessageEmbed
+ * @returns {[EmbedBuilder, ?AttachmentBuilder]} Array con dos elementos: en la posición [0], el EmbedBuilder
  * con los datos de la seed pasada como argumento; y en la posición [1], el archivo 'spoiler.json' como
- * MessageAttachment para seeds de ALTTPR que generen spoiler log (devuelve null en la posición [1] en cualquier
+ * AttachmentBuilder para seeds de ALTTPR que generen spoiler log (devuelve null en la posición [1] en cualquier
  * otro caso.)
  */
 function seed_info_embed(seed, interaction, preset = '') {
@@ -178,7 +184,7 @@ function seed_info_embed(seed, interaction, preset = '') {
 
 	else if (seed['data']['spoiler']['meta']['spoilers'] == 'on' || seed['data']['spoiler']['meta']['spoilers'] == 'generate') {
 		const spoiler = JSON.stringify(get_formatted_spoiler(seed), null, 4);
-		const spoiler_attachment = new MessageAttachment(Buffer.from(spoiler), 'spoiler.json');
+		const spoiler_attachment = new AttachmentBuilder(Buffer.from(spoiler), { name: 'spoiler.json' });
 		spoiler_attachment.setSpoiler(true);
 		return [alttpr_info_embed(seed, interaction, preset), spoiler_attachment];
 	}
@@ -238,7 +244,7 @@ function seed_raw_data(seed, interaction, preset = '') {
 
 		if (seed['data']['spoiler']['meta']['spoilers'] == 'on' || seed['data']['spoiler']['meta']['spoilers'] == 'generate') {
 			const spoiler = JSON.stringify(get_formatted_spoiler(seed), null, 4);
-			const spoiler_attachment = new MessageAttachment(Buffer.from(spoiler), 'spoiler.json');
+			const spoiler_attachment = new AttachmentBuilder(Buffer.from(spoiler), { name: 'spoiler.json' });
 			spoiler_attachment.setSpoiler(true);
 			output['spoiler'] = spoiler;
 			output['spoiler_attachment'] = spoiler_attachment;

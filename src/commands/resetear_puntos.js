@@ -1,7 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { PermissionFlagsBits } = require('discord-api-types/v10');
-const { Permissions, MessageEmbed, MessageActionRow, MessageButton } = require('discord.js');
-const { reset_player_scores } = require('../datamgmt/db_utils');
+const { PermissionFlagsBits, ButtonStyle } = require('discord-api-types/v10');
+const { PermissionsBitField, EmbedBuilder, ActionRowBuilder, ButtonBuilder } = require('discord.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -14,21 +13,21 @@ module.exports = {
 		if (!interaction.inGuild()) {
 			throw { 'message': 'Este comando no puede ser usado en mensajes directos.' };
 		}
-		if (!interaction.memberPermissions.has(Permissions.FLAGS.MANAGE_CHANNELS)) {
+		if (!interaction.memberPermissions.has(PermissionsBitField.Flags.ManageChannels)) {
 			throw { 'message': 'Solo un moderador puede ejecutar este comando.' };
 		}
 
-		const ans_embed = new MessageEmbed()
+		const ans_embed = new EmbedBuilder()
 			.setColor('#0099ff')
 			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 			.setDescription('**¡Una vez se reseteen las puntuaciones, no se podrán recuperar!**\n\nPulsa "Confirmar" si quieres resetear las puntuaciones.')
 			.setTimestamp();
 
-		const row = new MessageActionRow().addComponents(
-			new MessageButton()
+		const row = new ActionRowBuilder().addComponents(
+			new ButtonBuilder()
 				.setCustomId('resetear')
 				.setLabel('Confirmar')
-				.setStyle('PRIMARY'),
+				.setStyle(ButtonStyle.Primary),
 		);
 
 		await interaction.reply({ embeds: [ans_embed], components: [row], ephemeral: true });

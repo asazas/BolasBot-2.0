@@ -1,4 +1,4 @@
-const { MessageEmbed, CommandInteraction } = require('discord.js');
+const { EmbedBuilder, CommandInteraction } = require('discord.js');
 const { Sequelize, Model } = require('sequelize');
 const { save_async_result, get_player_result } = require('../datamgmt/async_db_utils');
 const { get_or_insert_player } = require('../datamgmt/db_utils');
@@ -50,7 +50,7 @@ async function done_async(interaction, db, race) {
 			collection = 0;
 		}
 		else {
-			const error_embed = new MessageEmbed()
+			const error_embed = new EmbedBuilder()
 				.setColor('#0099ff')
 				.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 				.setDescription(`${interaction.user}, tu resultado no se ha registrado. Asegúrate de rellenar los parámetros del comando correctamente.`)
@@ -83,7 +83,7 @@ async function done_async(interaction, db, race) {
 	}
 
 	// Respuesta al comando.
-	const ans_embed = new MessageEmbed()
+	const ans_embed = new EmbedBuilder()
 		.setColor('#0099ff')
 		.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 		.setDescription(`GG ${author}, tu resultado se ha registrado.`)
@@ -127,7 +127,7 @@ async function done_race(interaction, db, race, forfeit = false) {
 	}
 
 	// Responder al comando.
-	let text_ans = new MessageEmbed()
+	let text_ans = new EmbedBuilder()
 		.setColor('#0099ff')
 		.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 		.setTimestamp();
@@ -160,7 +160,7 @@ async function done_race(interaction, db, race, forfeit = false) {
 
 	// Terminar la carrera si el último jugador ha acabado.
 	if (typeof done_code == 'object' && done_code['done_count'] == done_code['player_count']) {
-		text_ans = new MessageEmbed()
+		text_ans = new EmbedBuilder()
 			.setColor('#0099ff')
 			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 			.setDescription('Todos los jugadores han terminado. Cerrando la carrera. ¡GG!')
@@ -187,7 +187,7 @@ async function undone_race(interaction, db, race) {
 	await get_or_insert_player(db, interaction.user.id, interaction.user.username, interaction.user.discriminator, `${interaction.user}`);
 	const undone_code = await set_player_undone(db, race.Id, interaction.user.id);
 
-	let text_ans = new MessageEmbed()
+	let text_ans = new EmbedBuilder()
 		.setColor('#0099ff')
 		.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 		.setTimestamp();

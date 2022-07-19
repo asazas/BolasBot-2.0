@@ -1,6 +1,6 @@
 const fs = require('fs');
 const { finished } = require('stream/promises');
-const { MessageEmbed, MessageAttachment, CommandInteraction } = require('discord.js');
+const { EmbedBuilder, Attachment, CommandInteraction, AttachmentBuilder } = require('discord.js');
 const { Sequelize } = require('sequelize');
 const gaxios = require('gaxios');
 // problemas con multipart data en gaxios
@@ -17,9 +17,9 @@ const { random_words } = require('../racing/async_util');
  * @description Envía un .zip de ajustes de jugadores a Archipelado para la creación de una nueva partida de
  * multiworld.
  *
- * @param {MessageAttachment} attachment Archivo comprimido .zip que incluye los ajustes de cada jugador.
- * @param {boolean}           spoiler    Parámetro que decide si la partida se genera con acceso al log de
- *                                       spoiler (true) o no (false.)
+ * @param {Attachment} attachment Archivo comprimido .zip que incluye los ajustes de cada jugador.
+ * @param {boolean}    spoiler    Parámetro que decide si la partida se genera con acceso al log de spoiler
+ *                                (true) o no (false.)
  *
  * @returns {object} Objeto que contiene la respuesta de la API de Archipelago Multiworld. Campos importantes:
  * status (201 = OK, cualquier otro = error), statusText, data.url (URL de la partida generada), data.text (para
@@ -83,12 +83,12 @@ async function crear_multiworld(interaction, db) {
 
 	if (game.status == 201) {
 
-		const multi_embed = new MessageEmbed()
+		const multi_embed = new EmbedBuilder()
 			.setColor('#0099ff')
 			.setTitle('Multiworld')
 			.setURL(game.data.url)
 			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
-			.addField('URL', game.data.url)
+			.addFields([{ name: 'URL', value: game.data.url }])
 			.setTimestamp();
 
 		// comando en servidor -> crear nuevo hilo
@@ -107,7 +107,7 @@ async function crear_multiworld(interaction, db) {
 			const multi_msg = await multi_thread.send({ embeds: [multi_embed] });
 			await multi_msg.pin();
 
-			const main_embed = new MessageEmbed()
+			const main_embed = new EmbedBuilder()
 				.setColor('#0099ff')
 				.setTitle('Éxito')
 				.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
@@ -125,13 +125,13 @@ async function crear_multiworld(interaction, db) {
 
 	else {
 		const image_name = `almeida${Math.floor(Math.random() * 4)}.png`;
-		const image = new MessageAttachment(`res/almeida/${image_name}`);
-		const embed = new MessageEmbed()
+		const image = new AttachmentBuilder(`res/almeida/${image_name}`);
+		const embed = new EmbedBuilder()
 			.setColor('#0099ff')
 			.setTitle('Error')
 			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 			.setDescription(`${game.status} ${game.statusText}`)
-			.addField('Detalles', game.data.text)
+			.addFields([{ name: 'Detalles', value: game.data.text }])
 			.setImage(`attachment://${image_name}`)
 			.setTimestamp();
 

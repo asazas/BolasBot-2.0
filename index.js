@@ -2,7 +2,7 @@ const fs = require('fs');
 const glob = require('glob');
 const path = require('path');
 // Require the necessary discord.js classes
-const { Client, Collection, Intents } = require('discord.js');
+const { Client, Collection, GatewayIntentBits, Partials, InteractionType } = require('discord.js');
 const { ClientCredentialsAuthProvider } = require('@twurple/auth');
 const { ApiClient } = require('@twurple/api');
 const { CronJob } = require('cron');
@@ -17,10 +17,10 @@ const { resetear_puntos_elo } = require('./src/otros/resetear_puntos_util');
 
 // Create a new Discord client instance
 const discord_client = new Client({
-	intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_MESSAGES,
-		Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_MESSAGE_TYPING, Intents.FLAGS.DIRECT_MESSAGES,
-		Intents.FLAGS.DIRECT_MESSAGE_REACTIONS, Intents.FLAGS.DIRECT_MESSAGE_TYPING],
-	partials: ['MESSAGE', 'CHANNEL', 'REACTION', 'USER'],
+	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildMessages,
+		GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.GuildMessageTyping, GatewayIntentBits.DirectMessages,
+		GatewayIntentBits.DirectMessageReactions, GatewayIntentBits.DirectMessageTyping],
+	partials: [Partials.Message, Partials.Channel, Partials.Reaction, Partials.User],
 });
 
 discord_client.commands = new Collection();
@@ -103,7 +103,7 @@ discord_client.once('ready', async () => {
 discord_client.on('interactionCreate', async interaction => {
 
 	// Autocompletado de opciones extra para seeds
-	if (interaction.isAutocomplete()) {
+	if (interaction.type === InteractionType.ApplicationCommandAutocomplete) {
 		const archivo = interaction.options.getAttachment('archivo');
 		const url = interaction.options.getString('url');
 		if (archivo != null || url != null) {
@@ -126,14 +126,14 @@ discord_client.on('interactionCreate', async interaction => {
 	}
 
 	// Respuesta a interacción con botones
-	if (interaction.isButton()) {
+	if (interaction.type === InteractionType.MessageComponent) {
 		// Confirmación de resetear puntos
 		if (interaction.customId === 'resetear') {
 			resetear_puntos_elo(interaction, db[interaction.guildId]);
 		}
 	}
 
-	if (!interaction.isCommand()) return;
+	if (interaction.type !== InteractionType.ApplicationCommand) return;
 
 	const command = discord_client.commands.get(interaction.commandName);
 

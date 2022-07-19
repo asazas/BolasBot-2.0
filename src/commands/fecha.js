@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 const { procesar_fecha } = require('../otros/fecha_util');
 
 module.exports = {
@@ -43,10 +43,10 @@ module.exports = {
 		}
 		const obj_fecha = procesar_fecha(fecha, hora, timezone);
 		const tstamp = obj_fecha.toSeconds();
-		const response_embed = new MessageEmbed()
+		const response_embed = new EmbedBuilder()
 			.setColor('#0099ff')
 			.setTitle(`<t:${tstamp}>`)
-			.addField('Timestamp', `\`\`\`<t:${tstamp}>\`\`\``)
+			.addFields([{ name: 'Timestamp', value: `\`\`\`<t:${tstamp}>\`\`\`` }])
 			.setTimestamp();
 		await interaction.reply({ embeds: [response_embed] });
 	},
