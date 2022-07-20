@@ -22,13 +22,15 @@ const HORA_EUROPEA_REGEX = /^(2[0-3]|[0-1]?[0-9]):([0-5][0-9])$/;
  * @description Devuelve un objeto DateTime de la librería Luxon que representa el inicio del día dado por el
  * parámetro "fecha".
  *
- * @param {string} fecha    Fecha en formato dd/mm/aaaa. También puede ser "hoy", "mañana" o un día de la semana.
- * @param {string} timezone Zona horaria a la que corresponde la fecha dada.
+ * @param {string}  fecha    Fecha en formato dd/mm/aaaa. También puede ser "hoy", "mañana", "ayer" o un día de la semana.
+ * @param {string}  timezone Zona horaria a la que corresponde la fecha dada.
+ * @param {boolean} pasado   Si se pasa un día de la semana, considerar que sea el día correspondiente inmediatamente
+ *                           anterior (true) o siguiente (false) al día actual.
  *
  * @returns {DateTime} Objeto DateTime de la librería Luxon que representa el inicio del día dado por el
  * parámetro "fecha".
  */
-function validar_fecha(fecha, timezone) {
+function validar_fecha(fecha, timezone, pasado = false) {
 	const fecha_obj = DateTime.fromFormat(fecha, 'D', { locale: 'es', zone: timezone });
 	if (fecha_obj.isValid) {
 		return fecha_obj;
@@ -41,12 +43,23 @@ function validar_fecha(fecha, timezone) {
 		const manana = DateTime.local({ zone: timezone }).startOf('day').plus({ days: 1 });
 		return manana;
 	}
+	else if (fecha === 'ayer') {
+		const manana = DateTime.local({ zone: timezone }).startOf('day').minus({ days: 1 });
+		return manana;
+	}
 	else if (fecha in dias_semana) {
 		const dia_semana_hoy = DateTime.local({ zone: timezone }).weekday;
 		let dia_semana_indicado = dias_semana[fecha];
-		if (dia_semana_indicado <= dia_semana_hoy) dia_semana_indicado += 7;
-		const proxima_fecha = DateTime.local({ zone: timezone }).startOf('day').plus({ days: dia_semana_indicado - dia_semana_hoy });
-		return proxima_fecha;
+		if (pasado) {
+			if (dia_semana_indicado >= dia_semana_hoy) dia_semana_indicado -= 7;
+			const fecha_anterior = DateTime.local({ zone: timezone }).startOf('day').minus({ days: dia_semana_hoy - dia_semana_indicado });
+			return fecha_anterior;
+		}
+		else {
+			if (dia_semana_indicado <= dia_semana_hoy) dia_semana_indicado += 7;
+			const proxima_fecha = DateTime.local({ zone: timezone }).startOf('day').plus({ days: dia_semana_indicado - dia_semana_hoy });
+			return proxima_fecha;
+		}
 	}
 	else {
 		throw { 'message': 'La fecha indicada no es válida.' };
