@@ -320,7 +320,72 @@ async function get_player_result(sequelize, submit_channel, player) {
 	}
 }
 
+
+/**
+ * @summary Llamado como parte de la rutina del comando /exportar.
+ *
+ * @description Devuelve la información y resultados de todas las carreras asíncronas en el rango temporal solicitado.
+ *
+ * @param {Sequelize} sequelize Base de datos del servidor.
+ * @param {number}    start     Timestamp que representa el momento inicial de la ventana temporal a buscar.
+ * @param {number}    end       Timestamp que representa el momento final de la ventana temporal a buscar.
+ * @param {number}    type      Tipo de carreras a incluir en la búsqueda. 0 = asíncronas, 1 = síncronas, 2 = ambas.
+ * @param {boolean}   ranked    Si es true, devuelve solo resultados de carreras puntuables. Si es false, devuelve
+ *                              resultados de todas las carreras.
+ *
+ * @returns {Model[]} Array de modelos conteniendo la información de las carreras buscadas. Si se buscan tanto
+ * carreras asíncronas como síncronas, se devuelven todas en el mismo array, en orden ascendente de fecha de cierre.
+ */
+async function get_past_races(sequelize, start, end, type, ranked) {
+	const async_races = sequelize.models.AsyncRaces;
+	const races = sequelize.models.Races;
+
+	let my_asyncs = null, my_races = null;
+
+	const condition = {
+		EndDate: {
+			[Op.between]: [start, end],
+		},
+		Status: 2,
+	};
+	if (ranked) condition['Ranked'] = true;
+
+	try {
+		return await sequelize.transaction(async (t) => {
+			if (type == 0 || type == 2) {
+				my_asyncs = await async_races.findAll({
+					where: condition,
+					order: [
+						['EndDate', 'ASC'],
+					],
+					transaction: t,
+				});
+				if (type == 0) return my_asyncs;
+			}
+
+			if (type == 1 || type == 2) {
+				my_races = await races.findAll({
+					where: condition,
+					order: [
+						['EndDate', 'ASC'],
+					],
+					transaction: t,
+				});
+				if (type == 1) return my_races;
+			}
+
+			// type == 2
+			const all_races = [...my_asyncs, ...my_races];
+			all_races.sort((a, b) => a.EndDate - b.EndDate);
+			return all_races;
+		});
+	}
+	catch (error) {
+		console.log(error['message']);
+	}
+}
+
 module.exports = {
 	insert_async, get_active_async_races, search_async_by_name, get_async_by_submit,
-	update_async_status, save_async_result, get_results_for_async, get_player_result,
+	update_async_status, save_async_result, get_results_for_async, get_player_result, get_past_races,
 };

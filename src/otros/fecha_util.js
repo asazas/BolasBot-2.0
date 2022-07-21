@@ -124,4 +124,4 @@ function procesar_fecha(fecha, hora, timezone) {
 	return fecha_con_hora;
 }
 
-module.exports = { procesar_fecha };
+module.exports = { validar_fecha, procesar_fecha };
