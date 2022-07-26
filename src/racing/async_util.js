@@ -261,8 +261,8 @@ async function async_crear(interaction, db) {
 		Por favor, mantened este canal lo más limpio posible y SIN SPOILERS.`)
 		.setTimestamp();
 	if (ranked) {
-		instructions.addField('Carrera asíncrona puntuable vinculante',
-			'Para participar en esta carrera asíncrona debes introducir el comando `/jugar` en este canal. Al hacerlo tendrás acceso a los detalles de la partida. Si te apuntas a la carrera y no registras un resultado antes de su cierre, se considerará como un forfeit.');
+		instructions.addFields([{ name: 'Carrera asíncrona puntuable vinculante',
+			value: 'Para participar en esta carrera asíncrona debes introducir el comando `/jugar` en este canal. Al hacerlo tendrás acceso a los detalles de la partida. Si te apuntas a la carrera y no registras un resultado antes de su cierre, se considerará como un forfeit.' }]);
 	}
 	await submit_channel.send({ embeds: [instructions] });
 

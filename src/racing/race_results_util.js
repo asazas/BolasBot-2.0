@@ -113,10 +113,10 @@ async function get_reduced_async_data_embed(db, submit_channel) {
 			{ name: 'Fecha de inicio', value: `<t:${my_async.StartDate}>` }])
 		.setTimestamp();
 	if (my_async.EndDate) {
-		data_embed.addField([{ name: 'Fecha de cierre', value: `<t:${my_async.EndDate}>` }]);
+		data_embed.addFields([{ name: 'Fecha de cierre', value: `<t:${my_async.EndDate}>` }]);
 	}
 	if (my_async.Preset) {
-		data_embed.addField([{ name: 'Descripción', value: my_async.Preset }]);
+		data_embed.addFields([{ name: 'Descripción', value: my_async.Preset }]);
 	}
 	return data_embed;
 }
