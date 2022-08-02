@@ -37,7 +37,7 @@ module.exports = {
 
 		.addIntegerOption(option =>
 			option.setName('tipo')
-				.setDescription('Tipos de carreras a exportar.')
+				.setDescription('Tipos de carreras a exportar. Por defecto: todas.')
 				.addChoices({ name: 'Todas', value: 2 },
 					{ name: 'Asíncronas', value: 0 },
 					{ name: 'Síncronas', value: 1 })),
