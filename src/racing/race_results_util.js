@@ -6,6 +6,32 @@ const { get_race_by_channel, get_results_for_race } = require('../datamgmt/race_
 
 
 /**
+ * @summary Función auxiliar para conversión de tiempos a formato hh:mm:ss.
+ *
+ * @description Convierte un timestamp numérico a formato hh:mm:ss.
+ *
+ * @param {number} timestamp Timestamp númerico, en segundos.
+ *
+ * @returns {string} Cadena en formato hh:mm:ss correspondiente al timestamp dado.
+ */
+function calcular_tiempo(timestamp) {
+	let time_str = 'Forfeit ';
+	if (timestamp < 359999) {
+		const s = timestamp % 60;
+		let m = Math.floor(timestamp / 60);
+		const h = Math.floor(m / 60);
+		m = m % 60;
+
+		const h_str = '0'.repeat(2 - h.toString().length) + h.toString();
+		const m_str = '0'.repeat(2 - m.toString().length) + m.toString();
+		const s_str = '0'.repeat(2 - s.toString().length) + s.toString();
+		time_str = `${h_str}:${m_str}:${s_str}`;
+	}
+	return time_str;
+}
+
+
+/**
  * @summary Llamado como parte de la rutina de los comandos /async crear, /async purgar y /done (cuando se usa
  * en carreras asíncronas.)
  *
@@ -27,18 +53,7 @@ async function get_async_results_text(db, submit_channel) {
 		msg += '|' + '-'.repeat(41) + '|\n';
 		let pos = 1;
 		for (const res of results) {
-			let time_str = 'Forfeit ';
-			if (res.Time < 359999) {
-				const s = res.Time % 60;
-				let m = Math.floor(res.Time / 60);
-				const h = Math.floor(m / 60);
-				m = m % 60;
-
-				const h_str = '0'.repeat(2 - h.toString().length) + h.toString();
-				const m_str = '0'.repeat(2 - m.toString().length) + m.toString();
-				const s_str = '0'.repeat(2 - s.toString().length) + s.toString();
-				time_str = `${h_str}:${m_str}:${s_str}`;
-			}
+			const time_str = calcular_tiempo(res.Time);
 			const pos_str = ' '.repeat(2 - pos.toString().length) + pos.toString();
 			let pl_name = res.player.Name.substring(0, 17);
 			pl_name = pl_name + ' '.repeat(17 - pl_name.length);
@@ -160,32 +175,6 @@ async function get_race_data_embed(db, race_channel) {
 		data_embed.addFields([{ name: 'Hash', value: my_race.SeedCode }]);
 	}
 	return data_embed;
-}
-
-
-/**
- * @summary Función auxiliar para conversión de tiempos a formato hh:mm:ss.
- *
- * @description Convierte un timestamp numérico a formato hh:mm:ss.
- *
- * @param {number} timestamp Timestamp númerico, en segundos.
- *
- * @returns {string} Cadena en formato hh:mm:ss correspondiente al timestamp dado.
- */
-function calcular_tiempo(timestamp) {
-	let time_str = 'Forfeit ';
-	if (timestamp < 359999) {
-		const s = timestamp % 60;
-		let m = Math.floor(timestamp / 60);
-		const h = Math.floor(m / 60);
-		m = m % 60;
-
-		const h_str = '0'.repeat(2 - h.toString().length) + h.toString();
-		const m_str = '0'.repeat(2 - m.toString().length) + m.toString();
-		const s_str = '0'.repeat(2 - s.toString().length) + s.toString();
-		time_str = `${h_str}:${m_str}:${s_str}`;
-	}
-	return time_str;
 }
 
 
@@ -344,6 +333,6 @@ async function calculate_player_scores(db, race_channel, async) {
 
 
 module.exports = {
-	get_async_results_text, get_async_data_embed, get_reduced_async_data_embed, get_race_data_embed,
-	get_race_results_text, calcular_tiempo, get_player_ranking_text, calculate_player_scores,
+	calcular_tiempo, get_async_results_text, get_async_data_embed, get_reduced_async_data_embed, get_race_data_embed,
+	get_race_results_text, get_player_ranking_text, calculate_score_change, calculate_player_scores,
 };
