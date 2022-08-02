@@ -324,7 +324,7 @@ async function get_player_result(sequelize, submit_channel, player) {
 /**
  * @summary Llamado como parte de la rutina del comando /exportar.
  *
- * @description Devuelve la información y resultados de todas las carreras asíncronas en el rango temporal solicitado.
+ * @description Devuelve los resultados de todas las carreras asíncronas en el rango temporal solicitado.
  *
  * @param {Sequelize} sequelize Base de datos del servidor.
  * @param {number}    start     Timestamp que representa el momento inicial de la ventana temporal a buscar.
@@ -333,14 +333,14 @@ async function get_player_result(sequelize, submit_channel, player) {
  * @param {boolean}   ranked    Si es true, devuelve solo resultados de carreras puntuables. Si es false, devuelve
  *                              resultados de todas las carreras.
  *
- * @returns {Model[]} Array de modelos conteniendo la información de las carreras buscadas. Si se buscan tanto
+ * @returns {Model[]} Array de modelos conteniendo cada uno de los resultados de las carreras buscadas. Si se buscan tanto
  * carreras asíncronas como síncronas, se devuelven todas en el mismo array, en orden ascendente de fecha de cierre.
  */
 async function get_past_races(sequelize, start, end, type, ranked) {
-	const async_races = sequelize.models.AsyncRaces;
-	const races = sequelize.models.Races;
+	const async_results = sequelize.models.AsyncResults;
+	const race_results = sequelize.models.RaceResults;
 
-	let my_asyncs = null, my_races = null;
+	let my_async_results = [], my_race_results = [];
 
 	const condition = {
 		EndDate: {
@@ -353,30 +353,63 @@ async function get_past_races(sequelize, start, end, type, ranked) {
 	try {
 		return await sequelize.transaction(async (t) => {
 			if (type == 0 || type == 2) {
-				my_asyncs = await async_races.findAll({
-					where: condition,
+				my_async_results = await async_results.findAll({
+					include: [
+						{
+							model: sequelize.models.AsyncRaces,
+							as: 'race',
+							required: true,
+							where: condition,
+						},
+						{
+							model: sequelize.models.Players,
+							as: 'player',
+							required: true,
+						},
+					],
 					order: [
-						['EndDate', 'ASC'],
+						['race', 'EndDate', 'ASC'],
+						['race', 'Id', 'ASC'],
+						['Time', 'ASC'],
+						['Timestamp', 'ASC'],
 					],
 					transaction: t,
 				});
-				if (type == 0) return my_asyncs;
 			}
 
 			if (type == 1 || type == 2) {
-				my_races = await races.findAll({
-					where: condition,
+				my_race_results = await race_results.findAll({
+					include: [
+						{
+							model: sequelize.models.Races,
+							as: 'race',
+							required: true,
+							where: condition,
+						},
+						{
+							model: sequelize.models.Players,
+							as: 'player',
+							required: true,
+						},
+					],
 					order: [
-						['EndDate', 'ASC'],
+						['race', 'EndDate', 'ASC'],
+						['race', 'Id', 'ASC'],
+						['Time', 'ASC'],
+						['Timestamp', 'ASC'],
 					],
 					transaction: t,
 				});
-				if (type == 1) return my_races;
 			}
 
-			// type == 2
-			const all_races = [...my_asyncs, ...my_races];
-			all_races.sort((a, b) => a.EndDate - b.EndDate);
+			const all_races = [...my_async_results, ...my_race_results];
+			all_races.sort(function(a, b) {
+				if (a.race.EndDate != b.race.EndDate) return a.race.EndDate - b.race.EndDate;
+				if (a.race.Id != b.race.Id) return a.race.Id - b.race.Id;
+				if (a.Time != b.Time) return a.Time - b.Time;
+				if (a.Timestamp != b.Timestamp) return a.Timestamp - b.Timestamp;
+				return 0;
+			});
 			return all_races;
 		});
 	}

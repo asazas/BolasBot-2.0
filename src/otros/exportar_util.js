@@ -1,9 +1,64 @@
 const { DateTime } = require('luxon');
 const { Sequelize, Model } = require('sequelize');
 const { Workbook } = require('exceljs');
-const { get_past_races, get_results_for_async } = require('../datamgmt/async_db_utils');
-const { get_results_for_race } = require('../datamgmt/race_db_utils');
+const { get_past_races } = require('../datamgmt/async_db_utils');
 const { calcular_tiempo, calculate_score_change } = require('../racing/race_results_util');
+
+
+/**
+ * @summary Función auxiliar para el procesado de resultados de carreras tras obtenerlas de base de datos.
+ *
+ * @description Convierte un único array de modelos Sequelize "RaceResults" o "AsyncResults" en un array de arrays,
+ * agrupados por carreras, y omitiendo carreras que no tengan un mínimo de dos resultados registrados. Esta función
+ * se utiliza como callback del método Array.reduce().
+ *
+ * @param {[Model[][], Model[]]} arr_de_arrays Array con dos elementos: en la posición [0], array de arrays incluyendo
+ *                                             los resultados agrupados por carreras. En la posición [1], array de
+ *                                             resultados correspondiente a la carrera procesada en la última invocación
+ *                                             del método.
+ * @param {Model}                res           Resultado procesado en la iteración actual.
+ * @param {number}               i             Índice del resultado actual en el array de resultados inicial.
+ * @param {Model[]}              res_carreras  Array de resultados inicial, tal y como se obtuvo de base de datos.
+ *
+ * @returns {[Model[][], Model[]]} El estado final de arr_de_arrays tras procesar el resultado.
+ */
+function results_reduce(arr_de_arrays, res, i, res_carreras) {
+	// caso particular primer resultado
+	if (i == 0) {
+		arr_de_arrays[1].push(res);
+		return arr_de_arrays;
+	}
+
+	const channel_actual = res.race.SubmitChannel || res.race.RaceChannel;
+	const channel_anterior = res_carreras[i - 1].race.SubmitChannel || res_carreras[i - 1].race.RaceChannel;
+
+	// caso particular último resultado
+	if (i == res_carreras.length - 1) {
+		// resultado en misma carrera que el resultado anterior
+		// (si es en carrera distinta, se descarta automáticamente)
+		if (channel_actual == channel_anterior) {
+			arr_de_arrays[1].push(res);
+		}
+		if (arr_de_arrays[1].length > 1) {
+			arr_de_arrays[0].push(arr_de_arrays[1]);
+		}
+		return arr_de_arrays;
+	}
+
+	// resultado en misma carrera que el resultado anterior
+	if (channel_actual == channel_anterior) {
+		arr_de_arrays[1].push(res);
+	}
+
+	// resultado en carrera distinta que el resultado anterior
+	else {
+		if (arr_de_arrays[1].length > 1) {
+			arr_de_arrays[0].push(arr_de_arrays[1]);
+		}
+		arr_de_arrays[1] = [res];
+	}
+	return arr_de_arrays;
+}
 
 
 /**
@@ -19,8 +74,8 @@ function actualizar_puntuaciones(results, jugadores) {
 
 	// puntuaciones antes de esta carrera
 	const starting_scores = {};
-	for (const my_res of results) {
-		starting_scores[my_res.player.DiscordId] = my_res.player.Score;
+	for (const player in jugadores) {
+		starting_scores[player] = jugadores[player].score;
 	}
 
 	// procesar cambios de puntuaciones para cada jugador
@@ -68,56 +123,58 @@ function actualizar_puntuaciones(results, jugadores) {
  * @summary Función auxiliar en la rutina del comando /exportar
  *
  * @description Procesa los resultados de una carrera, actualizando los datos de jugadores, resultados y
- * puntuaciones según sea necesario. Añade una hoja al Excel incluyendo los resultados de la carrera.
+ * puntuaciones según sea necesario.
  *
- * @param {number}   num        Número de la carrera dentro de la secuencia de carreras encontradas.
- * @param {Model[]}  carreras   Datos de las carreras, tal y como se obtuvieron de base de datos.
- * @param {Model[]}  res        Array de modelos con los resultados de la carrera para cada jugador.
- * @param {object}   jugadores  Objeto cuyas claves son los IDs de Discord de los jugadores y cuyos valores son
- *                              objetos que incluyen sus nombres de usuario, número de carreras disputadas y sus
- *                              puntuaciones Elo. Se actualiza tras la ejecución de esta función.
- * @param {object}   resultados Objeto cuyas claves son los IDs de Discord de los jugadores y cuyos valores son
- *                              arrays de objetos. Tamaño del array es el número total de carreras encontradas.
- *                              En cada posición del array, si el jugador participó en la carrera correspondiente,
- *                              hay un objeto que contiene su posición, tiempo y tasa de colección. Se actualiza
- *                              tras la ejecución de esta función.
+ * @param {number}    num        Índice la carrera dentro de la secuencia de carreras encontradas.
+ * @param {Model[][]} arr_res    Array de arrays incluyento todos los resultados agrupados por carreras.
+ * @param {object}    jugadores  Objeto cuyas claves son los IDs de Discord de los jugadores y cuyos valores son
+ *                               objetos que incluyen sus nombres de usuario, número de carreras disputadas y sus
+ *                               puntuaciones Elo. Se actualiza tras la ejecución de esta función.
+ * @param {object}    resultados Objeto cuyas claves son los IDs de Discord de los jugadores y cuyos valores son
+ *                               arrays de objetos. Tamaño del array es el número total de carreras encontradas.
+ *                               En cada posición del array, si el jugador participó en la carrera correspondiente,
+ *                               hay un objeto que contiene su posición, tiempo y tasa de colección. Se actualiza
+ *                               tras la ejecución de esta función.
  */
-function procesar_resultados_de_carrera(num, carreras, res, jugadores, resultados) {
-	for (let i = 0; i < res.length; ++i) {
-		const player_id = res[i].player.DiscordId;
+function procesar_resultados_de_carrera(num, arr_res, jugadores, resultados) {
+	const resultados_carrera = arr_res[num];
+	for (let i = 0; i < resultados_carrera.length; ++i) {
+		const res_jugador = resultados_carrera[i];
+		const player_id = res_jugador.player.DiscordId;
 		if (!(player_id in jugadores)) {
-			jugadores[player_id] = { name: res[i].player.Name, races: 0, score: 1500 };
+			jugadores[player_id] = { name: res_jugador.player.Name, races: 0, score: 1500 };
 		}
 		if (!(player_id in resultados)) {
-			resultados[player_id] = new Array(carreras.length);
+			resultados[player_id] = new Array(arr_res.length);
 		}
 
 		jugadores[player_id]['races'] += 1;
 
 		// Registrar resultado del jugador en vector de resultados
-		if (res[i].Time == 359999) {
+		if (res_jugador.Time == 359999) {
 			resultados[player_id][num] = { position: 'DNF', time: 'Forfeit' };
 		}
 		else {
-			resultados[player_id][num] = { position: i + 1, time: calcular_tiempo(res[i].Time) };
+			resultados[player_id][num] = { position: i + 1, time: calcular_tiempo(res_jugador.Time) };
 		}
-		if ('SubmitChannel' in carreras[num]) {
-			resultados[player_id][num]['cr'] = res[i].CollectionRate;
+		if ('CollectionRate' in res_jugador) {
+			resultados[player_id][num]['cr'] = res_jugador.CollectionRate;
 		}
 	}
 
 	// Actualizar Elo de los jugadores
-	actualizar_puntuaciones(res, jugadores);
+	actualizar_puntuaciones(resultados_carrera, jugadores);
 }
 
 
 /**
  * @summary Función auxiliar en la rutina del comando /exportar.
  *
- * @description Añade una hojas al Excel con los resultados de las carreras consultadas.
+ * @description Añade una hoja al Excel con los resultados de una carrera.
  *
- * @param {Workbook} excel      Hoja de cálculo de Excel a la que añadir los resultados de la carrera.
- * @param {Model[]}  carreras   Datos de las carreras, tal y como se obtuvieron de base de datos.
+ * @param {Workbook} excel      Hoja de cálculo de Excel a la que añadir los resultados de las carreras.
+ * @param {number}   num        Índice la carrera dentro de la secuencia de carreras encontradas.
+ * @param {Model[]}  carrera    Información general de la carrera, tal y como figura en base de datos.
  * @param {object}   jugadores  Objeto cuyas claves son los IDs de Discord de los jugadores y cuyos valores son
  *                              objetos que incluyen sus nombres de usuario, número de carreras disputadas y sus
  *                              puntuaciones Elo. Se actualiza tras la ejecución de esta función.
@@ -127,60 +184,55 @@ function procesar_resultados_de_carrera(num, carreras, res, jugadores, resultado
  *                              hay un objeto que contiene su posición, tiempo y tasa de colección. Se actualiza
  *                              tras la ejecución de esta función.
  */
-function resultado_excel(excel, carreras, jugadores, resultados) {
-	// iterar para todas las carreras
-	let num_race = 1;
-	for (let i = 0; i < carreras.length; ++i) {
-		const rows = [];
+function resultados_excel(excel, num, carrera, jugadores, resultados) {
 
-		// construir array de resultados para la carrera
-		for (const player of Object.keys(resultados)) {
-			if (resultados[player][i]) {
-				const my_res = resultados[player][i];
-				if ('SubmitChannel' in carreras[i]) {
-					rows.push([my_res['position'], jugadores[player]['name'], my_res['time'], my_res['cr']]);
-				}
-				else {
-					rows.push([my_res['position'], jugadores[player]['name'], my_res['time']]);
-				}
+	const rows = [];
+
+	// construir array de resultados para la carrera
+	for (const player of Object.keys(resultados)) {
+		if (resultados[player][num]) {
+			const my_res = resultados[player][num];
+			if ('SubmitChannel' in carrera) {
+				rows.push([my_res['position'], jugadores[player]['name'], my_res['time'], my_res['cr']]);
+			}
+			else {
+				rows.push([my_res['position'], jugadores[player]['name'], my_res['time']]);
 			}
 		}
-
-		// omitir carreras que no tienen al menos dos resultados
-		if (rows.length < 2) continue;
-
-		// ordenar array de resultados
-		rows.sort((a, b) => {
-			if (typeof a[0] === 'number' && typeof b[0] === 'number') return a[0] - b[0];
-			if (typeof a[0] === 'number' && typeof b[0] === 'string') return -1;
-			if (typeof a[0] === 'string' && typeof b[0] === 'number') return 1;
-			return 0;
-		});
-
-		// crear tabla en hoja de cálculo
-		const cols = [{ name: 'Posición' }, { name: 'Jugador' }, { name: 'Tiempo' }];
-		if ('SubmitChannel' in carreras[i]) {
-			cols.push({ name: 'Colección' });
-		}
-
-		const ws = excel.addWorksheet(`${num_race} - ${carreras[i].Name}`);
-		ws.addTable({
-			name: `${num_race} - ${carreras[i].Name}`,
-			ref: 'A1',
-			style: {
-				showRowStripes: true,
-			},
-			columns: cols,
-			rows: rows,
-		});
-		ws.columns.forEach(column => {
-			const lengths = column.values.map(v => v.toString().length);
-			const maxLength = Math.max(...lengths.filter(v => typeof v === 'number'));
-			column.width = maxLength + 1;
-		});
-
-		num_race++;
 	}
+
+	// ordenar array de resultados
+	rows.sort((a, b) => {
+		// ambos jugadores terminan
+		if (typeof a[0] === 'number' && typeof b[0] === 'number') return a[0] - b[0];
+		// uno de los jugadores se retira
+		if (typeof a[0] === 'number' && typeof b[0] === 'string') return -1;
+		if (typeof a[0] === 'string' && typeof b[0] === 'number') return 1;
+		return 0;
+	});
+
+	// crear tabla en hoja de cálculo
+	const cols = [{ name: 'Posición' }, { name: 'Jugador' }, { name: 'Tiempo' }];
+	if ('SubmitChannel' in carrera) {
+		cols.push({ name: 'Colección' });
+	}
+
+	const ws = excel.addWorksheet(`${num + 1} - ${carrera.Name}`);
+	ws.addTable({
+		name: `Race${num + 1}`,
+		ref: 'A1',
+		headerRow: true,
+		style: {
+			showRowStripes: true,
+		},
+		columns: cols,
+		rows: rows,
+	});
+	ws.columns.forEach(column => {
+		const lengths = column.values.map(v => v.toString().length);
+		const maxLength = Math.max(...lengths.filter(v => typeof v === 'number'));
+		column.width = maxLength + 1;
+	});
 }
 
 
@@ -197,12 +249,15 @@ function resultado_excel(excel, carreras, jugadores, resultados) {
  * @returns {Workbook} Hoja de cálculo Excel con los resultados de las carreras solicitadas.
  */
 async function exportar_resultados(db, inicio, final, tipo) {
-	const carreras = await get_past_races(db, inicio.toSeconds(), final.toSeconds(), tipo, true);
-	if (carreras.length == 0) {
+	const res_carreras = await get_past_races(db, inicio.toSeconds(), final.toSeconds(), tipo, true);
+
+	// resultados de las carreras como array de arrays, descartando carreras con menos de dos resultados
+	const [arrays_resultados, _] = res_carreras.reduce(results_reduce, [[], []]);
+	if (arrays_resultados.length == 0) {
 		throw { 'message': 'No hay resultados de carreras en el rango de fechas especificado.' };
 	}
-	if (carreras.length > 40) {
-		throw { 'message': 'Hay demasiadas carreras en el rango especificado. Solo se pueden recuperar un máximo de 40 de cada vez.' };
+	if (arrays_resultados.length > 50) {
+		throw { 'message': 'Demasiadas carreras encontradas. Reduce el rango de fechas.' };
 	}
 
 
@@ -218,24 +273,11 @@ async function exportar_resultados(db, inicio, final, tipo) {
 	const excel = new Workbook();
 	excel.addWorksheet('Resumen');
 
-	for (let i = 0; i < carreras.length; ++i) {
-		let resultado_carrera = null;
-
-		// carrera asíncrona
-		if ('SubmitChannel' in carreras[i]) {
-			resultado_carrera = await get_results_for_async(db, carreras[i].SubmitChannel);
-		}
-
-		// carrera síncrona
-		else {
-			resultado_carrera = await get_results_for_race(db, carreras[i].RaceChannel);
-		}
-
-		procesar_resultados_de_carrera(i, carreras, resultado_carrera, jugadores, resultados);
+	// Procesar resultados y registrar en el Excel
+	for (let i = 0; i < arrays_resultados.length; ++i) {
+		procesar_resultados_de_carrera(i, arrays_resultados, jugadores, resultados);
+		resultados_excel(excel, i, arrays_resultados[i][0].race, jugadores, resultados);
 	}
-
-	// Añadir hojas de resultados en el Excel
-	resultado_excel(excel, carreras, jugadores, resultados);
 
 	return excel;
 }
