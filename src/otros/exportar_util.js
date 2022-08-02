@@ -273,6 +273,63 @@ function resultados_excel(excel, num, carrera, jugadores, resultados) {
 	});
 }
 
+/**
+ * @summary Función auxiliar en la rutina del comando /exportar.
+ *
+ * @description Genera la primera hoja de Excel con el ránking general y resumen de resultados.
+ *
+ * @param {Worksheet}          hoja       Hoja de Excel en la que insertar el resumen.
+ * @param {[string, number][]} ranking    Lista de pares [ID del jugador, puntuación ELO], ordenada de mayor a menor
+ *                                        ELO.
+ * @param {object}             jugadores  Objeto cuyas claves son los IDs de Discord de los jugadores y cuyos
+ *                                        valores son objetos que incluyen sus nombres de usuario, número de
+ *                                        carreras disputadas y sus puntuaciones Elo.
+ * @param {object}             resultados Objeto cuyas claves son los IDs de Discord de los jugadores y cuyos valores
+ *                                        son arrays de objetos. Tamaño del array es el número total de carreras
+ *                                        encontradas. En cada posición del array, si el jugador participó en la
+ *                                        carrera correspondiente, hay un objeto que contiene su posición, tiempo y
+ *                                        tasa de colección.
+ */
+function resumen_excel(hoja, ranking, jugadores, resultados) {
+	const cols = [{ name: 'Posición' }, { name: 'Jugador' }, { name: 'Puntuación' }, { name: 'Disputadas' }];
+	const num_races = Object.values(resultados)[0].length;
+	for (let i = 1; i <= num_races; ++i) {
+		cols.push({ name: `C${i}` });
+	}
+
+	const rows = [];
+	let curr_pos = 1;
+	for (const [player_id, score] of ranking) {
+		const my_row = [curr_pos, jugadores[player_id]['name'], Math.round(score), jugadores[player_id]['races']];
+		for (const race of resultados[player_id]) {
+			if (race) {
+				my_row.push(race.position);
+			}
+			else {
+				my_row.push('-');
+			}
+		}
+		rows.push(my_row);
+		curr_pos += 1;
+	}
+
+	hoja.addTable({
+		name: 'Summary',
+		ref: 'A1',
+		headerRow: true,
+		style: {
+			showRowStripes: true,
+		},
+		columns: cols,
+		rows: rows,
+	});
+	hoja.columns.forEach(column => {
+		const lengths = column.values.map(v => v.toString().length);
+		const maxLength = Math.max(...lengths.filter(v => typeof v === 'number'));
+		column.width = maxLength + 2;
+	});
+}
+
 
 /**
  * @summary Invocado con /exportar.
@@ -316,6 +373,10 @@ async function exportar_resultados(db, inicio, final, tipo) {
 		procesar_resultados_de_carrera(i, arrays_resultados, jugadores, resultados);
 		resultados_excel(excel, i, arrays_resultados[i][0].race, jugadores, resultados);
 	}
+
+	const ranking = Object.keys(jugadores).map((key) => [key, jugadores[key].score]);
+	ranking.sort((a, b) => b[1] - a[1]);
+	resumen_excel(excel.worksheets[0], ranking, jugadores, resultados);
 
 	return excel;
 }
