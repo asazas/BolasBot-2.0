@@ -1,8 +1,13 @@
 const { DateTime } = require('luxon');
 const { Sequelize, Model } = require('sequelize');
-const { Workbook } = require('exceljs');
+const { Workbook, Worksheet } = require('exceljs');
 const { get_past_races } = require('../datamgmt/async_db_utils');
 const { calcular_tiempo, calculate_score_change } = require('../racing/race_results_util');
+
+
+const RACE_PROPERTIES = ['Name', 'CreationDate', 'StartDate', 'EndDate', 'Preset', 'SeedUrl'];
+const PROPERTIES_TEXT = { 'Name': 'Nombre', 'CreationDate': 'Fecha de creación', 'StartDate': 'Fecha de inicio',
+	'EndDate': 'Fecha de final', 'Preset': 'Descripción', 'SeedUrl': 'Seed' };
 
 
 /**
@@ -170,11 +175,41 @@ function procesar_resultados_de_carrera(num, arr_res, jugadores, resultados) {
 /**
  * @summary Función auxiliar en la rutina del comando /exportar.
  *
+ * @description Añade información general acerca de la carrera en la hoja de Excel correspondiente.
+ *
+ * @param {Worksheet} ws      Hoja de Excel a la que añadir la información.
+ * @param {Model}     carrera Información general de la carrera, tal y como figura en base de datos.
+ */
+function info_carrera(ws, carrera) {
+	const base_row = 2, base_col = 6;
+	let i = 0;
+	for (const prop of RACE_PROPERTIES) {
+		if (prop in carrera) {
+			const key_cell = ws.getCell(base_row + i, base_col);
+			key_cell.value = PROPERTIES_TEXT[prop];
+			key_cell.font = { bold: true };
+			let my_prop = carrera[prop];
+			const value_cell = ws.getCell(base_row + i, base_col + 1);
+			if (prop.includes('Date')) {
+				my_prop = new Date(parseInt(my_prop) * 1000);
+				value_cell.numFmt = 'dd/mm/yyyy hh:mm:ss';
+				value_cell.alignment = { horizontal: 'left' };
+			}
+			ws.getCell(base_row + i, base_col + 1).value = my_prop;
+			i += 1;
+		}
+	}
+}
+
+
+/**
+ * @summary Función auxiliar en la rutina del comando /exportar.
+ *
  * @description Añade una hoja al Excel con los resultados de una carrera.
  *
  * @param {Workbook} excel      Hoja de cálculo de Excel a la que añadir los resultados de las carreras.
  * @param {number}   num        Índice la carrera dentro de la secuencia de carreras encontradas.
- * @param {Model[]}  carrera    Información general de la carrera, tal y como figura en base de datos.
+ * @param {Model}    carrera    Información general de la carrera, tal y como figura en base de datos.
  * @param {object}   jugadores  Objeto cuyas claves son los IDs de Discord de los jugadores y cuyos valores son
  *                              objetos que incluyen sus nombres de usuario, número de carreras disputadas y sus
  *                              puntuaciones Elo. Se actualiza tras la ejecución de esta función.
@@ -228,9 +263,12 @@ function resultados_excel(excel, num, carrera, jugadores, resultados) {
 		columns: cols,
 		rows: rows,
 	});
+	info_carrera(ws, carrera);
 	ws.columns.forEach(column => {
 		const lengths = column.values.map(v => v.toString().length);
-		const maxLength = Math.max(...lengths.filter(v => typeof v === 'number'));
+		let maxLength = Math.max(...lengths.filter(v => typeof v === 'number'));
+		if (maxLength < 6) maxLength = 6;
+		if (maxLength > 45) maxLength = 45;
 		column.width = maxLength + 1;
 	});
 }
