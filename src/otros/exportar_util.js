@@ -5,9 +5,9 @@ const { get_past_races } = require('../datamgmt/async_db_utils');
 const { calcular_tiempo, calculate_score_change } = require('../racing/race_results_util');
 
 
-const RACE_PROPERTIES = ['Name', 'CreationDate', 'StartDate', 'EndDate', 'Preset', 'SeedUrl'];
-const PROPERTIES_TEXT = { 'Name': 'Nombre', 'CreationDate': 'Fecha de creación', 'StartDate': 'Fecha de inicio',
-	'EndDate': 'Fecha de final', 'Preset': 'Descripción', 'SeedUrl': 'Seed' };
+const RACE_PROPERTIES = ['Name', 'Label', 'CreationDate', 'StartDate', 'EndDate', 'Preset', 'SeedUrl'];
+const PROPERTIES_TEXT = { 'Name': 'Nombre', 'Label': 'Etiqueta', 'CreationDate': 'Fecha de creación',
+	'StartDate': 'Fecha de inicio', 'EndDate': 'Fecha de final', 'Preset': 'Descripción', 'SeedUrl': 'Seed' };
 
 
 /**
@@ -336,15 +336,16 @@ function resumen_excel(hoja, ranking, jugadores, resultados) {
  *
  * @description Exporta los resultados de carreras disputadas en un periodo de tiempo determinado.
  *
- * @param {Sequelize} db     Base de datos del servidor en el que se invocó el comando.
- * @param {DateTime}  inicio Buscar carreras cerradas tras esta fecha de inicio.
- * @param {DateTime}  final  Buscar carreras cerradas antes de esta fecha final.
- * @param {number}    tipo   Tipo de carreras a incluir. 0 = asíncronas, 1 = síncronas, 2 = ambas.
+ * @param {Sequelize} db       Base de datos del servidor en el que se invocó el comando.
+ * @param {string}    etiqueta Buscar carreras agrupadas únicamente bajo la etiqueta indicada.
+ * @param {DateTime}  inicio   Buscar carreras cerradas tras esta fecha de inicio.
+ * @param {DateTime}  final    Buscar carreras cerradas antes de esta fecha final.
+ * @param {number}    tipo     Tipo de carreras a incluir. 0 = asíncronas, 1 = síncronas, 2 = ambas.
  *
  * @returns {Workbook} Hoja de cálculo Excel con los resultados de las carreras solicitadas.
  */
-async function exportar_resultados(db, inicio, final, tipo) {
-	const res_carreras = await get_past_races(db, inicio.toSeconds(), final.toSeconds(), tipo, true);
+async function exportar_resultados(db, etiqueta, inicio, final, tipo) {
+	const res_carreras = await get_past_races(db, etiqueta, inicio.toSeconds(), final.toSeconds(), tipo, false);
 
 	// resultados de las carreras como array de arrays, descartando carreras con menos de dos resultados
 	const [arrays_resultados, _] = res_carreras.reduce(results_reduce, [[], []]);

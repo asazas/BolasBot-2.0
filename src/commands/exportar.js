@@ -14,6 +14,10 @@ module.exports = {
 		.setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels)
 
 		.addStringOption(option =>
+			option.setName('etiqueta')
+				.setDescription('Etiqueta por la que filtrar carreras a exportar. Por defecto, se consideran todas las carreras.'))
+
+		.addStringOption(option =>
 			option.setName('inicio')
 				.setDescription('Fecha (dd/mm/aaaa), considerar carreras cerradas a partir de esta fecha. Por defecto: todas.'))
 
@@ -50,6 +54,10 @@ module.exports = {
 
 		await interaction.deferReply();
 
+		let etiqueta = interaction.options.getString('etiqueta');
+		if (etiqueta) {
+			etiqueta = etiqueta.toLowerCase();
+		}
 		let inicio = interaction.options.getString('inicio');
 		if (!inicio) {
 			inicio = '0';
@@ -72,7 +80,7 @@ module.exports = {
 		const inicio_val = inicio === '0' ? DateTime.fromSeconds(0) : validar_fecha(inicio, timezone, true);
 		const final_val = validar_fecha(final, timezone, true);
 
-		const excel = await exportar_resultados(db, inicio_val, final_val.plus({ days: 1 }), tipo);
+		const excel = await exportar_resultados(db, etiqueta, inicio_val, final_val.plus({ days: 1 }), tipo);
 
 		const tmp_file = tmp.fileSync();
 		await excel.xlsx.write(fs.createWriteStream(tmp_file.name));

@@ -8,6 +8,7 @@ const { Sequelize, Model } = require('sequelize');
  *
  * @param {Sequelize} sequelize    Base de datos del servidor.
  * @param {string}    name         Nombre de la carrera.
+ * @param {string}    label        Etiqueta de la carrera.
  * @param {string}    creator      ID en Discord del creador de la carrera.
  * @param {boolean}   ranked       Indica si la carrera es puntuable (true) o no (false.)
  * @param {string}    preset       Nombre del preset de la seed para la carrera, incluyendo opciones extra.
@@ -18,12 +19,13 @@ const { Sequelize, Model } = require('sequelize');
  *
  * @returns {Model} Modelo correspondiente a la carrera creada.
  */
-async function insert_race(sequelize, name, creator, ranked, preset, seed_hash, seed_code, seed_url, race_channel) {
+async function insert_race(sequelize, name, label, creator, ranked, preset, seed_hash, seed_code, seed_url, race_channel) {
 	const races = sequelize.models.Races;
 	try {
 		return await sequelize.transaction(async (t) => {
 			return await races.create({
 				Name: name,
+				Label: label,
 				Creator: creator,
 				CreationDate: Math.floor(new Date().getTime() / 1000),
 				Ranked: ranked,

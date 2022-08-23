@@ -28,6 +28,10 @@ command.data = new SlashCommandBuilder()
 				option.setName('nombre')
 					.setDescription('Nombre de la carrera asíncrona'))
 
+			.addStringOption(option =>
+				option.setName('etiqueta')
+					.setDescription('Etiqueta para agrupar carreras con un propósito similar.'))
+
 			.addBooleanOption(option =>
 				option.setName('ranked')
 					.setDescription('Determina si la carrera es puntuable y vinculante.'))

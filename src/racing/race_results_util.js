@@ -86,10 +86,13 @@ async function get_async_data_embed(db, submit_channel) {
 	const data_embed = new EmbedBuilder()
 		.setColor('#0099ff')
 		.setTitle(`Carrera asíncrona: ${my_async.Name}`)
-		.addFields([
-			{ name: 'Creador', value: my_async.creator.Name },
-			{ name: 'Fecha de inicio', value: `<t:${my_async.StartDate}>` }])
 		.setTimestamp();
+	if (my_async.Label) {
+		data_embed.addFields([{ name: 'Etiqueta', value: my_async.Label }]);
+	}
+	data_embed.addFields([
+		{ name: 'Creador', value: my_async.creator.Name },
+		{ name: 'Fecha de inicio', value: `<t:${my_async.StartDate}>` }]);
 	if (my_async.EndDate) {
 		data_embed.addFields([{ name: 'Fecha de cierre', value: `<t:${my_async.EndDate}>` }]);
 	}
@@ -123,10 +126,13 @@ async function get_reduced_async_data_embed(db, submit_channel) {
 	const data_embed = new EmbedBuilder()
 		.setColor('#0099ff')
 		.setTitle(`Carrera asíncrona: ${my_async.Name}`)
-		.addFields([
-			{ name: 'Creador', value: my_async.creator.Name },
-			{ name: 'Fecha de inicio', value: `<t:${my_async.StartDate}>` }])
 		.setTimestamp();
+	if (my_async.Label) {
+		data_embed.addFields([{ name: 'Etiqueta', value: my_async.Label }]);
+	}
+	data_embed.addFields([
+		{ name: 'Creador', value: my_async.creator.Name },
+		{ name: 'Fecha de inicio', value: `<t:${my_async.StartDate}>` }]);
 	if (my_async.EndDate) {
 		data_embed.addFields([{ name: 'Fecha de cierre', value: `<t:${my_async.EndDate}>` }]);
 	}
@@ -155,10 +161,13 @@ async function get_race_data_embed(db, race_channel) {
 	const data_embed = new EmbedBuilder()
 		.setColor('#0099ff')
 		.setTitle(`Carrera: ${my_race.Name}`)
-		.addFields([
-			{ name: 'Creador', value: my_race.creator.Name },
-			{ name: 'Fecha de creación', value: `<t:${my_race.CreationDate}>` }])
 		.setTimestamp();
+	if (my_race.Label) {
+		data_embed.addFields([{ name: 'Etiqueta', value: my_race.Label }]);
+	}
+	data_embed.addFields([
+		{ name: 'Creador', value: my_race.creator.Name },
+		{ name: 'Fecha de creación', value: `<t:${my_race.CreationDate}>` }]);
 	if (my_race.StartDate) {
 		data_embed.addFields([{ name: 'Fecha de inicio', value: `<t:${my_race.StartDate}>` }]);
 	}

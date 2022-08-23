@@ -117,6 +117,15 @@ async function carrera_crear(interaction, db) {
 		throw { 'message': 'Solo un moderador puede crear carreras puntuables.' };
 	}
 
+	let label = interaction.options.getString('etiqueta');
+	if (label && !interaction.memberPermissions.has(PermissionsBitField.Flags.ManageChannels)) {
+		throw { 'message': 'Solo un moderador puede etiquetar carreras.' };
+	}
+	if (label && label.length > 20) {
+		throw { 'message': 'La etiqueta es demasiado larga.' };
+	}
+	if (label) label = label.toLowerCase();
+
 	// Nombre de la carrera
 	let name = interaction.options.getString('nombre');
 	if (!name) {
@@ -135,7 +144,7 @@ async function carrera_crear(interaction, db) {
 		autoArchiveDuration: 1440,
 	});
 
-	await insert_race(db, name, creator.id, ranked, full_preset, seed_info ? seed_info['hash'] : null, seed_info ? seed_info['code'] : null,
+	await insert_race(db, name, label, creator.id, ranked, full_preset, seed_info ? seed_info['hash'] : null, seed_info ? seed_info['code'] : null,
 		seed_info ? seed_info['url'] : null, race_channel.id);
 
 	const async_data = await get_race_data_embed(db, race_channel.id);

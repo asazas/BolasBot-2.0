@@ -108,6 +108,9 @@ async function get_data_models(server) {
 			type: DataTypes.TEXT,
 			allowNull: false,
 		},
+		Label: {
+			type: DataTypes.TEXT,
+		},
 		Creator: {
 			type: DataTypes.TEXT,
 		},
@@ -199,6 +202,9 @@ async function get_data_models(server) {
 		Name: {
 			type: DataTypes.TEXT,
 			allowNull: false,
+		},
+		Label: {
+			type: DataTypes.TEXT,
 		},
 		Creator: {
 			type: DataTypes.TEXT,

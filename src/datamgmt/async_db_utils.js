@@ -8,6 +8,7 @@ const { Op, Sequelize, Model } = require('sequelize');
  *
  * @param {Sequelize} sequelize        Base de datos del servidor.
  * @param {string}    name             Nombre de la carrera asíncrona.
+ * @param {string}    label            Etiqueta de la carrera asíncrona.
  * @param {string}    creator          ID en Discord del creador de la carrera asíncrona.
  * @param {boolean}   ranked           Indica si la carrera asíncrona es puntuable (true) o no (false.)
  * @param {string}    preset           Nombre del preset de la seed para la carrera, incluyendo opciones extra.
@@ -22,13 +23,14 @@ const { Op, Sequelize, Model } = require('sequelize');
  *
  * @returns {Model} Modelo correspondiente a la nueva carrera asíncrona.
  */
-async function insert_async(sequelize, name, creator, ranked, preset, seed_hash, seed_code, seed_url,
+async function insert_async(sequelize, name, label, creator, ranked, preset, seed_hash, seed_code, seed_url,
 	role_id, submit_channel, results_channel, results_message, spoilers_channel) {
 	const async_races = sequelize.models.AsyncRaces;
 	try {
 		return await sequelize.transaction(async (t) => {
 			return await async_races.create({
 				Name: name,
+				Label: label,
 				Creator: creator,
 				StartDate: Math.floor(new Date().getTime() / 1000),
 				Ranked: ranked,
@@ -327,6 +329,7 @@ async function get_player_result(sequelize, submit_channel, player) {
  * @description Devuelve los resultados de todas las carreras asíncronas en el rango temporal solicitado.
  *
  * @param {Sequelize} sequelize Base de datos del servidor.
+ * @param {string}    label     Etiqueta por la que filtrar carreras a exportar.
  * @param {number}    start     Timestamp que representa el momento inicial de la ventana temporal a buscar.
  * @param {number}    end       Timestamp que representa el momento final de la ventana temporal a buscar.
  * @param {number}    type      Tipo de carreras a incluir en la búsqueda. 0 = asíncronas, 1 = síncronas, 2 = ambas.
@@ -336,7 +339,7 @@ async function get_player_result(sequelize, submit_channel, player) {
  * @returns {Model[]} Array de modelos conteniendo cada uno de los resultados de las carreras buscadas. Si se buscan tanto
  * carreras asíncronas como síncronas, se devuelven todas en el mismo array, en orden ascendente de fecha de cierre.
  */
-async function get_past_races(sequelize, start, end, type, ranked) {
+async function get_past_races(sequelize, label, start, end, type, ranked) {
 	const async_results = sequelize.models.AsyncResults;
 	const race_results = sequelize.models.RaceResults;
 
@@ -348,6 +351,7 @@ async function get_past_races(sequelize, start, end, type, ranked) {
 		},
 		Status: 2,
 	};
+	if (label) condition['Label'] = label;
 	if (ranked) condition['Ranked'] = true;
 
 	try {

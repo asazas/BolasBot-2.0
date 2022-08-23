@@ -136,6 +136,15 @@ async function async_crear(interaction, db) {
 		throw { 'message': 'Solo un moderador puede crear carreras puntuables.' };
 	}
 
+	let label = interaction.options.getString('etiqueta');
+	if (label && !interaction.memberPermissions.has(PermissionsBitField.Flags.ManageChannels)) {
+		throw { 'message': 'Solo un moderador puede etiquetar carreras.' };
+	}
+	if (label && label.length > 20) {
+		throw { 'message': 'La etiqueta es demasiado larga.' };
+	}
+	if (label) label = label.toLowerCase();
+
 	// Límite de carreras asíncronas: máximo 10 en el servidor
 	const asyncs = await get_active_async_races(db);
 	if (asyncs && asyncs.length >= 10) {
@@ -230,7 +239,7 @@ async function async_crear(interaction, db) {
 	const results_msg = await results_channel.send(results_text);
 
 	// Registrar async en base de datos.
-	await insert_async(db, name, creator.id, ranked, full_preset, seed_info ? seed_info['hash'] : null, seed_info ? seed_info['code'] : null,
+	await insert_async(db, name, label, creator.id, ranked, full_preset, seed_info ? seed_info['hash'] : null, seed_info ? seed_info['code'] : null,
 		seed_info ? seed_info['url'] : null, async_role.id, submit_channel.id, results_channel.id, results_msg.id, spoilers_channel.id);
 
 	// Enviar seed al canal de submit, si la carrera no es ranked.
