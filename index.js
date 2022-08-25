@@ -32,8 +32,8 @@ for (const file of commandFiles) {
 }
 
 // Registrar presets de BolasBot (clasificarlos por randomizers para sugerencias de opciones extra)
-const all_extra = ['spoiler', 'noqs', 'pistas', 'ad', 'hard', 'keys', 'botas', 'split'];
-const alttp_extra = ['spoiler', 'noqs', 'pistas', 'ad', 'hard', 'keys', 'botas'];
+const all_extra = ['spoiler', 'noqs', 'pistas', 'ad', 'hard', 'keys', 'botas', 'pseudobotas', 'split'];
+const alttp_extra = ['spoiler', 'noqs', 'pistas', 'ad', 'hard', 'keys', 'botas', 'pseudobotas'];
 const presets_alttp = [];
 for (const file of glob.sync('rando-settings/alttp/*.json')) {
 	presets_alttp.push(path.basename(file, '.json'));

@@ -29,7 +29,8 @@ function preset_file(preset) {
 /**
  * @summary Añadir opciones de customizer por defecto.
  *
- * @description Añade a un preset de ALTTPR las opciones de customizer con sus valores por defecto.
+ * @description Añade a un preset de ALTTPR las opciones de customizer con sus valores por defecto. Si el preset
+ * ya contiene opciones de customizer, esta función no hace nada.
  *
  * @param {object} preset_data Contenidos del archivo de preset de ALTTPR.
  *
@@ -40,6 +41,43 @@ function add_default_customizer(preset_data) {
 		const default_customizer = JSON.parse(fs.readFileSync('res/default-customizer.json'));
 		preset_data['settings'] = { ...preset_data['settings'], ...default_customizer };
 	}
+	return preset_data;
+}
+
+
+/**
+ * @summary Distribuye ítems en localizaciones forzadas.
+ *
+ * @description Útil presets de customizer en los que se indiquen ítems en localizaciones forzadas. Procesa
+ * dichas localizaciones y distribuye los ítems adecuados de acuerdo a las indicaciones del preset.
+ *
+ * @param {object} preset_data Contenidos del archivo de preset de ALTTPR.
+ *
+ * @returns {object} Archivo de preset con objetos en localizaciones forzadas añadidos.
+ */
+function place_forced_locations(preset_data) {
+	preset_data = add_default_customizer(preset_data);
+
+	for (const entry of preset_data['forced_locations']) {
+		if (!entry['quantity']) entry['quantity'] = 1;
+		entry['quantity'] = Math.min(entry['quantity'], entry['locations'].length);
+		if (!entry['chance']) entry['chance'] = 100;
+		if (!entry['override']) entry['override'] = true;
+
+		for (let i = 0; i < entry['quantity']; ++i) {
+			if (Math.random() * 100 <= entry['chance']) {
+				while (entry['locations'].length > 0) {
+					const choice = Math.floor(Math.random() * entry['locations'].length);
+					const loc = entry['locations'][choice];
+					entry['locations'].splice(choice, 1);
+					if (loc in preset_data['settings']['l']) continue;
+					preset_data['settings']['l'][loc] = entry['item'];
+					break;
+				}
+			}
+		}
+	}
+
 	return preset_data;
 }
 
@@ -75,6 +113,9 @@ async function generate_alttpr(preset_data, extra) {
 		if (extra_params.includes('keys')) {
 			preset_data['settings']['dungeon_items'] = 'full';
 		}
+		if (extra_params.includes('pseudobotas')) {
+			preset_data['settings']['pseudoboots'] = true;
+		}
 		if (extra_params.includes('botas')) {
 			preset_data = add_default_customizer(preset_data);
 			preset_data['customizer'] = true;
@@ -94,6 +135,9 @@ async function generate_alttpr(preset_data, extra) {
 	}
 
 	if (preset_data['customizer']) {
+		if (preset_data['forced_locations']) {
+			preset_data = place_forced_locations(preset_data);
+		}
 		return await gaxios.request({ url: 'https://alttpr.com/api/customizer', method: 'POST', data: preset_data['settings'], retry: true });
 	}
 	return await gaxios.request({ url: 'https://alttpr.com/api/randomizer', method: 'POST', data: preset_data['settings'], retry: true });

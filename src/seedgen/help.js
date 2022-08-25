@@ -9,7 +9,8 @@ const extra_alttp = `**spoiler: **Hace que el spoiler log de la seed esté dispo
 **ad: **All Dungeons, Ganon solo será vulnerable al completar todas las mazmorras del juego, incluyendo Torre de Agahnim.
 **hard: **Cambia el item pool a hard, reduciendo el número máximo de corazones, espadas e ítems de seguridad.
 **keys: **Habilita el modo Keysanity: llaves, mapas y brújulas estarán mezcladas en el pool general de ítems.
-**botas: **Las Botas de Pegaso estarán equipadas al inicio de la partida.`;
+**botas: **Las Botas de Pegaso estarán equipadas al inicio de la partida.
+**pseudobotas: **Se podrá correr desde el inicio de la partida como si se tuviesen las Botas de Pegaso, pero para desbloquear las localizaciones de ítems pertinentes, deberán obtenerse las verdaderas Botas de Pegaso.`;
 
 const extra_sm = `**spoiler: **Hace que el spoiler log de la seed esté disponible.
 **split: **Cambia el algoritmo de randomización a Major/Minor Split.

@@ -2,7 +2,7 @@
   "randomizer": "alttp",
   "goal_name": "enemizer open",
   "customizer": false,
-  "description": "Igual que open pero con enemizer shuffled para los pequeños (algunas limitaciones dadas por el juego) y random para bosses (cualquier número de repeticiones para cada boss).",
+  "description": "Igual que open pero con enemizer shuffled para los pequeños (algunas limitaciones dadas por el juego) y random para bosses (tres bosses aparecen dos veces, el resto aparecen una vez).",
   "settings": {
     "name": "enemizer",
     "notes": "Enemizer",
@@ -21,7 +21,7 @@
       "tower": "7"
     },
     "enemizer": {
-      "boss_shuffle": "random",
+      "boss_shuffle": "full",
       "enemy_damage": "default",
       "enemy_health": "default",
       "enemy_shuffle": "shuffled",
