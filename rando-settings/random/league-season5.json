@@ -1,0 +1,38 @@
+{
+  "randomizer": "random",
+  "name": "league-season5",
+  "description": "Modo escogido al azar entre los usados en la quinta temporada de la Liga de ALTTPR.",
+  "presets": [
+    {
+      "preset": "open",
+      "extra": "ad",
+      "chance": 1
+    },
+    {
+      "preset": "invrosia",
+      "chance": 1
+    },
+    {
+      "preset": "casual",
+      "extra": "botas",
+      "chance": 1
+    },
+    {
+      "preset": "retrance",
+      "chance": 1
+    },
+    {
+      "preset": "swordless",
+      "chance": 1
+    },
+    {
+      "preset": "crosskeys",
+      "extra": "pseudobotas",
+      "chance": 1
+    },
+    {
+      "preset": "enemizer",
+      "chance": 1
+    }
+  ]
+}
