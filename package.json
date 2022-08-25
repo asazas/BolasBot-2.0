@@ -15,7 +15,7 @@
     "@twurple/auth": "^5.2.2",
     "axios": "^0.27.2",
     "cron": "^2.1.0",
-    "discord-api-types": "^0.37.4",
+    "discord-api-types": "^0.37.5",
     "discord.js": "^14.3.0",
     "exceljs": "^4.3.0",
     "form-data": "^4.0.0",
