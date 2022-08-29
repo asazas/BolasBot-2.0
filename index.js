@@ -6,7 +6,7 @@ const { Client, Collection, GatewayIntentBits, Partials, InteractionType } = req
 const { ClientCredentialsAuthProvider } = require('@twurple/auth');
 const { ApiClient } = require('@twurple/api');
 const { CronJob } = require('cron');
-const { discordEmojiGuildId, discordToken, twitchClientId, twitchClientSecret } = require('./config.json');
+const { dbLogging, discordEmojiGuildId, discordToken, twitchClientId, twitchClientSecret } = require('./config.json');
 const { get_data_models } = require('./src/datamgmt/setup');
 const { comprueba_streams } = require('./src/streams/streams_util');
 const { get_global_var } = require('./src/datamgmt/db_utils');
@@ -75,7 +75,7 @@ discord_client.once('ready', async () => {
 
 	// initialize databases
 	for (const guild_id of discord_client.guilds.cache.map(guild => guild.id)) {
-		db[guild_id] = await get_data_models(guild_id);
+		db[guild_id] = await get_data_models(guild_id, dbLogging);
 		role_channels[guild_id] = (await get_global_var(db[guild_id])).ReactionRolesChannel;
 	}
 
@@ -90,7 +90,7 @@ discord_client.once('ready', async () => {
 		job.start();
 	}
 
-	console.log(`Ready! Logged in as ${discord_client.user.tag}`);
+	console.log(`Bot arrancado como ${discord_client.user.tag}`);
 });
 
 

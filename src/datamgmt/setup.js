@@ -7,12 +7,13 @@ const { Sequelize, DataTypes } = require('sequelize');
  * @description Inicializa la base de datos SQLite para cada uno de los servidores en los que está el bot:
  * incluye todas las definiciones de tablas y la creación del archivo de base de datos si este no existe.
  *
- * @param {string} server ID del servidor para el que se inicializa la base de datos.
+ * @param {string}  server     ID del servidor para el que se inicializa la base de datos.
+ * @param {boolean} db_logging Establece si se registran todas las operaciones hechas en base de datos a la consola.
  *
  * @returns {Sequelize} Objeto Sequelize correspondiente a la base de datos inicializada del servidor.
  */
-async function get_data_models(server) {
-	const sequelize = new Sequelize({ dialect: 'sqlite', storage: `data/${server}.db`, define: { freezeTableName: true, timestamps: false } });
+async function get_data_models(server, db_logging) {
+	const sequelize = new Sequelize({ dialect: 'sqlite', storage: `data/${server}.db`, logging: db_logging, define: { freezeTableName: true, timestamps: false } });
 
 	sequelize.define('GlobalVar', {
 		ServerId: {
@@ -361,7 +362,13 @@ async function get_data_models(server) {
 
 	await sequelize.transaction(async (t) => {
 		try {
-			return await sequelize.models.GlobalVar.create({ ServerId: server }, { transaction: t });
+			return await sequelize.models.GlobalVar.findOrCreate({
+				where: {
+					ServerId: server,
+				},
+				transaction: t,
+				lock: t.LOCK.UPDATE,
+			});
 		}
 		catch (error) {
 			console.log(error['message']);

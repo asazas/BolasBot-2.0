@@ -94,6 +94,8 @@ async function done_async(interaction, db, race) {
 		.setTimestamp();
 	await interaction.editReply({ embeds: [ans_embed], ephemeral: true });
 	await interaction.channel.send(`${author} ha registrado un resultado.`);
+
+	console.log(`${author.username} ha registrado un resultado para la carrera ${race.Name} en el servidor ${interaction.guild.name}`);
 }
 
 

@@ -23,9 +23,9 @@ module.exports = {
 			throw { 'message': 'Este comando solo puede ser usado en canales de carreras asíncronas puntuables.' };
 		}
 
-		const author = interaction.user;
-		const creator_in_db = await get_or_insert_player(db, author.id, author.username, author.discriminator, `${author}`);
-		if (creator_in_db[0].Banned) {
+		const player = interaction.user;
+		const player_in_db = await get_or_insert_player(db, player.id, player.username, player.discriminator, `${player}`);
+		if (player_in_db[0].Banned) {
 			throw { 'message': 'Este usuario no puede participar en carreras porque está vetado.' };
 		}
 
@@ -33,9 +33,9 @@ module.exports = {
 			throw { 'message': 'Esta carrera no está abierta.' };
 		}
 
-		const player_result = await get_player_result(db, race.SubmitChannel, author.id);
+		const player_result = await get_player_result(db, race.SubmitChannel, player.id);
 		if (!player_result) {
-			await save_async_result(db, race.Id, author.id, 359999, 0);
+			await save_async_result(db, race.Id, player.id, 359999, 0);
 		}
 
 		const async_data = await get_async_data_embed(db, race.SubmitChannel);
@@ -52,6 +52,9 @@ module.exports = {
 		else {
 			await interaction.editReply({ embeds: [async_data], ephemeral: true });
 		}
+
+		console.log(`${player.username} ha usado el comando /jugar para la carrera ${race.Name} en el servidor ${interaction.guild.name}`);
+
 		return;
 	},
 };
