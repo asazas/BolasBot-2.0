@@ -13,7 +13,12 @@ const { Sequelize, DataTypes } = require('sequelize');
  * @returns {Sequelize} Objeto Sequelize correspondiente a la base de datos inicializada del servidor.
  */
 async function get_data_models(server, db_logging) {
-	const sequelize = new Sequelize({ dialect: 'sqlite', storage: `data/${server}.db`, logging: db_logging, define: { freezeTableName: true, timestamps: false } });
+	const sequelize = new Sequelize({
+		dialect: 'sqlite',
+		storage: `data/${server}.db`,
+		logging: db_logging ? console.log : false,
+		define: { freezeTableName: true, timestamps: false },
+	});
 
 	sequelize.define('GlobalVar', {
 		ServerId: {
