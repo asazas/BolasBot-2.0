@@ -14,6 +14,8 @@ const { asignar_reaction_role, quitar_reaction_role } = require('./src/roles/rol
 const { initialize_code_emojis } = require('./src/seedgen/seedgen_util');
 const { responder_comando_de_servidor } = require('./src/otros/comandos_util');
 const { resetear_puntos_elo } = require('./src/otros/resetear_puntos_util');
+const { generate_from_preset } = require('./src/seedgen/seedgen');
+const { seed_info_embed } = require('./src/seedgen/info_embeds');
 
 // Create a new Discord client instance
 const discord_client = new Client({
@@ -130,6 +132,38 @@ discord_client.on('interactionCreate', async interaction => {
 		// Confirmación de resetear puntos
 		if (interaction.customId === 'resetear') {
 			resetear_puntos_elo(interaction, db[interaction.guildId]);
+		}
+
+		// Botones en /seed torneo (ALTTPR Hispano 2023)
+		if (interaction.customId === 'standard') {
+			await interaction.deferReply();
+			const [full_preset, seed] = await generate_from_preset('standard', '');
+			const info_embed = seed_info_embed(seed, interaction, full_preset);
+			await interaction.editReply({ embeds: [info_embed[0]] });
+		}
+		if (interaction.customId === 'openboots') {
+			await interaction.deferReply();
+			const [full_preset, seed] = await generate_from_preset('open', 'botas');
+			const info_embed = seed_info_embed(seed, interaction, full_preset);
+			await interaction.editReply({ embeds: [info_embed[0]] });
+		}
+		if (interaction.customId === 'ambrosia') {
+			await interaction.deferReply();
+			const [full_preset, seed] = await generate_from_preset('ambrosia', '');
+			const info_embed = seed_info_embed(seed, interaction, full_preset);
+			await interaction.editReply({ embeds: [info_embed[0]] });
+		}
+		if (interaction.customId === 'keysanity') {
+			await interaction.deferReply();
+			const [full_preset, seed] = await generate_from_preset('open', 'keys');
+			const info_embed = seed_info_embed(seed, interaction, full_preset);
+			await interaction.editReply({ embeds: [info_embed[0]] });
+		}
+		if (interaction.customId === 'enemizer') {
+			await interaction.deferReply();
+			const [full_preset, seed] = await generate_from_preset('enemizer', '');
+			const info_embed = seed_info_embed(seed, interaction, full_preset);
+			await interaction.editReply({ embeds: [info_embed[0]] });
 		}
 	}
 
