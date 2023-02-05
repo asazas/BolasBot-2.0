@@ -6,7 +6,7 @@ const { SlashCommandBuilder, SlashCommandStringOption } = require('@discordjs/bu
 const { generate_from_preset, generate_varia_finetune, retrieve_from_url, preset_file, generate_from_file } = require('../seedgen/seedgen');
 const { seed_info_embed, varia_info_embed } = require('../seedgen/info_embeds');
 const { preset_help, extra_help } = require('../seedgen/help');
-const { CommandInteraction, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { CommandInteraction } = require('discord.js');
 
 
 /**
@@ -223,11 +223,7 @@ command.data = new SlashCommandBuilder()
 
 			.addSubcommand(subcommand =>
 				subcommand.setName('extra')
-					.setDescription('Ayuda de opciones extra')))
-
-	.addSubcommand(subcommand =>
-		subcommand.setName('torneo')
-			.setDescription('Generar una seed con configuración de Torneo Hispano ALTTPR 2023.'));
+					.setDescription('Ayuda de opciones extra')));
 
 
 command.execute = async function(interaction) {
@@ -269,44 +265,8 @@ command.execute = async function(interaction) {
 		await interaction.reply({ embeds: [preset_help(interaction)] });
 		return;
 	}
-
 	else if (interaction.options.getSubcommand() == 'extra') {
 		await interaction.reply({ embeds: [extra_help(interaction)] });
-		return;
-	}
-
-	else if (interaction.options.getSubcommand() == 'torneo') {
-		const ans_embed = new EmbedBuilder()
-			.setColor('#0099ff')
-			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
-			.setTitle('Seed de Torneo Hispano ALTTPR 2023')
-			.setDescription('Elige uno de los modos disponibles.')
-			.setTimestamp();
-
-		const row = new ActionRowBuilder().addComponents(
-			new ButtonBuilder()
-				.setCustomId('standard')
-				.setLabel('Standard')
-				.setStyle(ButtonStyle.Primary),
-			new ButtonBuilder()
-				.setCustomId('openboots')
-				.setLabel('Open Boots')
-				.setStyle(ButtonStyle.Primary),
-			new ButtonBuilder()
-				.setCustomId('ambrosia')
-				.setLabel('Ambrosia')
-				.setStyle(ButtonStyle.Primary),
-			new ButtonBuilder()
-				.setCustomId('keysanity')
-				.setLabel('Keysanity')
-				.setStyle(ButtonStyle.Primary),
-			new ButtonBuilder()
-				.setCustomId('enemizer')
-				.setLabel('Enemizer')
-				.setStyle(ButtonStyle.Primary),
-		);
-
-		await interaction.reply({ embeds: [ans_embed], components: [row], ephemeral: true });
 		return;
 	}
 };
