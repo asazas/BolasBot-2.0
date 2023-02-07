@@ -2,6 +2,7 @@ const { EmbedBuilder } = require('discord.js');
 const { Sequelize } = require('sequelize');
 const { get_async_by_submit, get_results_for_async } = require('../datamgmt/async_db_utils');
 const { update_player_score, get_ranked_players } = require('../datamgmt/db_utils');
+const { get_private_async_by_channel, get_results_for_private_async } = require('../datamgmt/private_async_db_utils');
 const { get_race_by_channel, get_results_for_race } = require('../datamgmt/race_db_utils');
 
 
@@ -188,6 +189,82 @@ async function get_race_data_embed(db, race_channel) {
 
 
 /**
+ * @summary Llamado como parte de la rutina de los comandos /async_privada crear en carreras asíncronas
+ * invitacionales puntuables.
+ *
+ * @description Genera un embed con información sobre una carrera asíncrona invitacional, pero ocultando
+ * los datos de la seed.
+ *
+ * @param {Sequelize} db             Base de datos del servidor en el que se invocó el comando.
+ * @param {string}    submit_channel ID del hilo de envío de resultados de la carrera.
+ *
+ * @returns {EmbedBuilder} Embed con los datos de la carrera.
+ */
+async function get_private_async_data_embed(db, race_channel) {
+	const my_race = await get_private_async_by_channel(db, race_channel);
+
+	const data_embed = new EmbedBuilder()
+		.setColor('#0099ff')
+		.setTitle(`Carrera asíncrona privada: ${my_race.Name}`)
+		.setTimestamp();
+	if (my_race.Label) {
+		data_embed.addFields([{ name: 'Etiqueta', value: my_race.Label }]);
+	}
+	data_embed.addFields([
+		{ name: 'Creador', value: my_race.creator.Name },
+		{ name: 'Fecha de inicio', value: `<t:${my_race.StartDate}>` }]);
+	if (my_race.EndDate) {
+		data_embed.addFields([{ name: 'Fecha de cierre', value: `<t:${my_race.EndDate}>` }]);
+	}
+	if (my_race.Preset) {
+		data_embed.addFields([{ name: 'Descripción', value: my_race.Preset }]);
+	}
+	if (my_race.SeedUrl) {
+		data_embed.addFields([{ name: 'Seed', value: my_race.SeedUrl }]);
+	}
+	if (my_race.SeedCode) {
+		data_embed.addFields([{ name: 'Hash', value: my_race.SeedCode }]);
+	}
+	return data_embed;
+}
+
+
+/**
+ * @summary Llamado como parte de la rutina de los comandos /async_privada crear y /jugar en carreras asíncronas
+ * invitacionales.
+ *
+ * @description Genera un embed con información sobre una carrera asíncrona invitacional: creador, fechas de
+ * inicio y cierre, descripción, seed y hash.
+ *
+ * @param {Sequelize} db             Base de datos del servidor en el que se invocó el comando.
+ * @param {string}    submit_channel ID del hilo de envío de resultados de la carrera.
+ *
+ * @returns {EmbedBuilder} Embed con los datos de la carrera.
+ */
+async function get_reduced_private_async_data_embed(db, race_channel) {
+	const my_race = await get_private_async_by_channel(db, race_channel);
+
+	const data_embed = new EmbedBuilder()
+		.setColor('#0099ff')
+		.setTitle(`Carrera asíncrona privada: ${my_race.Name}`)
+		.setTimestamp();
+	if (my_race.Label) {
+		data_embed.addFields([{ name: 'Etiqueta', value: my_race.Label }]);
+	}
+	data_embed.addFields([
+		{ name: 'Creador', value: my_race.creator.Name },
+		{ name: 'Fecha de inicio', value: `<t:${my_race.StartDate}>` }]);
+	if (my_race.EndDate) {
+		data_embed.addFields([{ name: 'Fecha de cierre', value: `<t:${my_race.EndDate}>` }]);
+	}
+	if (my_race.Preset) {
+		data_embed.addFields([{ name: 'Descripción', value: my_race.Preset }]);
+	}
+	return data_embed;
+}
+
+
+/**
  * @summary Llamado como parte de la rutina del comando /carrera forzar final y de /done y /forfeit (en carreras
  * síncronas, si es el último jugador de la carrera el que lo invoca.)
  *
@@ -291,16 +368,19 @@ function calculate_score_change(my_player_score, other_player_score, result) {
  *
  * @param {Sequelize} db             Base de datos del servidor en el que se invocó el comando.
  * @param {string}    submit_channel ID del canal de envío de resultados de la carrera.
- * @param {boolean}   async          Parámetro que indica si se trata de una carrera asíncrona (true) o
- *                                   síncrona (false.)
+ * @param {number}    type           Parámetro que indica si se trata de una carrera asíncrona (0),
+ *                                   síncrona (1), o asíncrona invitacional (2.)
  */
-async function calculate_player_scores(db, race_channel, async) {
+async function calculate_player_scores(db, race_channel, type) {
 	let results = null;
-	if (async) {
+	if (type == 0) {
 		results = await get_results_for_async(db, race_channel);
 	}
-	else {
+	else if (type == 1) {
 		results = await get_results_for_race(db, race_channel);
+	}
+	else {
+		results = await get_results_for_private_async(db, race_channel);
 	}
 
 	for (const my_res of results) {
@@ -343,5 +423,6 @@ async function calculate_player_scores(db, race_channel, async) {
 
 module.exports = {
 	calcular_tiempo, get_async_results_text, get_async_data_embed, get_reduced_async_data_embed, get_race_data_embed,
-	get_race_results_text, get_player_ranking_text, calculate_score_change, calculate_player_scores,
+	get_private_async_data_embed, get_reduced_private_async_data_embed, get_race_results_text, get_player_ranking_text,
+	calculate_score_change,	calculate_player_scores,
 };

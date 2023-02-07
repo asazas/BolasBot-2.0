@@ -11,7 +11,7 @@ const { seed_in_create_race } = require('./race_seed_util');
  * Lista de palabras para generar nombres aleatorios de carreras.
  */
 const random_words = ['Asazas', 'Armando', 'Vilxs', 'Diegolazo', 'Matkap', 'Kitsune', 'Eolina', 'Kaede',
-	'Kodama', 'Akuma', 'Cougars', 'Fantasma', 'Marco', 'Jim', 'Gio', 'Midget',
+	'Kodama', 'Akuma', 'Cougars', 'Marco', 'Jim', 'Gio', 'Midget',
 
 	'Campeón', 'Scrub', 'Noob', 'Casual', 'Fernando', 'Almeida', 'Genio', 'Fenómeno', 'Lento', 'Trampas',
 	'Sus', 'Memes', 'México', 'Waifu', 'Gamer', 'VTuber', '5Head', 'Larpas', 'Magcargo'];
@@ -92,7 +92,7 @@ async function cerrar_async(interaction, db, race) {
 				.setTitle(`Ranking tras ${race.Name}`)
 				.setURL(hist_msg.url)
 				.setTimestamp();
-			await calculate_player_scores(db, interaction.channelId, true);
+			await calculate_player_scores(db, interaction.channelId, 0);
 			const score_text = await get_player_ranking_text(db);
 			await my_score_channel.send({ content: score_text, embeds: [score_embed] });
 		}

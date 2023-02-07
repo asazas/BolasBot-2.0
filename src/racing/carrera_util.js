@@ -82,7 +82,7 @@ async function cerrar_carrera(interaction, db, race) {
 			.setTitle(`Ranking tras ${race.Name}`)
 			.setURL(hist_msg.url)
 			.setTimestamp();
-		await calculate_player_scores(db, interaction.channelId, false);
+		await calculate_player_scores(db, interaction.channelId, 1);
 		const score_text = await get_player_ranking_text(db);
 		await my_score_channel.send({ content: score_text, embeds: [score_embed] });
 	}

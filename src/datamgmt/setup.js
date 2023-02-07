@@ -304,6 +304,95 @@ async function get_data_models(server, db_logging) {
 	async_results.belongsTo(async_races, { as: 'race', foreignKey: 'Race', onDelete: 'SET NULL' });
 	async_results.belongsTo(players, { as: 'player', foreignKey: 'Player', onDelete: 'SET NULL' });
 
+	const private_async_races = sequelize.define('PrivateAsyncRaces', {
+		Id: {
+			type: DataTypes.INTEGER,
+			primaryKey: true,
+			autoIncrement: true,
+		},
+		Name: {
+			type: DataTypes.TEXT,
+			allowNull: false,
+		},
+		Label: {
+			type: DataTypes.TEXT,
+		},
+		Creator: {
+			type: DataTypes.TEXT,
+		},
+		StartDate: {
+			type: DataTypes.INTEGER,
+			allowNull: false,
+		},
+		EndDate: {
+			type: DataTypes.INTEGER,
+		},
+		Ranked: {
+			type: DataTypes.BOOLEAN,
+			allowNull: false,
+			defaultValue: false,
+		},
+		// 0: en curso, 1: terminada
+		Status: {
+			type: DataTypes.INTEGER,
+			allowNull: false,
+			validate: {
+				min: 0,
+				max: 1,
+			},
+			defaultValue: 0,
+		},
+		Preset: {
+			type: DataTypes.TEXT,
+		},
+		SeedHash: {
+			type: DataTypes.TEXT,
+		},
+		SeedCode: {
+			type: DataTypes.TEXT,
+		},
+		SeedUrl: {
+			type: DataTypes.TEXT,
+		},
+		RaceChannel: {
+			type: DataTypes.TEXT,
+			allowNull: false,
+		},
+	});
+	private_async_races.belongsTo(players, { as: 'creator', foreignKey: 'Creator', onDelete: 'SET NULL' });
+
+	const private_async_results = sequelize.define('PrivateAsyncResults', {
+		Id: {
+			type: DataTypes.INTEGER,
+			primaryKey: true,
+			autoIncrement: true,
+		},
+		Race: {
+			type: DataTypes.TEXT,
+			unique: 'UniqueKey',
+		},
+		Player: {
+			type: DataTypes.TEXT,
+			unique: 'UniqueKey',
+		},
+		Timestamp: {
+			type: DataTypes.INTEGER,
+			allowNull: false,
+		},
+		Time: {
+			type: DataTypes.INTEGER,
+			allowNull: false,
+			defaultValue: 359999,
+		},
+		CollectionRate: {
+			type: DataTypes.INTEGER,
+			allowNull: false,
+			defaultValue: 0,
+		},
+	});
+	private_async_results.belongsTo(private_async_races, { as: 'race', foreignKey: 'Race', onDelete: 'SET NULL' });
+	private_async_results.belongsTo(players, { as: 'player', foreignKey: 'Player', onDelete: 'SET NULL' });
+
 	const reaction_role_categories = sequelize.define('ReactionRoleCategories', {
 		Name: {
 			type: DataTypes.TEXT,
