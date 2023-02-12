@@ -164,7 +164,7 @@ async function done_private_async(interaction, db, race) {
 	const ans_embed = new EmbedBuilder()
 		.setColor('#0099ff')
 		.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
-		.setDescription(`GG ${author}, tu resultado se ha registrado. Para consultar los resultados de la carrera, usa el comando: \`\`\`/async_privada resultados\`\`\``)
+		.setDescription(`GG ${author}, tu resultado se ha registrado. Para consultar los resultados de la carrera, usa el comando: \`/async_privada resultados\``)
 		.addFields(
 			{ name: 'Tiempo', value: `${calcular_tiempo(time_s)}`, inline: true },
 			{ name: 'CR', value: `${collection}`, inline: true },
