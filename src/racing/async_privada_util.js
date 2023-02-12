@@ -329,15 +329,18 @@ async function async_privada_resultados(interaction, db) {
 
 	await get_or_insert_player(db, interaction.user.id, interaction.user.username, interaction.user.discriminator, `${interaction.user}`);
 
-	const player_result = await get_player_private_async_result(db, race.RaceChannel, interaction.user.id);
-	if (!player_result || player_result.Status !== 2) {
-		const msg = new EmbedBuilder()
-			.setColor('#0099ff')
-			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
-			.setDescription('Para poder consultar los resultados de la carrera, debes estar invitado a la misma y haber enviado un resultado.')
-			.setTimestamp();
-		await interaction.editReply({ embeds: [msg], ephemeral: true });
-		return;
+	// moderadores y el creador de la carrera pueden ver resultados sin tener que enviar uno
+	if (!interaction.memberPermissions.has(PermissionsBitField.Flags.ManageChannels) && interaction.user.id != race.Creator) {
+		const player_result = await get_player_private_async_result(db, race.RaceChannel, interaction.user.id);
+		if ((!player_result) || player_result.Status !== 2) {
+			const msg = new EmbedBuilder()
+				.setColor('#0099ff')
+				.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
+				.setDescription('Para poder consultar los resultados de la carrera, debes estar invitado a la misma y haber enviado un resultado.')
+				.setTimestamp();
+			await interaction.editReply({ embeds: [msg], ephemeral: true });
+			return;
+		}
 	}
 
 	const results_text = await get_private_async_results_text(db, race.RaceChannel);
