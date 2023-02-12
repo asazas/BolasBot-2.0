@@ -182,7 +182,7 @@ async function async_privada_crear(interaction, db) {
 		.setTimestamp();
 	if (ranked) {
 		instructions.addFields([{
-			name: 'Carrera asíncrona puntuable vinculante',
+			name: 'Carrera asíncrona puntuable',
 			value: 'Para participar en esta carrera asíncrona debes introducir el comando `/jugar` en este canal. Al hacerlo tendrás acceso a los detalles de la partida.',
 		}]);
 	}
@@ -320,7 +320,7 @@ async function async_privada_desinvitar(interaction, db) {
  * @param {Sequelize}          db          Base de datos del servidor en el que se invocó el comando.
  */
 async function async_privada_resultados(interaction, db) {
-	await interaction.deferReply();
+	await interaction.deferReply({ ephemeral: true });
 
 	const race = await get_private_async_by_channel(db, interaction.channelId);
 	if (!race) {

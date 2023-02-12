@@ -2,6 +2,7 @@ const { EmbedBuilder, CommandInteraction } = require('discord.js');
 const { Sequelize, Model } = require('sequelize');
 const { save_async_result, get_player_result } = require('../datamgmt/async_db_utils');
 const { get_or_insert_player } = require('../datamgmt/db_utils');
+const { save_private_async_result, get_player_private_async_result } = require('../datamgmt/private_async_db_utils');
 const { set_player_forfeit, set_player_done, set_player_undone } = require('../datamgmt/race_db_utils');
 const { cerrar_carrera } = require('./carrera_util');
 const { get_async_results_text, calcular_tiempo } = require('./race_results_util');
@@ -87,6 +88,83 @@ async function done_async(interaction, db, race) {
 		.setColor('#0099ff')
 		.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
 		.setDescription(`GG ${author}, tu resultado se ha registrado.`)
+		.addFields(
+			{ name: 'Tiempo', value: `${calcular_tiempo(time_s)}`, inline: true },
+			{ name: 'CR', value: `${collection}`, inline: true },
+		)
+		.setTimestamp();
+	await interaction.editReply({ embeds: [ans_embed], ephemeral: true });
+	await interaction.channel.send(`${author} ha registrado un resultado.`);
+
+	console.log(`${author.username} ha registrado un resultado para la carrera ${race.Name} en el servidor ${interaction.guild.name}`);
+}
+
+
+/**
+ * @summary Invocado por el comando /done en carreras asíncronas invitacionales.
+ *
+ * @description Registra el resultado de un jugador en una carrera asíncrona invitacional.
+ *
+ * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
+ * @param {Sequelize}          db          Base de datos del servidor en el que se invocó el comando.
+ * @param {Model}              race        Carrera asíncrona para la que se registra el resultado, tal y como
+ *                                         figura en base de datos.
+ */
+async function done_private_async(interaction, db, race) {
+
+	const author = interaction.user;
+	const creator_in_db = await get_or_insert_player(db, author.id, author.username, author.discriminator, `${author}`);
+	if (creator_in_db[0].Banned) {
+		throw { 'message': 'Este usuario no puede participar en carreras porque está vetado.' };
+	}
+
+	if (race.Status != 0) {
+		throw { 'message': 'Esta carrera no está abierta.' };
+	}
+
+	await interaction.deferReply({ ephemeral: true });
+	const player_result = await get_player_private_async_result(db, race.RaceChannel, author.id);
+	if ((!player_result) || player_result.Status % 2 === 1) {
+		throw { 'message': 'No estás invitado a esta carrera.' };
+	}
+
+	// Procesar tiempo y collection.
+	let collection = interaction.options.getInteger('collection');
+	if (!collection) {
+		collection = 0;
+	}
+	let time = interaction.options.getString('tiempo');
+	if (!time) {
+		if (interaction.commandName === 'forfeit') {
+			time = '99:59:59';
+			collection = 0;
+		}
+		else {
+			const error_embed = new EmbedBuilder()
+				.setColor('#0099ff')
+				.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
+				.setDescription(`${interaction.user}, tu resultado no se ha registrado. Asegúrate de rellenar los parámetros del comando correctamente.`)
+				.setTimestamp();
+			await interaction.editReply({ embeds: [error_embed], ephemeral: true });
+			return;
+		}
+	}
+
+	if (collection < 0 || !(/^\d?\d:[0-5]\d:[0-5]\d$/.test(time))) {
+		throw { 'message': 'Parámetros inválidos.' };
+	}
+
+	// Registrar tiempo y collection.
+	const time_arr = time.split(':');
+	const time_s = 3600 * parseInt(time_arr[0]) + 60 * parseInt(time_arr[1]) + parseInt(time_arr[2]);
+
+	await save_private_async_result(db, race.Id, author.id, time_s, collection, 2);
+
+	// Respuesta al comando.
+	const ans_embed = new EmbedBuilder()
+		.setColor('#0099ff')
+		.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
+		.setDescription(`GG ${author}, tu resultado se ha registrado. Para consultar los resultados de la carrera, usa el comando: \`\`\`/async_privada resultados\`\`\``)
 		.addFields(
 			{ name: 'Tiempo', value: `${calcular_tiempo(time_s)}`, inline: true },
 			{ name: 'CR', value: `${collection}`, inline: true },
@@ -211,4 +289,4 @@ async function undone_race(interaction, db, race) {
 	await interaction.reply({ embeds: [text_ans] });
 }
 
-module.exports = { done_async, done_race, undone_race };
+module.exports = { done_async, done_private_async, done_race, undone_race };

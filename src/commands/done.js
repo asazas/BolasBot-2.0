@@ -1,7 +1,8 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { get_async_by_submit } = require('../datamgmt/async_db_utils');
+const { get_private_async_by_channel } = require('../datamgmt/private_async_db_utils');
 const { get_race_by_channel } = require('../datamgmt/race_db_utils');
-const { done_async, done_race } = require('../racing/done_util');
+const { done_async, done_race, done_private_async } = require('../racing/done_util');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -24,7 +25,14 @@ module.exports = {
 		if (!race) {
 			race = await get_async_by_submit(db, interaction.channelId);
 			if (!race) {
-				throw { 'message': 'Este comando solo puede ser usado en canales de carreras.' };
+				race = await get_private_async_by_channel(db, interaction.channelId);
+				if (!race) {
+					throw { 'message': 'Este comando solo puede ser usado en canales de carreras.' };
+				}
+
+				// carrera asíncrona invitacional
+				await done_private_async(interaction, db, race);
+				return;
 			}
 
 			// carrera asíncrona
