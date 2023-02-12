@@ -106,23 +106,28 @@ discord_client.on('interactionCreate', async interaction => {
 	if (interaction.type === InteractionType.ApplicationCommandAutocomplete) {
 		const archivo = interaction.options.getAttachment('archivo');
 		const url = interaction.options.getString('url');
+		const current_extra = interaction.options.getString('extra');
+		let previous_words = '';
+		if (current_extra.includes(' ')) {
+			previous_words = current_extra.substring(0, current_extra.lastIndexOf(' ') + 1);
+		}
 		if (archivo != null || url != null) {
-			return interaction.respond(all_extra.map((el) => ({ name: el, value: el })));
+			return interaction.respond(all_extra.map((el) => ({ name: previous_words + el, value: previous_words + el })));
 		}
 		const preset = interaction.options.getString('preset');
 		if (presets_alttp.includes(preset) || presets_mystery.includes(preset)) {
-			return interaction.respond(alttp_extra.map((el) => ({ name: el, value: el })));
+			return interaction.respond(alttp_extra.map((el) => ({ name: previous_words + el, value: previous_words + el })));
 		}
 		if (presets_sm.includes(preset)) {
-			return interaction.respond(sm_extra.map((el) => ({ name: el, value: el })));
+			return interaction.respond(sm_extra.map((el) => ({ name: previous_words + el, value: previous_words + el })));
 		}
 		if (presets_smz3.includes(preset)) {
-			return interaction.respond(smz3_extra.map((el) => ({ name: el, value: el })));
+			return interaction.respond(smz3_extra.map((el) => ({ name: previous_words + el, value: previous_words + el })));
 		}
 		if (presets_varia.includes(preset)) {
-			return interaction.respond(varia_extra.map((el) => ({ name: el, value: el })));
+			return interaction.respond(varia_extra.map((el) => ({ name: previous_words + el, value: previous_words + el })));
 		}
-		return interaction.respond(all_extra.map((el) => ({ name: el, value: el })));
+		return interaction.respond(all_extra.map((el) => ({ name: previous_words + el, value: previous_words + el })));
 	}
 
 	// Respuesta a interacción con botones
