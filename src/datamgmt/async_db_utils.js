@@ -326,7 +326,7 @@ async function get_player_result(sequelize, submit_channel, player) {
 /**
  * @summary Llamado como parte de la rutina del comando /exportar.
  *
- * @description Devuelve los resultados de todas las carreras asíncronas en el rango temporal solicitado.
+ * @description Devuelve los resultados de todas las carreras en el rango temporal solicitado.
  *
  * @param {Sequelize} sequelize Base de datos del servidor.
  * @param {string}    label     Etiqueta por la que filtrar carreras a exportar.
@@ -341,9 +341,10 @@ async function get_player_result(sequelize, submit_channel, player) {
  */
 async function get_past_races(sequelize, label, start, end, type, ranked) {
 	const async_results = sequelize.models.AsyncResults;
+	const private_async_results = sequelize.models.PrivateAsyncResults;
 	const race_results = sequelize.models.RaceResults;
 
-	let my_async_results = [], my_race_results = [];
+	let my_async_results = [], my_private_async_results = [], my_race_results = [];
 
 	const condition = {
 		EndDate: {
@@ -361,6 +362,29 @@ async function get_past_races(sequelize, label, start, end, type, ranked) {
 					include: [
 						{
 							model: sequelize.models.AsyncRaces,
+							as: 'race',
+							required: true,
+							where: condition,
+						},
+						{
+							model: sequelize.models.Players,
+							as: 'player',
+							required: true,
+						},
+					],
+					order: [
+						['race', 'EndDate', 'ASC'],
+						['race', 'Id', 'ASC'],
+						['Time', 'ASC'],
+						['Timestamp', 'ASC'],
+					],
+					transaction: t,
+				});
+
+				my_private_async_results = await private_async_results.findAll({
+					include: [
+						{
+							model: sequelize.models.PrivateAsyncRaces,
 							as: 'race',
 							required: true,
 							where: condition,
@@ -406,7 +430,7 @@ async function get_past_races(sequelize, label, start, end, type, ranked) {
 				});
 			}
 
-			const all_races = [...my_async_results, ...my_race_results];
+			const all_races = [...my_async_results, ...my_private_async_results, ...my_race_results];
 			all_races.sort(function(a, b) {
 				if (a.race.EndDate != b.race.EndDate) return a.race.EndDate - b.race.EndDate;
 				if (a.race.Id != b.race.Id) return a.race.Id - b.race.Id;
