@@ -389,6 +389,16 @@ async function get_data_models(server, db_logging) {
 			allowNull: false,
 			defaultValue: 0,
 		},
+		// 0: invitado, 1: no invitado, 2: invitado con resultado, 3: no invitado con resultado
+		Status: {
+			type: DataTypes.INTEGER,
+			allowNull: false,
+			validate: {
+				min: 0,
+				max: 3,
+			},
+			defaultValue: 0,
+		},
 	});
 	private_async_results.belongsTo(private_async_races, { as: 'race', foreignKey: 'Race', onDelete: 'SET NULL' });
 	private_async_results.belongsTo(players, { as: 'player', foreignKey: 'Player', onDelete: 'SET NULL' });

@@ -1,7 +1,7 @@
 const glob = require('glob');
 const path = require('path');
 const { SlashCommandBuilder, SlashCommandStringOption } = require('@discordjs/builders');
-const { async_privada_crear, async_privada_terminar, async_privada_invitar, async_privada_desinvitar } = require('../racing/async_privada_util');
+const { async_privada_crear, async_privada_terminar, async_privada_invitar, async_privada_desinvitar, async_privada_resultados } = require('../racing/async_privada_util');
 
 
 const preset_files = glob.sync('rando-settings/**/*.json');
@@ -68,6 +68,10 @@ command.data = new SlashCommandBuilder()
 					.setRequired(true)))
 
 	.addSubcommand(subcommand =>
+		subcommand.setName('resultados')
+			.setDescription('Obtener resultados de la carrera asíncrona'))
+
+	.addSubcommand(subcommand =>
 		subcommand.setName('terminar')
 			.setDescription('Terminar la carrera asíncrona'));
 
@@ -85,6 +89,9 @@ command.execute = async function(interaction, db) {
 	}
 	else if (interaction.options.getSubcommand() == 'desinvitar') {
 		await async_privada_desinvitar(interaction, db);
+	}
+	else if (interaction.options.getSubcommand() == 'resultados') {
+		await async_privada_resultados(interaction, db);
 	}
 	else if (interaction.options.getSubcommand() == 'terminar') {
 		await async_privada_terminar(interaction, db);

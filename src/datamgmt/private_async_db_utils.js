@@ -1,4 +1,4 @@
-const { Sequelize, Model, where } = require('sequelize');
+const { Sequelize, Model, Op } = require('sequelize');
 
 
 /**
@@ -112,7 +112,7 @@ async function finish_private_async(sequelize, id) {
  * @summary Llamado al terminar una carrera asíncrona invitacional para contruir la tabla de resultados y actualizar el
  * ranking de jugadores, en el caso de que la carrera fuese puntuable.
  *
- * @description Obtiene los resultados de todos los jugadores en la carrera, en orden ascendiente de tiempos.
+ * @description Obtiene los resultados de todos los jugadores invitados a la carrera, en orden ascendiente de tiempos.
  *
  * @param {Sequelize} sequelize    Base de datos del servidor.
  * @param {string}    race_channel ID del hilo de Discord asociado a la carrera.
@@ -139,6 +139,11 @@ async function get_results_for_private_async(sequelize, race_channel) {
 						required: true,
 					},
 				],
+				where: {
+					Status: {
+						[Op.or]: [0, 2],
+					},
+				},
 				order: [
 					['Time', 'ASC'],
 					['Timestamp', 'ASC'],
@@ -212,7 +217,7 @@ async function get_player_private_async_result(sequelize, race_channel, player) 
  * @returns {[Model, null]} Array cuyo primer elemento es el modelo correspondiente al resultado de carrera
  * asíncrona registrado o actualizado.
  */
-async function save_private_async_result(sequelize, race, player, time, collection_rate) {
+async function save_private_async_result(sequelize, race, player, time, collection_rate, status) {
 	const async_results = sequelize.models.PrivateAsyncResults;
 	try {
 		return await sequelize.transaction(async (t) => {
@@ -222,6 +227,7 @@ async function save_private_async_result(sequelize, race, player, time, collecti
 				Timestamp: Math.floor(new Date().getTime() / 1000),
 				Time: time,
 				CollectionRate: collection_rate,
+				Status: status,
 			}, {
 				transaction: t,
 			});
@@ -232,39 +238,7 @@ async function save_private_async_result(sequelize, race, player, time, collecti
 	}
 }
 
-
-/**
- * @summary Invocado en las rutinas de los comandos /async_privada desinvitar
- *
- * @description Elimina el resultado enviado por un jugador en una carrera asíncrona privada.
- *
- * @param {Sequelize} sequelize       Base de datos del servidor.
- * @param {number}    race            ID en base de datos de la carrera para la que se elimina el resultado.
- * @param {string}    player          ID en Discord del jugador del que se elimina el resultado.
- *
- * @returns {number} Número de entradas de base de datos eliminadas.
- */
-async function delete_private_async_result(sequelize, race, player) {
-	const async_results = sequelize.models.PrivateAsyncResults;
-	try {
-		return await sequelize.transaction(async (t) => {
-			return await async_results.destroy(
-				{
-					where: {
-						Race: race,
-						Player: player,
-					},
-				}, {
-					transaction: t,
-				});
-		});
-	}
-	catch (error) {
-		console.log(error['message']);
-	}
-}
-
 module.exports = {
 	insert_private_async, get_private_async_by_channel, finish_private_async, get_results_for_private_async,
-	get_player_private_async_result, save_private_async_result, delete_private_async_result,
+	get_player_private_async_result, save_private_async_result,
 };

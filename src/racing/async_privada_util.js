@@ -1,13 +1,12 @@
 const { PermissionsBitField, EmbedBuilder, CommandInteraction, ChannelType } = require('discord.js');
 const { Sequelize, Model } = require('sequelize');
-const { get_results_for_async, get_async_by_submit, get_active_async_races, insert_async, update_async_status } = require('../datamgmt/async_db_utils');
 
-const { get_or_insert_player, get_global_var, set_async_history_channel, set_player_score_channel, set_async_submit_category } = require('../datamgmt/db_utils');
-const { get_async_results_text, get_async_data_embed, calculate_player_scores, get_player_ranking_text, get_reduced_async_data_embed, get_private_async_data_embed, get_reduced_private_async_data_embed } = require('./race_results_util');
+const { get_or_insert_player, get_global_var, set_async_history_channel, set_player_score_channel } = require('../datamgmt/db_utils');
+const { calculate_player_scores, get_player_ranking_text, get_private_async_data_embed, get_reduced_private_async_data_embed, get_private_async_results_text } = require('./race_results_util');
 const { seed_in_create_race } = require('./race_seed_util');
 
 const { random_words } = require('./async_util');
-const { insert_private_async, get_private_async_by_channel, finish_private_async, get_player_private_async_result, save_private_async_result, delete_private_async_result } = require('../datamgmt/private_async_db_utils');
+const { insert_private_async, get_private_async_by_channel, finish_private_async, get_player_private_async_result, save_private_async_result, get_results_for_private_async } = require('../datamgmt/private_async_db_utils');
 
 
 /**
@@ -26,7 +25,7 @@ async function cerrar_async_privada(interaction, db, race) {
 
 	// Copia de resultados al historial, si los hay
 	const submit_channel = await interaction.guild.channels.fetch(`${race.RaceChannel}`);
-	const results = await get_results_for_async(db, submit_channel.id);
+	const results = await get_results_for_private_async(db, submit_channel.id);
 
 	// Crear canal de historial si no existe
 	if (results && results.length > 1) {
@@ -52,8 +51,8 @@ async function cerrar_async_privada(interaction, db, race) {
 			await set_async_history_channel(db, my_hist_channel.id);
 		}
 
-		const results_text = await get_async_results_text(db, submit_channel.id);
-		const data_embed = await get_async_data_embed(db, submit_channel.id);
+		const results_text = await get_private_async_results_text(db, submit_channel.id);
+		const data_embed = await get_private_async_data_embed(db, submit_channel.id);
 		const hist_msg = await my_hist_channel.send({ content: results_text, embeds: [data_embed] });
 
 		// Actualización de puntuaciones si la carrera es ranked
@@ -92,8 +91,8 @@ async function cerrar_async_privada(interaction, db, race) {
 	}
 
 	// Archivar hilo de la carrera asíncrona.
-	await submit_channel.setArchived(true);
 	await submit_channel.setLocked(true);
+	await submit_channel.setArchived(true);
 }
 
 
@@ -182,8 +181,10 @@ async function async_privada_crear(interaction, db) {
 		Por favor, mantened este canal lo más limpio posible y SIN SPOILERS mientras no todos los jugadores terminen la carrera.`)
 		.setTimestamp();
 	if (ranked) {
-		instructions.addFields([{ name: 'Carrera asíncrona puntuable vinculante',
-			value: 'Para participar en esta carrera asíncrona debes introducir el comando `/jugar` en este canal. Al hacerlo tendrás acceso a los detalles de la partida.' }]);
+		instructions.addFields([{
+			name: 'Carrera asíncrona puntuable vinculante',
+			value: 'Para participar en esta carrera asíncrona debes introducir el comando `/jugar` en este canal. Al hacerlo tendrás acceso a los detalles de la partida.',
+		}]);
 	}
 	await race_channel.send({ embeds: [instructions] });
 
@@ -233,11 +234,16 @@ async function async_privada_invitar(interaction, db) {
 	}
 
 	const player_result = await get_player_private_async_result(db, race.RaceChannel, jugador.id);
-	if (player_result) {
+	if (player_result && (player_result.Status === 0 || player_result.Status === 2)) {
 		throw { 'message': 'Este jugador ya está invitado a la carrera.' };
 	}
 
-	await save_private_async_result(db, race.Id, jugador.id, 359999, 0);
+	if (!player_result) {
+		await save_private_async_result(db, race.Id, jugador.id, 359999, 0, 0);
+	}
+	else {
+		await save_private_async_result(db, player_result.Race, player_result.Player, player_result.Time, player_result.CollectionRate, player_result.Status - 1);
+	}
 	const race_channel = await interaction.guild.channels.fetch(`${race.RaceChannel}`);
 	if (jugador.id !== race.Creator) {
 		await race_channel.members.add(jugador.id);
@@ -289,7 +295,7 @@ async function async_privada_desinvitar(interaction, db) {
 		throw { 'message': 'Este jugador no está invitado a la carrera.' };
 	}
 
-	await delete_private_async_result(db, race.Id, jugador.id);
+	await save_private_async_result(db, player_result.Race, player_result.Player, player_result.Time, player_result.CollectionRate, player_result.Status + 1);
 	const race_channel = await interaction.guild.channels.fetch(`${race.RaceChannel}`);
 	if (jugador.id !== race.Creator) {
 		await race_channel.members.remove(jugador.id);
@@ -301,6 +307,41 @@ async function async_privada_desinvitar(interaction, db) {
 		.setDescription(`${jugador} ha sido eliminado de la carrera.`)
 		.setTimestamp();
 	await interaction.editReply({ embeds: [msg] });
+}
+
+
+/**
+ * @summary Invocado con /async_privada resultados.
+ *
+ * @description Obtiene los resultados provisionales de la carrera asíncrona privada. La respuesta solo es visible
+ * para el usuario que invocó el comando, y solo se mostrará si el jugador ha enviado un resultado.
+ *
+ * @param {CommandInteraction} interaction Interacción correspondiente al comando invocado.
+ * @param {Sequelize}          db          Base de datos del servidor en el que se invocó el comando.
+ */
+async function async_privada_resultados(interaction, db) {
+	await interaction.deferReply();
+
+	const race = await get_private_async_by_channel(db, interaction.channelId);
+	if (!race) {
+		throw { 'message': 'Este comando solo puede ser usado en canales de carreras asíncronas invitacionales.' };
+	}
+
+	await get_or_insert_player(db, interaction.user.id, interaction.user.username, interaction.user.discriminator, `${interaction.user}`);
+
+	const player_result = await get_player_private_async_result(db, race.RaceChannel, interaction.user.id);
+	if (!player_result || player_result.Status !== 2) {
+		const msg = new EmbedBuilder()
+			.setColor('#0099ff')
+			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
+			.setDescription('Para poder consultar los resultados de la carrera, debes estar invitado a la misma y haber enviado un resultado.')
+			.setTimestamp();
+		await interaction.editReply({ embeds: [msg], ephemeral: true });
+		return;
+	}
+
+	const results_text = await get_private_async_results_text(db, race.RaceChannel);
+	await interaction.editReply({ content: results_text, ephemeral: true });
 }
 
 
@@ -339,4 +380,4 @@ async function async_privada_terminar(interaction, db) {
 	cerrar_async_privada(interaction, db, race);
 }
 
-module.exports = { async_privada_crear, async_privada_invitar, async_privada_desinvitar, async_privada_terminar };
+module.exports = { async_privada_crear, async_privada_invitar, async_privada_desinvitar, async_privada_resultados, async_privada_terminar };

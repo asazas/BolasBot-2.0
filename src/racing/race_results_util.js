@@ -101,7 +101,7 @@ async function get_async_data_embed(db, submit_channel) {
 		data_embed.addFields([{ name: 'Descripción', value: my_async.Preset }]);
 	}
 	if (my_async.SeedUrl) {
-		data_embed.addFields([{ name: 'Seed', value:my_async.SeedUrl }]);
+		data_embed.addFields([{ name: 'Seed', value: my_async.SeedUrl }]);
 	}
 	if (my_async.SeedCode) {
 		data_embed.addFields([{ name: 'Hash', value: my_async.SeedCode }]);
@@ -185,6 +185,44 @@ async function get_race_data_embed(db, race_channel) {
 		data_embed.addFields([{ name: 'Hash', value: my_race.SeedCode }]);
 	}
 	return data_embed;
+}
+
+
+/**
+ * @summary Llamado como parte de la rutina de los comandos /async_privada crear, /async_privada terminar y /done (cuando se usa
+ * en carreras asíncronas invitacionales.)
+ *
+ * @description Genera una tabla formateada con los resultados ordenados de los jugadores de la carrera asíncrona privada,
+ * incluyendo posiciones, nombres, tiempos y tasas de colección de ítems.
+ *
+ * @param {Sequelize} db             Base de datos del servidor en el que se invocó el comando.
+ * @param {string}    race_channel   ID del hilo de envío de resultados de la carrera asíncrona invitacional.
+ *
+ * @returns {string} Tabla formateada de resultados, en forma de cadena de texto.
+ */
+async function get_private_async_results_text(db, race_channel) {
+	const results = await get_results_for_private_async(db, race_channel);
+	let msg = '```\n';
+	msg += '+' + '-'.repeat(41) + '+\n';
+	msg += '| Rk | Jugador           | Tiempo   | CR  |\n';
+
+	if (results) {
+		msg += '|' + '-'.repeat(41) + '|\n';
+		let pos = 1;
+		for (const res of results) {
+			const time_str = calcular_tiempo(res.Time);
+			const pos_str = ' '.repeat(2 - pos.toString().length) + pos.toString();
+			let pl_name = res.player.Name.substring(0, 17);
+			pl_name = pl_name + ' '.repeat(17 - pl_name.length);
+			let col_rate = res.CollectionRate.toString();
+			col_rate = ' '.repeat(3 - col_rate.length) + col_rate;
+			msg += `| ${pos_str} | ${pl_name} | ${time_str} | ${col_rate} |\n`;
+			pos += 1;
+		}
+		msg += '+' + '-'.repeat(41) + '+\n';
+		msg += '```';
+		return msg;
+	}
 }
 
 
@@ -423,6 +461,6 @@ async function calculate_player_scores(db, race_channel, type) {
 
 module.exports = {
 	calcular_tiempo, get_async_results_text, get_async_data_embed, get_reduced_async_data_embed, get_race_data_embed,
-	get_private_async_data_embed, get_reduced_private_async_data_embed, get_race_results_text, get_player_ranking_text,
-	calculate_score_change,	calculate_player_scores,
+	get_private_async_results_text, get_private_async_data_embed, get_reduced_private_async_data_embed, get_race_results_text,
+	get_player_ranking_text, calculate_score_change, calculate_player_scores,
 };
