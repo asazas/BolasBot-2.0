@@ -389,7 +389,7 @@ async function get_player_ranking_text(db) {
  */
 function calculate_score_change(my_player_score, other_player_score, result) {
 	// factor K, máximo cambio de puntos en un solo duelo
-	const K = 100;
+	const K = 60;
 	const diff_ratio = (other_player_score - my_player_score) / 400;
 	const my_expected = (1 + 10 ** diff_ratio) ** -1;
 	return K * (result - my_expected);
