@@ -69,7 +69,7 @@ module.exports = {
 			.addFields(
 				{ name: 'Jugador 1', value: `${p1}`, inline: true },
 				{ name: 'Jugador 2', value: `${p2}`, inline: true },
-				{ name: 'Fecha', value: `<t:${tstamp}> (<t:${tstamp}:R>)` },
+				{ name: 'Fecha', value: `<t:${tstamp}:F> (<t:${tstamp}:R>)` },
 			)
 			.setTimestamp();
 		if (desc) {
@@ -79,11 +79,6 @@ module.exports = {
 		const announce_msg = await announce_channel.send({ embeds: [announce_embed] });
 		await announce_msg.react('🎙️');
 
-		const response_embed = new EmbedBuilder()
-			.setColor('#0099ff')
-			.setAuthor({ name: interaction.client.user.username, iconURL: interaction.client.user.avatarURL() })
-			.setDescription('Se ha programado la carrera.')
-			.setTimestamp();
-		await interaction.editReply({ embeds: [response_embed] });
+		await interaction.editReply({ embeds: [announce_embed] });
 	},
 };
