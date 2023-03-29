@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { EmbedBuilder } = require('discord.js');
+const { EmbedBuilder, GuildScheduledEventEntityType, GuildScheduledEventPrivacyLevel } = require('discord.js');
 const { procesar_fecha } = require('../otros/fecha_util');
 const { sreServer, sreMatchChannel } = require('../../config.json');
 
@@ -78,6 +78,16 @@ module.exports = {
 		const announce_channel = await interaction.guild.channels.fetch(`${sreMatchChannel}`);
 		const announce_msg = await announce_channel.send({ embeds: [announce_embed] });
 		await announce_msg.react('🎙️');
+
+		await interaction.guild.scheduledEvents.create({
+			name: `${p1.username} vs. ${p2.username}`,
+			entityType: GuildScheduledEventEntityType.External,
+			privacyLevel: GuildScheduledEventPrivacyLevel.GuildOnly,
+			entityMetadata: { location: 'https://www.twitch.tv/speedrunsespanol' },
+			scheduledStartTime: tstamp * 1000,
+			scheduledEndTime: (tstamp + 7200) * 1000,
+			description: desc ? desc : '',
+		});
 
 		await interaction.editReply({ embeds: [announce_embed] });
 	},
