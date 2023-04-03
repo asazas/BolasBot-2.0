@@ -113,6 +113,9 @@ async function generate_alttpr(preset_data, extra) {
 		if (extra_params.includes('keys')) {
 			preset_data['settings']['dungeon_items'] = 'full';
 		}
+		if (extra_params.includes('espada')) {
+			preset_data['settings']['weapons'] = 'assured';
+		}
 		if (extra_params.includes('pseudobotas')) {
 			preset_data['settings']['pseudoboots'] = true;
 		}
@@ -235,6 +238,9 @@ async function generate_smz3(preset_data, extra, jugadores = 1, nombres = '') {
 		}
 		if (extra_params.includes('keys')) {
 			preset_data['settings']['keyshuffle'] = 'keysanity';
+		}
+		if (extra_params.includes('espada')) {
+			preset_data['settings']['swordlocation'] = 'uncle';
 		}
 	}
 	return await gaxios.request({ url: 'https://samus.link/api/randomizers/smz3/generate', method: 'POST', data: preset_data['settings'], retry: true });

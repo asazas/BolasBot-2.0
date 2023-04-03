@@ -32,8 +32,8 @@ for (const file of commandFiles) {
 }
 
 // Registrar presets de BolasBot (clasificarlos por randomizers para sugerencias de opciones extra)
-const all_extra = ['spoiler', 'noqs', 'pistas', 'ad', 'hard', 'keys', 'botas', 'pseudobotas', 'split'];
-const alttp_extra = ['spoiler', 'noqs', 'pistas', 'ad', 'hard', 'keys', 'botas', 'pseudobotas'];
+const all_extra = ['spoiler', 'noqs', 'pistas', 'ad', 'hard', 'keys', 'espada', 'botas', 'pseudobotas', 'split'];
+const alttp_extra = ['spoiler', 'noqs', 'pistas', 'ad', 'hard', 'keys', 'espada', 'botas', 'pseudobotas'];
 const presets_alttp = [];
 for (const file of glob.sync('rando-settings/alttp/*.json')) {
 	presets_alttp.push(path.basename(file, '.json'));
@@ -47,7 +47,7 @@ const presets_sm = [];
 for (const file of glob.sync('rando-settings/sm/*.json')) {
 	presets_sm.push(path.basename(file, '.json'));
 }
-const smz3_extra = ['spoiler', 'ad', 'hard', 'keys'];
+const smz3_extra = ['spoiler', 'ad', 'hard', 'keys', 'espada'];
 const presets_smz3 = [];
 for (const file of glob.sync('rando-settings/smz3/*.json')) {
 	presets_smz3.push(path.basename(file, '.json'));
