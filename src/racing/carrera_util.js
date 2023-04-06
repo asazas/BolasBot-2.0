@@ -29,8 +29,8 @@ async function cerrar_carrera(interaction, db, race) {
 	// Crear canal de historial si no existe
 	const global_var = await get_global_var(db);
 	let my_hist_channel = null;
-	if (global_var.RaceHistoryChannel) {
-		my_hist_channel = await interaction.guild.channels.fetch(`${global_var.RaceHistoryChannel}`);
+	if (global_var.AsyncHistoryChannel) {
+		my_hist_channel = await interaction.guild.channels.fetch(`${global_var.AsyncHistoryChannel}`);
 	}
 	if (!my_hist_channel) {
 		my_hist_channel = await interaction.guild.channels.create({

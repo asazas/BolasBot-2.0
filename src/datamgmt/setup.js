@@ -28,6 +28,7 @@ async function get_data_models(server, db_logging) {
 		AsyncSubmitCategory: {
 			type: DataTypes.TEXT,
 		},
+		// deprecated
 		RaceHistoryChannel: {
 			type: DataTypes.TEXT,
 		},
