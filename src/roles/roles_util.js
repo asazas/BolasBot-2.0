@@ -52,8 +52,7 @@ async function actualizar_mensaje_roles(cat_msg, roles_en_cat) {
 		}
 		desc += `${rol.EmojiName} : ${rol.Description}`;
 	}
-	const embed = cat_msg.embeds[0];
-	embed.setDescription(desc);
+	const embed = EmbedBuilder.from(cat_msg.embeds[0]).setDescription(desc);
 	await cat_msg.edit({ embeds: [embed] });
 }
 
