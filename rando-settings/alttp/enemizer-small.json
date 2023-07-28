@@ -1,0 +1,38 @@
+{
+  "randomizer": "alttp",
+  "goal_name": "enemizer small",
+  "customizer": false,
+  "description": "Modo open con enemigos randomizados pero jefes vanilla.",
+  "settings": {
+    "name": "enemizer small",
+    "notes": "Enemizer Small",
+    "allow_quickswap": true,
+    "goal": "ganon",
+    "item": {
+      "pool": "normal",
+      "functionality": "normal"
+    },
+    "lang": "es",
+    "mode": "open",
+    "hints": "off",
+    "weapons": "randomized",
+    "crystals": {
+      "ganon": "7",
+      "tower": "7"
+    },
+    "enemizer": {
+      "boss_shuffle": "none",
+      "enemy_damage": "default",
+      "enemy_health": "default",
+      "enemy_shuffle": "shuffled",
+      "pot_shuffle": "off"
+    },
+    "glitches": "none",
+    "spoilers": false,
+    "entrances": "none",
+    "tournament": true,
+    "accessibility": "items",
+    "dungeon_items": "standard",
+    "item_placement": "advanced"
+  }
+}
