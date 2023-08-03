@@ -24,14 +24,14 @@ module.exports = {
 
 		await interaction.deferReply();
 
-		const modo = interaction.options.getString('fecha');
+		const modo = interaction.options.getString('modo');
 		const spoiler = interaction.options.getBoolean('spoiler');
 		const spoiler_str = spoiler ? '-l' : '';
 
 		const rom_name = `${random_words[Math.floor(Math.random() * random_words.length)]}${random_words[Math.floor(Math.random() * random_words.length)]}`;
 
 		const tmp_dir = await exec('mktemp -d');
-		const tmp_dir_name = tmp_dir['stdout'];
+		const tmp_dir_name = tmp_dir['stdout'].trim();
 
 		await exec(`java -jar universal-pokemon-randomizer-zx.jar cli -s ZXsettings/standard.rnqs -i crystal-speedchoice-8.gbc -o "${tmp_dir_name}/${rom_name}_UPR.gbc" ${spoiler_str}`,
 			{ cwd: UPRPath });
@@ -40,7 +40,9 @@ module.exports = {
 
 
 		if (spoiler) {
-			await interaction.editReply({ files: [`${tmp_dir_name}/${rom_name}.gbc`, `${tmp_dir_name}/${rom_name}_UPR.gbc.log`, `${tmp_dir_name}/${rom_name}.gbc_SPOILER.txt`] });
+			await interaction.editReply({ files: [`${tmp_dir_name}/${rom_name}.gbc`,
+				{ attachment: `${tmp_dir_name}/${rom_name}_UPR.gbc.log`, name: `SPOILER_${tmp_dir_name}/${rom_name}_UPR.gbc.log` },
+				{ attachment: `${tmp_dir_name}/${rom_name}.gbc_SPOILER.txt`, name: `SPOILER_${tmp_dir_name}/${rom_name}_UPR.gbc.log` }] });
 		}
 		else {
 			await interaction.editReply({ files: [`${tmp_dir_name}/${rom_name}.gbc`] });
