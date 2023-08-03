@@ -34,6 +34,7 @@ module.exports = {
 		if (!rom_name) {
 			rom_name = `${random_words[Math.floor(Math.random() * random_words.length)]}${random_words[Math.floor(Math.random() * random_words.length)]}`;
 		}
+		rom_name = rom_name.substring(0, 50);
 
 		const tmp_dir = await exec('mktemp -d');
 		const tmp_dir_name = tmp_dir['stdout'].trim();
