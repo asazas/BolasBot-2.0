@@ -28,7 +28,7 @@ async function generate_upr(interaction, modo_upr, nombre, spoiler) {
 	if (spoiler) {
 		await interaction.editReply({
 			files: [`${tmp_dir_name}/${nombre}.gbc`,
-				{ attachment: `${tmp_dir_name}/${nombre}.gbc.log`, name: `SPOILER_${nombre}_UPR.gbc.log` }],
+				{ attachment: `${tmp_dir_name}/${nombre}.gbc.log`, name: `SPOILER_${nombre}.gbc.log` }],
 		});
 	}
 	else {
