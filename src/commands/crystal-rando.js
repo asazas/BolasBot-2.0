@@ -28,7 +28,7 @@ async function generate_upr(interaction, modo_upr, nombre, spoiler) {
 	if (spoiler) {
 		await interaction.editReply({
 			files: [`${tmp_dir_name}/${nombre}.gbc`,
-				{ attachment: `${tmp_dir_name}/${nombre}.gbc.log`, name: `SPOILER_${tmp_dir_name}/${nombre}.gbc.log` }],
+				{ attachment: `${tmp_dir_name}/${nombre}.gbc.log`, name: `SPOILER_${nombre}_UPR.gbc.log` }],
 		});
 	}
 	else {
@@ -64,8 +64,8 @@ async function generate_itemrando(interaction, modo_upr, modo_itemrando, nombre,
 	if (spoiler) {
 		await interaction.editReply({
 			files: [`${tmp_dir_name}/${nombre}.gbc`,
-				{ attachment: `${tmp_dir_name}/${nombre}_UPR.gbc.log`, name: `SPOILER_${tmp_dir_name}/${nombre}_UPR.gbc.log` },
-				{ attachment: `${tmp_dir_name}/${nombre}.gbc_SPOILER.txt`, name: `SPOILER_${tmp_dir_name}/${nombre}_UPR.gbc.log` }],
+				{ attachment: `${tmp_dir_name}/${nombre}_UPR.gbc.log`, name: `SPOILER_${nombre}_UPR.gbc.log` },
+				{ attachment: `${tmp_dir_name}/${nombre}.gbc_SPOILER.txt`, name: `SPOILER_${nombre}.gbc_SPOILER.txt` }],
 		});
 	}
 	else {
