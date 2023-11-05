@@ -42,7 +42,7 @@ module.exports = {
 				.setDescription('Descripción o información adicional que se desee proporcionar.')),
 
 	async execute(interaction) {
-		if (interaction.guildId != sreServer || interaction.guildId != bolasServer) {
+		if (interaction.guildId != sreServer && interaction.guildId != bolasServer) {
 			throw { 'message': 'Este comando no puede utilizarse en este servidor de Discord.' };
 		}
 
