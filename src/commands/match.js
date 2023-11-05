@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { EmbedBuilder, GuildScheduledEventEntityType, GuildScheduledEventPrivacyLevel } = require('discord.js');
 const { procesar_fecha } = require('../otros/fecha_util');
-const { sreServer, sreMatchChannel } = require('../../config.json');
+const { sreServer, sreMatchChannel, bolasServer, bolasMatchChannel } = require('../../config.json');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -42,7 +42,7 @@ module.exports = {
 				.setDescription('Descripción o información adicional que se desee proporcionar.')),
 
 	async execute(interaction) {
-		if (interaction.guildId != sreServer) {
+		if (interaction.guildId != sreServer || interaction.guildId != bolasServer) {
 			throw { 'message': 'Este comando no puede utilizarse en este servidor de Discord.' };
 		}
 
@@ -75,19 +75,39 @@ module.exports = {
 		if (desc) {
 			announce_embed.addFields({ name: 'Notas', value: `${desc}` });
 		}
-		const announce_channel = await interaction.guild.channels.fetch(`${sreMatchChannel}`);
+
+		let announce_channel; 
+		if (interaction.guildId == sreServer) {
+			announce_channel = await interaction.guild.channels.fetch(`${sreMatchChannel}`);
+		}
+		else {
+			announce_channel = await interaction.guild.channels.fetch(`${bolasMatchChannel}`);
+		}
 		const announce_msg = await announce_channel.send({ embeds: [announce_embed] });
 		await announce_msg.react('🎙️');
 
-		await interaction.guild.scheduledEvents.create({
-			name: `${p1.username} vs. ${p2.username}`,
-			entityType: GuildScheduledEventEntityType.External,
-			privacyLevel: GuildScheduledEventPrivacyLevel.GuildOnly,
-			entityMetadata: { location: 'https://www.twitch.tv/speedrunsespanol' },
-			scheduledStartTime: tstamp * 1000,
-			scheduledEndTime: (tstamp + 7200) * 1000,
-			description: desc ? desc : '',
-		});
+		if (interaction.guildId == sreServer) {
+			await interaction.guild.scheduledEvents.create({
+				name: `${p1.username} vs. ${p2.username}`,
+				entityType: GuildScheduledEventEntityType.External,
+				privacyLevel: GuildScheduledEventPrivacyLevel.GuildOnly,
+				entityMetadata: { location: 'https://www.twitch.tv/speedrunsespanol' },
+				scheduledStartTime: tstamp * 1000,
+				scheduledEndTime: (tstamp + 7200) * 1000,
+				description: desc ? desc : '',
+			});
+		}
+		else {
+			await interaction.guild.scheduledEvents.create({
+				name: `${p1.username} vs. ${p2.username}`,
+				entityType: GuildScheduledEventEntityType.External,
+				privacyLevel: GuildScheduledEventPrivacyLevel.GuildOnly,
+				entityMetadata: { location: 'https://www.twitch.tv/bolasazules' },
+				scheduledStartTime: tstamp * 1000,
+				scheduledEndTime: (tstamp + 7200) * 1000,
+				description: desc ? desc : '',
+			});
+		}
 
 		await interaction.editReply({ embeds: [announce_embed] });
 	},
